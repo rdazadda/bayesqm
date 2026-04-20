@@ -1,0 +1,46 @@
+Package: bayesqm
+Type: Package
+Title: Bayesian Q-Methodology Factor Analysis
+Version: 0.1.0
+Authors@R: person(
+    "Raymond", "Dacosta Azadda",
+    email = "dacostazadda@gmail.com",
+    role = c("aut", "cre"))
+Description: A Bayesian factor-analytic framework for Q methodology. Fits a
+    low-rank factor model to Q-sort data with a Student-t likelihood and a
+    hierarchical normal prior on loadings, samples the posterior with Stan,
+    resolves rotational ambiguity via MatchAlign post-processing, and returns
+    posterior summaries including credible intervals for loadings and factor
+    scores, probabilistic dominant-factor membership, distinguishing and
+    consensus statements, and PSIS-LOO-based factor enumeration.
+License: MIT + file LICENSE
+URL: https://github.com/rdazadda/bayesqm
+BugReports: https://github.com/rdazadda/bayesqm/issues
+Encoding: UTF-8
+Language: en-US
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Config/testthat/edition: 3
+Depends:
+    R (>= 4.1.0)
+Imports:
+    stats,
+    utils,
+    tools,
+    parallel,
+    rstantools (>= 2.3.0)
+Suggests:
+    cmdstanr (>= 0.8.0),
+    rstan (>= 2.32.0),
+    loo (>= 2.7.0),
+    GPArotation (>= 2024.3-1),
+    lpSolve,
+    readxl (>= 1.4.0),
+    jsonlite (>= 1.8.0),
+    posterior (>= 1.5.0),
+    ggplot2 (>= 3.4.0),
+    ggdist (>= 3.3.0),
+    knitr (>= 1.40),
+    rmarkdown (>= 2.20),
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
