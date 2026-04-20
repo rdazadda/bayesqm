@@ -14,7 +14,7 @@ Description: A Bayesian factor-analytic framework for Q methodology. Fits a
     scores, probabilistic dominant-factor membership, distinguishing and
     consensus statements, and PSIS-LOO-based factor enumeration.
 License: MIT + file LICENSE
-URL: https://github.com/rdazadda/bayesqm
+URL: https://github.com/rdazadda/bayesqm, https://rdazadda.github.io/bayesqm/
 BugReports: https://github.com/rdazadda/bayesqm/issues
 Encoding: UTF-8
 Language: en-US
