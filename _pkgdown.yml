@@ -118,6 +118,7 @@ reference:
   - title: "Simulation helpers"
     desc: "Data-generating functions and assessment utilities used in the paper."
     contents:
+      - demo_fit
       - generate_data
       - assess_recovery
       - tucker_congruence
