@@ -74,8 +74,8 @@ and convergence diagnostics.
 
 ## How it works
 
-`bayesqm` samples a low-rank Bayesian factor model with Stan — a
-Student-t likelihood by default, Normal optional — and resolves
+`bayesqm` samples a low-rank Bayesian factor model with Stan - a
+Student-t likelihood by default, Normal optional and resolves
 rotational, sign, and label-permutation ambiguity with MatchAlign
 post-processing. Every factor-analytic quantity is returned as
 posterior draws: loadings, z-scores, and hyperparameters all carry
