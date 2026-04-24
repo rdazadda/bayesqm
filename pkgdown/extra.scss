@@ -1,0 +1,101 @@
+/* -----------------------------------------------------------------
+   bayesqm custom theme
+   Palette sampled from the Kake demographics figure:
+     navy  #236192  (primary)
+     gold  #FFCD00  (accent)
+     plus orange, sky, green, pink for semantic roles
+   ----------------------------------------------------------------- */
+
+/* ---- palette ------------------------------------------------------ */
+$navy:   #236192;
+$gold:   #FFCD00;
+$orange: #DF6A2E;
+$sky:    #87D1E6;
+$green:  #71984A;
+$pink:   #F45197;
+
+/* ---- Bootstrap 5 semantic mappings ------------------------------- */
+$primary:   $navy;
+$secondary: $orange;
+$success:   $green;
+$info:      $sky;
+$warning:   $gold;
+$danger:    $pink;
+
+/* ---- links ------------------------------------------------------- */
+$link-color:       $navy;
+$link-hover-color: darken($navy, 10%);
+
+/* ---- navbar ------------------------------------------------------ */
+$navbar-bg:                      $navy;
+$navbar-dark-color:              rgba(white, 0.88);
+$navbar-dark-hover-color:        $gold;
+$navbar-dark-active-color:       $gold;
+$navbar-dark-brand-color:        white;
+
+/* ---- inline code + preformatted blocks --------------------------- */
+$code-color:      $navy;
+$code-bg:         rgba($sky, 0.18);
+$pre-bg:          #f7fafc;
+
+/* ---- headings ---------------------------------------------------- */
+$headings-color:       $navy;
+$headings-font-weight: 600;
+
+/* ---- tables ------------------------------------------------------ */
+$table-border-color: rgba($navy, 0.15);
+
+
+/* =================================================================
+   Post-variable rules (custom components)
+   ================================================================= */
+
+/* Reference index: gold underline on each section heading */
+#reference-index h2,
+.template-reference-index h2 {
+  border-bottom: 3px solid $gold;
+  padding-bottom: 0.35rem;
+  margin-top: 2rem;
+}
+
+/* Version pill in the navbar sidebar gets gold */
+.pkg-version {
+  color: $gold;
+  font-weight: 600;
+}
+
+/* Sidebar callout badges pop on navy */
+.page-header .badge {
+  background-color: $navy !important;
+  color: white !important;
+}
+
+/* Give code chunks a subtle navy left border */
+pre.sourceCode,
+div.sourceCode {
+  border-left: 3px solid rgba($navy, 0.35);
+}
+
+/* Hovered function cards on the reference page */
+.ref-index .details a:hover {
+  color: $navy;
+  text-decoration: underline;
+}
+
+/* Dark-mode overrides --------------------------------------------- */
+[data-bs-theme="dark"] {
+  --bs-primary:    #{lighten($navy, 18%)};
+  --bs-link-color: #{$sky};
+  --bs-code-color: #{$sky};
+  --bs-code-bg:    rgba(135, 209, 230, 0.10);
+
+  #reference-index h2,
+  .template-reference-index h2 {
+    border-bottom-color: #{$gold};
+  }
+
+  pre.sourceCode,
+  div.sourceCode {
+    border-left-color: #{rgba($sky, 0.4)};
+  }
+}

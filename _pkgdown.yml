@@ -1,4 +1,135 @@
 url: https://rdazadda.github.io/bayesqm/
+
 template:
   bootstrap: 5
+  light-switch: true
+  bslib:
+    primary:   "#236192"
+    secondary: "#DF6A2E"
+    success:   "#71984A"
+    info:      "#87D1E6"
+    warning:   "#FFCD00"
+    danger:    "#F45197"
+    base_font:    {google: "Inter"}
+    heading_font: {google: "Inter"}
+    code_font:    {google: "JetBrains Mono"}
 
+navbar:
+  structure:
+    left:  [intro, reference, news]
+    right: [search, github, lightswitch]
+  components:
+    intro:
+      text: "Get started"
+      href: articles/bayesqm-intro.html
+    reference:
+      text: "Reference"
+      href: reference/index.html
+    news:
+      text: "Changelog"
+      href: news/index.html
+    github:
+      icon: fa-github
+      href: https://github.com/rdazadda/bayesqm
+      aria-label: GitHub
+
+home:
+  sidebar:
+    structure: [links, citation, authors, license, dev]
+    components:
+      links:
+        title: "Links"
+        text: |
+          * [Report a bug](https://github.com/rdazadda/bayesqm/issues)
+
+reference:
+  - title: "Model fitting"
+    desc: >
+      The main entry points: fit a single Bayesian factor model, or fit
+      across a range of K under the peak-plus-Sivula protocol.
+    contents:
+      - fit_bayesian
+      - run_bayes
+      - matchalign
+
+  - title: "Posterior summaries"
+    desc: "Tidy summaries of loadings, factor z-scores, and scalar hyperparameters."
+    contents:
+      - compute_loadings
+      - compute_zscores
+      - compute_factor_array
+      - compute_posterior_scalars
+
+  - title: "Probabilistic factor membership"
+    desc: >
+      Posterior probabilities replacing the classical z-score tests and
+      Brown-threshold flags.
+    contents:
+      - compute_dominant_prob
+      - compute_threshold_prob
+      - compute_distinguishing_prob
+      - compute_consensus_prob
+      - classify_membership
+
+  - title: "Plots (base R)"
+    desc: >
+      Every view reads a quantity the fit already carries; no new
+      dependencies required.
+    contents:
+      - plot.bayesqm_fit
+      - plot_loading_posterior
+      - plot_zscore_posterior
+      - plot_membership
+      - plot_elpd
+      - plot_ppc
+      - plot_tucker
+      - plot_dist_cons
+      - plot_hyper
+
+  - title: "Plots (ggplot2 / ggdist adapter)"
+    desc: "ggplot2 + ggdist renderings of the same views."
+    contents:
+      - autoplot.bayesqm_fit
+      - autoplot.bayesqm_run
+
+  - title: "Theming and export"
+    desc: "Palette control, figure export, and ready-to-paste captions."
+    contents:
+      - bayesqm_colors
+      - save_bayesqm_plot
+      - caption_bayesqm
+      - rename_factors
+
+  - title: "Standard accessors for a bayesqm_fit"
+    desc: "`coef()`, `fitted()`, `residuals()`, and the rstantools generics."
+    contents:
+      - bayesqm-fit-accessors
+      - bayesqm-fit-methods
+      - posterior_interval.bayesqm_fit
+      - prior_summary.bayesqm_fit
+
+  - title: "Data: import and construction"
+    desc: "Readers for CSV/Excel/PQMethod/Ken-Q/KADE/HTMLQ and the `qsort_data` object."
+    contents:
+      - read_qsort
+      - import.pqmethod
+      - qsort_data
+      - qsort_data-methods
+
+  - title: "Simulation helpers"
+    desc: "Data-generating functions and assessment utilities used in the paper."
+    contents:
+      - generate_data
+      - assess_recovery
+      - tucker_congruence
+
+footer:
+  structure:
+    left:  [developed_by, built_with]
+    right: [package]
+  components:
+    package: "bayesqm &middot; CANHR, University of Alaska Fairbanks"
+
+authors:
+  Raymond Dacosta Azadda:
+    href: "https://github.com/rdazadda"
