@@ -33,22 +33,9 @@ navbar:
       aria-label: GitHub
 
 home:
-  title: "bayesqm: Bayesian Q-Methodology Factor Analysis in R"
-  description: >
-    A Bayesian factor-analytic framework for Q methodology. Credible
-    intervals on every quantity, probabilistic factor membership, and
-    PSIS-LOO-based factor enumeration.
   sidebar:
-    structure: [install, links, citation, authors, license, dev]
+    structure: [links, citation, authors, license, dev]
     components:
-      install:
-        title: "Install"
-        text: |
-          ```r
-          # install.packages("remotes")
-          remotes::install_github("rdazadda/bayesqm")
-          ```
-          Requires `cmdstanr` or `rstan`.
       links:
         title: "Links"
         text: |
@@ -146,10 +133,9 @@ reference:
 
 footer:
   structure:
-    left:  [developed_by, built_with, citation]
+    left:  [developed_by, built_with]
     right: [package]
   components:
-    citation: "Cite with `citation('bayesqm')`."
     package: "bayesqm &middot; CANHR, University of Alaska Fairbanks"
 
 authors:
