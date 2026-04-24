@@ -151,6 +151,8 @@ object.
 
 Data-generating functions and assessment utilities used in the paper.
 
+- [`demo_fit()`](https://rdazadda.github.io/bayesqm/reference/demo_fit.md)
+  : A synthetic bayesqm_fit for examples and tutorials
 - [`generate_data()`](https://rdazadda.github.io/bayesqm/reference/generate_data.md)
   [`generate_loadings()`](https://rdazadda.github.io/bayesqm/reference/generate_data.md)
   [`generate_noise()`](https://rdazadda.github.io/bayesqm/reference/generate_data.md)
