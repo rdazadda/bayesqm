@@ -1,7 +1,5 @@
 ---
 title: "Getting started with bayesqm"
-author: "Raymond Dacosta Azadda"
-date: "`r format(Sys.Date(), '%B %Y')`"
 output:
   rmarkdown::html_vignette:
     toc: true
