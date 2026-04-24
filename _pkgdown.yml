@@ -16,7 +16,7 @@ template:
 
 navbar:
   structure:
-    left:  [intro, reference, news]
+    left:  [intro, reference]
     right: [search, github, lightswitch]
   components:
     intro:
@@ -25,9 +25,6 @@ navbar:
     reference:
       text: "Reference"
       href: reference/index.html
-    news:
-      text: "Changelog"
-      href: news/index.html
     github:
       icon: fa-github
       href: https://github.com/rdazadda/bayesqm
