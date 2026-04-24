@@ -713,8 +713,8 @@ plot_hyper <- function(fit, pars = c("nu", "sigma", "tau"),
     graphics::mtext(p, side = 3, line = 2.6,
                     cex = 1.05, font = 2, col = cols$dark)
     graphics::mtext(
-      sprintf("median = %.3g    [%.3g,  %.3g]    %d%% CrI%s",
-              med, lo, hi, round(100 * prob), scale_note),
+      sprintf("median = %.3g;  %d%% CrI: [%.3g, %.3g]%s",
+              med, round(100 * prob), lo, hi, scale_note),
       side = 3, line = 1.0, cex = 0.78, col = "grey30")
   }
 
