@@ -46,12 +46,12 @@ run <- run_bayes(qdata, K_max = 5)
 plot_elpd(run)
 ```
 
-The `bayesqm_run` object reports both the peak K (the ELPD-optimal
-choice) and the Sivula K (the parsimony choice). When they agree, the
-data supports that K unambiguously. When they disagree, the gap itself
-is informative, and
+The `bayesqm_run` object adopts the ELPD peak as the chosen K and
+reports the Sivula K alongside as a parsimony diagnostic.
 [`run_bayes()`](https://rdazadda.github.io/bayesqm/reference/run_bayes.md)
-labels the case `agree`, `gap`, or `reversed` in the summary.
+labels the relationship between the two `agree`, `gap`, or `reversed`.
+The peak is always the adopted K; the label tells the reader how
+confidently the data discriminate between adjacent models.
 
 The richer visual views for a single fit are:
 
@@ -76,27 +76,28 @@ opens the right device from the file extension, and
 returns a ready-to-paste figure caption that reports K, N, J, chains,
 coverage probability, and convergence diagnostics.
 
-## Relationship to qmethod
+## How it works
 
-The output object deliberately parallels `qmethod`’s. The slot names
-(`$loa`, `$zsc`, `$zsc_n`, `$qdc`, `$f_char`, `$flagged`) are identical,
-as is the `$qdc$dist.and.cons` vocabulary (“Distinguishes all”,
-“Consensus”, “Distinguishes f1, f3”). Dotted import aliases
-([`import.pqmethod()`](https://rdazadda.github.io/bayesqm/reference/import-aliases.md),
-[`import.htmlq()`](https://rdazadda.github.io/bayesqm/reference/import-aliases.md),
-[`import.kenq()`](https://rdazadda.github.io/bayesqm/reference/import-aliases.md),
-[`import.easyhtmlq()`](https://rdazadda.github.io/bayesqm/reference/import-aliases.md))
-forward to the same-named readers. Scripts written against `qmethod` can
-usually be ported by changing one or two function calls.
+`bayesqm` samples a low-rank Bayesian factor model with Stan — a
+Student-t likelihood by default, Normal optional — and resolves
+rotational, sign, and label-permutation ambiguity with MatchAlign
+post-processing. Every factor-analytic quantity is returned as posterior
+draws: loadings, z-scores, and hyperparameters all carry credible
+intervals rather than point estimates. Participant flagging is the
+posterior probability that a factor is dominant for a given participant;
+distinguishing statements are scored by `P(|f_jk - f_jl| > δ)`; and the
+number of factors is chosen by the ELPD peak under a peak-plus-Sivula
+protocol built on PSIS-LOO.
 
-The methodology is different where it has to be. `qmethod` does centroid
-or PCA extraction, varimax rotation, Brown’s significance threshold for
-flagging, a z-score test for distinguishing statements, and scree or
-parallel analysis for choosing K. `bayesqm` replaces each of those with
-its Bayesian analogue: a factor model sampled with Stan, MatchAlign for
-rotational alignment, posterior dominance probability for flagging,
-`P(|f_jk - f_jl| > δ)` for distinguishing, and peak-plus-Sivula ELPD for
-K selection. Where the output shapes can be kept compatible, they are.
+The fit stores everything on a small set of named slots: `$loa` for
+posterior-mean loadings, `$ci_lower` / `$ci_upper` for credible
+intervals, `$zsc` and `$zsc_n` for continuous and forced-distribution
+factor scores, `$f_char` for factor characteristics, `$flagged` for the
+dominance logical, and `$qdc` for the distinguishing-statement table.
+Standard R accessors (`coef`, `fitted`, `residuals`, `sigma`,
+`as.matrix`, `plot`) dispatch on the object, and the draws are also
+exposed in a Stan-style matrix that `posterior` and `bayesplot` consume
+natively.
 
 ## Where to look next
 
