@@ -5,16 +5,18 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Bayesian Q-Methodology Factor Analysis • bayesqm</title>
+<title>bayesqm: Bayesian Q-Methodology Factor Analysis in R • bayesqm</title>
 <script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/Inter-0.4.10/font.css" rel="stylesheet">
 <link href="deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Bayesian Q-Methodology Factor Analysis">
-<meta name="description" content="A Bayesian factor-analytic framework for Q methodology. Fits a low-rank factor model to Q-sort data with a Student-t likelihood and a hierarchical normal prior on loadings, samples the posterior with Stan, resolves rotational ambiguity via MatchAlign post-processing, and returns posterior summaries including credible intervals for loadings and factor scores, probabilistic dominant-factor membership, distinguishing and consensus statements, and PSIS-LOO-based factor enumeration.">
-<meta property="og:description" content="A Bayesian factor-analytic framework for Q methodology. Fits a low-rank factor model to Q-sort data with a Student-t likelihood and a hierarchical normal prior on loadings, samples the posterior with Stan, resolves rotational ambiguity via MatchAlign post-processing, and returns posterior summaries including credible intervals for loadings and factor scores, probabilistic dominant-factor membership, distinguishing and consensus statements, and PSIS-LOO-based factor enumeration.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="bayesqm: Bayesian Q-Methodology Factor Analysis in R">
+<meta name="description" content="A Bayesian factor-analytic framework for Q methodology. Credible intervals on every quantity, probabilistic factor membership, and PSIS-LOO-based factor enumeration.
+">
+<meta property="og:description" content="A Bayesian factor-analytic framework for Q methodology. Credible intervals on every quantity, probabilistic factor membership, and PSIS-LOO-based factor enumeration.
+">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -119,10 +121,23 @@
 <p>Copyright © 2026 Raymond Dacosta Azadda. Released under the MIT license; see <a href="LICENSE">LICENSE</a> for the full text.</p>
 </div>
 </div>
-  </main><aside class="col-md-3"><div class="links">
+  </main><aside class="col-md-3"><div class="install">
+<h2 data-toc-skip>Install</h2>
+<ul class="list-unstyled">
+<li>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"rdazadda/bayesqm"</span><span class="op">)</span></span></code></pre></div>
+<p>Requires <code>cmdstanr</code> or <code>rstan</code>.</p>
+</li>
+</ul>
+</div>
+
+<div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><ul>
+<li><a href="https://github.com/rdazadda/bayesqm" class="external-link">Browse source</a></li>
 <li><a href="https://github.com/rdazadda/bayesqm/issues" class="external-link">Report a bug</a></li>
 </ul></li>
 </ul>
@@ -158,7 +173,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://github.com/rdazadda" class="external-link">Raymond Dacosta Azadda</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Developed by <a href="https://github.com/rdazadda" class="external-link">Raymond Dacosta Azadda</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. Cite with <code>citation('bayesqm')</code>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
