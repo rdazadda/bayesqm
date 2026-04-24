@@ -2,7 +2,8 @@
 
 ## Authors
 
-- **Raymond Dacosta Azadda**. Author, maintainer.
+- **[Raymond Dacosta Azadda](https://github.com/rdazadda)**. Author,
+  maintainer.
 
 ## Citation
 
