@@ -109,9 +109,6 @@ autoplot.bayesqm_run <- function(object, ...) {
 }
 
 
-# ---- internal autoplot helpers ----
-
-
 .autoplot_loadings <- function(fit) {
   .bq_need("ggdist")
   cols <- bayesqm_colors()

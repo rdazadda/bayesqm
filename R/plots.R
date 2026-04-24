@@ -12,9 +12,7 @@
 #     matched by multiple actual arguments" collisions.
 
 
-# ---- internal helpers ----
-# (.bq_col() lives in colors.R and reads from the active scheme)
-
+# Internal helpers. .bq_col() lives in colors.R and reads from the active scheme.
 
 .bq_dots <- function(dots, exclude) {
   dots[!(names(dots) %in% exclude)]
@@ -31,9 +29,6 @@
     list(override = FALSE, mfrow = cur)
   }
 }
-
-
-# ---- plot.bayesqm_fit ----
 
 
 #' Factor-score dotchart for a bayesqm_fit
@@ -123,9 +118,6 @@ plot.bayesqm_fit <- function(x, sort_by = 1L, prob = NULL,
 }
 
 
-# ---- plot_elpd ----
-
-
 #' ELPD across K with peak and Sivula annotations
 #'
 #' @description
@@ -191,9 +183,6 @@ plot_elpd <- function(run, ...) {
 
   invisible(run)
 }
-
-
-# ---- plot_membership ----
 
 
 #' Dominant-factor posterior-probability heatmap
@@ -279,9 +268,6 @@ plot_membership <- function(fit, sort = TRUE, ...) {
 }
 
 
-# ---- plot_ppc ----
-
-
 #' Posterior predictive check on the correlation-matrix RMSE
 #'
 #' @description
@@ -334,9 +320,6 @@ plot_ppc <- function(fit, breaks = 30, ...) {
 
   invisible(fit)
 }
-
-
-# ---- plot_loading_posterior ----
 
 
 #' Loading forest with 50 and 95 percent credible intervals
@@ -442,9 +425,6 @@ plot_loading_posterior <- function(fit, factors = NULL,
 }
 
 
-# ---- plot_zscore_posterior ----
-
-
 #' Per-statement factor-score posterior across factors
 #'
 #' @description
@@ -524,9 +504,6 @@ plot_zscore_posterior <- function(fit, statement, ...) {
 }
 
 
-# ---- plot_tucker ----
-
-
 #' MatchAlign Tucker's phi distribution by factor
 #'
 #' @description
@@ -592,9 +569,6 @@ plot_tucker <- function(fit, ...) {
 }
 
 
-# ---- plot_dist_cons ----
-
-
 #' Distinguishing-statement posterior-probability heatmap
 #'
 #' @description
@@ -653,9 +627,6 @@ plot_dist_cons <- function(fit, delta = 1.0, ...) {
 
   invisible(fit)
 }
-
-
-# ---- plot_hyper ----
 
 
 #' Hyperparameter posterior densities
