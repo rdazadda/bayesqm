@@ -40,6 +40,8 @@ jobs:
             any::rmarkdown
             any::ggplot2
             any::ggdist
+            any::ggridges
+            any::scales
             any::posterior
             any::loo
             local::.

@@ -34,6 +34,7 @@ without requiring Stan.
 
 ```{r, message = FALSE, warning = FALSE}
 library(bayesqm)
+library(ggplot2)
 ```
 
 ## The Q-sort data
@@ -155,12 +156,12 @@ run <- run_bayes(qdata, K_max = 4, seed = 1,
 For this vignette we use a synthetic run produced by `demo_run()`:
 
 ```{r}
-run <- demo_run(K_max = 4, k_peak = 3, k_sivula = 2, case = "gap")
+run <- demo_run(K_max = 5, k_peak = 3, k_sivula = 2, case = "gap")
 run
 ```
 
-```{r elpd, fig.cap = "ELPD across K. Solid = peak (automated choice). Dashed = Sivula."}
-plot_elpd(run)
+```{r elpd, fig.width = 7, fig.height = 4.2, fig.cap = "ΔELPD vs K = 1 with the Sivula rejection band (|ΔELPD| < 4). Red triangle marks the Sivula K, blue square the ELPD peak, orange diamond the K adopted by the analyst."}
+make_elpd_diff(run, adopted = 3)
 ```
 
 The `run$case` field labels this relationship. When both methods pick
@@ -193,8 +194,8 @@ Participant-level membership is probabilistic too.
 head(classify_membership(fit$Lambda_draws))
 ```
 
-```{r membership, fig.cap = "Dominant-factor posterior probability with tier strip."}
-plot_membership(fit)
+```{r membership, fig.width = 6.5, fig.height = 5.5, fig.cap = "Blue tiles = posterior probability that each factor is dominant for a given participant (values printed in each cell). The right column shows the overall assignment verdict on an orange-red scale."}
+make_dominant_panel(fit)
 ```
 
 ## Posterior predictive check

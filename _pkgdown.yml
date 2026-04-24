@@ -85,9 +85,15 @@ reference:
       - plot_dist_cons
       - plot_hyper
 
-  - title: "Plots (ggplot2 / ggdist adapter)"
-    desc: "ggplot2 + ggdist renderings of the same views."
+  - title: "Paper figure renderers (ggplot2)"
+    desc: >
+      Direct ports of the three main-text figures in the accompanying
+      paper: the ELPD curve, the dominant-factor panel, and the PPC
+      ridgeline. Also reachable through `ggplot2::autoplot()`.
     contents:
+      - make_elpd_diff
+      - make_dominant_panel
+      - make_ppc_ridge
       - autoplot.bayesqm_fit
       - autoplot.bayesqm_run
 

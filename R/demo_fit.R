@@ -1,17 +1,20 @@
-# Demo fit constructor: a reproducible synthetic bayesqm_fit that runs
-# everything downstream (summaries, plots, accessors) without needing a
-# Stan backend. Use it in examples, tutorials, and the package vignette;
-# it is NOT a substitute for fit_bayesian() on real data.
+# Demo fit constructors. Produce reproducible synthetic bayesqm_fit /
+# bayesqm_run objects with structure that *looks* like a real Q-sort
+# analysis when plotted: participants load predominantly on one factor,
+# some statements polarise the factors, some are consensus, and the
+# posterior spread is tight enough that credible intervals separate
+# from zero.
 
 
 #' A synthetic bayesqm_fit for examples and tutorials
 #'
 #' @description
-#' Returns a `bayesqm_fit` object built from pre-generated posterior
-#' draws, so every summary and plot function can run without a Stan
-#' backend. Use it for demonstrations, teaching materials, and the
-#' package vignette. It is not a substitute for [fit_bayesian()] on
-#' real data.
+#' Returns a `bayesqm_fit` with realistic Q-methodology structure:
+#' every participant has a dominant factor, roughly 40 percent of the
+#' statements polarise the factor pair, 10 percent are consensus, and
+#' the remainder are weakly partial. Use it for documentation,
+#' teaching materials, and the package vignette; it is not a
+#' substitute for [fit_bayesian()] on real data.
 #'
 #' @param N Number of participants.
 #' @param J Number of statements.
@@ -30,17 +33,61 @@
 demo_fit <- function(N = 20, J = 22, K = 2, Td = 400, seed = 1L) {
   set.seed(seed)
 
-  Lambda_draws <- array(rnorm(Td * N * K, sd = 0.35), c(Td, N, K))
+  # Loadings: each participant gets a primary factor with a clear
+  # positive loading, small random cross-loadings on the others.
+  Lambda_mean  <- matrix(0, N, K)
+  primary      <- ((seq_len(N) - 1L) %% K) + 1L
   for (i in seq_len(N)) {
-    k_dom <- ((i - 1L) %% K) + 1L
-    Lambda_draws[, i, k_dom] <- Lambda_draws[, i, k_dom] + 0.85
+    Lambda_mean[i, ]          <- runif(K, -0.15, 0.15)
+    Lambda_mean[i, primary[i]] <- runif(1, 0.55, 0.85)
   }
-  F_draws <- array(rnorm(Td * J * K), c(Td, J, K))
+  Lambda_draws <- array(0, c(Td, N, K))
+  for (i in seq_len(N)) for (k in seq_len(K)) {
+    Lambda_draws[, i, k] <- rnorm(Td, mean = Lambda_mean[i, k], sd = 0.08)
+  }
+
+  # Factor scores: mix of polarising, consensus, neutral, and partial
+  # statements so the distinguishing / consensus plots have signal.
+  F_mean <- matrix(0, J, K)
+  n_pole   <- max(round(0.40 * J), K)
+  n_cons   <- max(round(0.10 * J), 1L)
+  n_neut   <- max(round(0.10 * J), 1L)
+  n_part   <- J - n_pole - n_cons - n_neut
+
+  # Polarising: strongly positive on one factor, strongly negative on
+  # the others, cycled across the statements.
+  for (j in seq_len(n_pole)) {
+    kp <- ((j - 1L) %% K) + 1L
+    F_mean[j, ]   <- -1.3
+    F_mean[j, kp] <-  1.5
+  }
+  # Consensus: every factor agrees (roughly half positive, half negative).
+  for (j in seq_len(n_cons)) {
+    row <- n_pole + j
+    F_mean[row, ] <- if (j %% 2 == 0) 1.1 else -1.1
+  }
+  # Neutral: around zero on every factor.
+  for (j in seq_len(n_neut)) {
+    F_mean[n_pole + n_cons + j, ] <- runif(K, -0.25, 0.25)
+  }
+  # Partial: non-trivial differences but not extreme.
+  if (n_part > 0L) for (j in seq_len(n_part)) {
+    row <- n_pole + n_cons + n_neut + j
+    F_mean[row, ] <- runif(K, -0.9, 0.9)
+  }
+  # Shuffle so the plot rows are not artificially ordered by type.
+  stmt_ord        <- sample.int(J)
+  F_mean          <- F_mean[stmt_ord, , drop = FALSE]
+
+  F_draws <- array(0, c(Td, J, K))
+  for (j in seq_len(J)) for (k in seq_len(K)) {
+    F_draws[, j, k] <- rnorm(Td, mean = F_mean[j, k], sd = 0.22)
+  }
 
   distribution <- get_distribution(J)
-  L_mean <- apply(Lambda_draws, c(2, 3), mean); dim(L_mean) <- c(N, K)
-  F_mean <- apply(F_draws,      c(2, 3), mean); dim(F_mean) <- c(J, K)
-  Y_cont <- F_mean %*% t(L_mean) + matrix(rnorm(J * N, 0, 0.3), J, N)
+  L_hat <- apply(Lambda_draws, c(2, 3), mean); dim(L_hat) <- c(N, K)
+  F_hat <- apply(F_draws,      c(2, 3), mean); dim(F_hat) <- c(J, K)
+  Y_cont <- F_hat %*% t(L_hat) + matrix(rnorm(J * N, 0, 0.25), J, N)
   Y      <- discretize_to_grid(Y_cont, distribution)
   rownames(Y) <- paste0("S", seq_len(J))
   colnames(Y) <- paste0("P", seq_len(N))
@@ -79,7 +126,9 @@ demo_fit <- function(N = 20, J = 22, K = 2, Td = 400, seed = 1L) {
     ci_hi        = ci_hi,
     Lambda_draws = Lambda_draws,
     F_draws      = F_draws,
-    align_info   = list(congruence = matrix(0.96, Td, K), pivot = 1L),
+    align_info   = list(congruence = matrix(rbeta(Td * K, 85, 5),
+                                            Td, K),
+                        pivot = 1L),
     hyperparams  = list(
       nu    = abs(rnorm(Td, 20, 4)),
       sigma = abs(rnorm(Td, 0.5, 0.08)),
@@ -123,9 +172,7 @@ demo_run <- function(K_max = 4L, k_peak = 3L, k_sivula = 2L,
   case <- match.arg(case)
   set.seed(seed)
 
-  K <- seq_len(K_max)
-  # Build an ELPD curve that peaks at k_peak, gently declining on each
-  # side, with a plausible decreasing SE as K grows.
+  K    <- seq_len(K_max)
   elpd <- -abs(K - k_peak) ^ 1.3 * 6 - 165 + rnorm(K_max, 0, 0.5)
   se   <- seq(8, 5, length.out = K_max)
 
