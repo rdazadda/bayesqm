@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:paulbuerkner.com)",
+      "WebFetch(domain:easystats.github.io)",
+      "WebFetch(domain:www.tidymodels.org)",
+      "WebFetch(domain:mc-stan.org)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:rdazadda.github.io)"
+    ]
+  }
+}
