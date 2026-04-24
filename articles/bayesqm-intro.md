@@ -80,7 +80,7 @@ fit
 #>   Data:      N = 20 persons, J = 22 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-04-24 21:09:47
+#>   Fitted:    2026-04-24 21:26:03
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
@@ -220,12 +220,43 @@ fits the model for each K in a range and applies the
 **peak-plus-Sivula** protocol: the ELPD peak is the automated choice;
 the Sivula (2025) parsimony rule is reported alongside.
 
+On real data you would call:
+
 ``` r
 run <- run_bayes(qdata, K_max = 4, seed = 1,
                  chains = 2, iter = 1500, warmup = 800)
+```
+
+For this vignette we use a synthetic run produced by
+[`demo_run()`](https://rdazadda.github.io/bayesqm/reference/demo_run.md):
+
+``` r
+run <- demo_run(K_max = 4, k_peak = 3, k_sivula = 2, case = "gap")
 run
+#> Bayesian Q-methodology: multi-K comparison
+#>   K range:      1..4
+#>   ELPD peak:    K = 3  (automated adoption)
+#>   Sivula rule:  K = 2  (parsimony diagnostic)
+#>   Case:         gap  (ELPD peak > Sivula (weak discrimination between adjacent models))
+#> 
+#> LOO comparison:
+#>  K    elpd   se delta_elpd se_delta ratio
+#>  1 -180.09 8.00                          
+#>  2 -170.91 7.00      -9.18     3.00  3.06
+#>  3 -165.42 6.00      -5.49     3.00  1.83
+#>  4 -170.20 5.00       4.78     3.00  1.59
+#> 
+#> Case 'gap': adopt k_peak if corroborated by external evidence, else fall back to k_sivula for parsimony.
+```
+
+``` r
 plot_elpd(run)
 ```
+
+![ELPD across K. Solid = peak (automated choice). Dashed =
+Sivula.](bayesqm-intro_files/figure-html/elpd-1.png)
+
+ELPD across K. Solid = peak (automated choice). Dashed = Sivula.
 
 The `run$case` field labels this relationship. When both methods pick
 the same K, the case is `agree` and the data supports that K
@@ -340,7 +371,7 @@ fit2 <- rename_factors(fit, c("tradition", "innovation"))
 plot(fit2)
 ```
 
-![](bayesqm-intro_files/figure-html/unnamed-chunk-12-1.png)
+![](bayesqm-intro_files/figure-html/unnamed-chunk-13-1.png)
 
 Every plot reads its palette through
 [`bayesqm_colors()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-colors.md);
