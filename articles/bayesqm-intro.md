@@ -81,7 +81,7 @@ fit
 #>   Data:      N = 20 persons, J = 22 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-04-24 21:50:45
+#>   Fitted:    2026-04-24 22:11:48
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
@@ -264,14 +264,17 @@ analyst.](bayesqm-intro_files/figure-html/elpd-1.png)
 triangle marks the Sivula K, blue square the ELPD peak, orange diamond
 the K adopted by the analyst.
 
-The `run$case` field labels this relationship. When both methods pick
-the same K, the case is `agree` and the data supports that K
-unambiguously. When the ELPD peak exceeds the Sivula choice, the case is
-`gap`: the richer model fits a bit better on LOO but not decisively, and
-the choice between them should turn on substantive evidence. When Sivula
-picks a larger K than the peak (`reversed`), something has usually gone
-wrong in the ELPD comparison itself; this case is rare in practice and
-should not be read as a substantive finding.
+The ELPD peak is always the adopted K; Sivula is reported alongside so
+readers can see how confidently the data discriminate between adjacent
+models. The `run$case` field labels the relationship between the two.
+When Sivula lands on the same K as the peak, the case is `agree` and the
+decision is unambiguous. When Sivula points to a smaller K than the
+peak, the case is `gap` — the peak is still adopted, but Sivula is
+flagging that the marginal evidence for the extra factor is not
+decisive, and that gap itself is worth reporting. The `reversed` case,
+in which Sivula exceeds the peak, is rare and usually indicates
+numerical instability in the ELPD comparison rather than a substantive
+finding.
 
 ## Distinguishing, consensus, and membership
 
@@ -372,20 +375,11 @@ Standard R accessors work on the fit (`coef`, `fitted`, `residuals`,
 Stan-style draws matrix that `posterior` and `bayesplot` consume
 natively.
 
-## Renaming factors and theming
-
-Substantive factor labels replace `f1..fK` in every slot:
-
-``` r
-fit2 <- rename_factors(fit, c("tradition", "innovation"))
-plot(fit2)
-```
-
-![](bayesqm-intro_files/figure-html/unnamed-chunk-13-1.png)
+## Theming
 
 Every plot reads its palette through
-[`bayesqm_colors()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-colors.md);
-switch the scheme once and every subsequent plot follows:
+[`bayesqm_colors()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-colors.md).
+Switch the scheme once and every subsequent base-R plot follows:
 
 ``` r
 bayesqm_set_colors("teal")   # "blue" (default), "red", "purple", "grey"
@@ -400,6 +394,8 @@ bayesqm_set_colors("blue")
 - [`?run_bayes`](https://rdazadda.github.io/bayesqm/reference/run_bayes.md)
   — peak-plus-Sivula thresholds
 - `?bayesqm-membership` — the full set of membership summaries
+- [`?rename_factors`](https://rdazadda.github.io/bayesqm/reference/rename_factors.md)
+  — relabel `f1..fK` with substantive factor names
 - [`ggplot2::autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
   — ggplot2 / ggdist versions of every view above, when `ggplot2` and
   `ggdist` are installed
