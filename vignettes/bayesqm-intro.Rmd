@@ -164,15 +164,17 @@ run
 make_elpd_diff(run, adopted = 3)
 ```
 
-The `run$case` field labels this relationship. When both methods pick
-the same K, the case is `agree` and the data supports that K
-unambiguously. When the ELPD peak exceeds the Sivula choice, the case
-is `gap`: the richer model fits a bit better on LOO but not
-decisively, and the choice between them should turn on substantive
-evidence. When Sivula picks a larger K than the peak (`reversed`),
-something has usually gone wrong in the ELPD comparison itself; this
-case is rare in practice and should not be read as a substantive
-finding.
+The ELPD peak is always the adopted K; Sivula is reported alongside
+so readers can see how confidently the data discriminate between
+adjacent models. The `run$case` field labels the relationship between
+the two. When Sivula lands on the same K as the peak, the case is
+`agree` and the decision is unambiguous. When Sivula points to a
+smaller K than the peak, the case is `gap` — the peak is still
+adopted, but Sivula is flagging that the marginal evidence for the
+extra factor is not decisive, and that gap itself is worth reporting.
+The `reversed` case, in which Sivula exceeds the peak, is rare and
+usually indicates numerical instability in the ELPD comparison rather
+than a substantive finding.
 
 ## Distinguishing, consensus, and membership
 
@@ -238,17 +240,10 @@ Standard R accessors work on the fit (`coef`, `fitted`, `residuals`,
 Stan-style draws matrix that `posterior` and `bayesplot` consume
 natively.
 
-## Renaming factors and theming
+## Theming
 
-Substantive factor labels replace `f1..fK` in every slot:
-
-```{r}
-fit2 <- rename_factors(fit, c("tradition", "innovation"))
-plot(fit2)
-```
-
-Every plot reads its palette through `bayesqm_colors()`; switch the
-scheme once and every subsequent plot follows:
+Every plot reads its palette through `bayesqm_colors()`. Switch the
+scheme once and every subsequent base-R plot follows:
 
 ```{r, eval = FALSE}
 bayesqm_set_colors("teal")   # "blue" (default), "red", "purple", "grey"
@@ -261,5 +256,6 @@ bayesqm_set_colors("blue")
 - `?fit_bayesian` — every prior and sampler option
 - `?run_bayes` — peak-plus-Sivula thresholds
 - `?bayesqm-membership` — the full set of membership summaries
+- `?rename_factors` — relabel `f1..fK` with substantive factor names
 - `ggplot2::autoplot()` — ggplot2 / ggdist versions of every view
   above, when `ggplot2` and `ggdist` are installed

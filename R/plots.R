@@ -666,7 +666,8 @@ plot_hyper <- function(fit, pars = c("nu", "sigma", "tau"),
     stop("No non-empty hyperparameter draws to plot.")
 
   old_par <- graphics::par(mfrow = c(1, length(avail)),
-                           mar = c(5, 4, 3, 1))
+                           mar  = c(5, 4.5, 5, 2.5),
+                           oma  = c(0, 0, 1, 0))
   on.exit(graphics::par(old_par), add = TRUE)
 
   dots <- .bq_dots(list(...),
@@ -682,9 +683,6 @@ plot_hyper <- function(fit, pars = c("nu", "sigma", "tau"),
     else
       identical(log, "x")
 
-    # Compute density in the right space. On log-x, we estimate density
-    # on log(v); the x positions are then exp(d$x), so polygon / line
-    # points sit correctly on the log-scaled axis.
     bw <- if (use_log) "SJ" else "nrd0"
     d_raw <- stats::density(if (use_log) log(v) else v, bw = bw)
     d_x <- if (use_log) exp(d_raw$x) else d_raw$x
@@ -696,28 +694,28 @@ plot_hyper <- function(fit, pars = c("nu", "sigma", "tau"),
 
     do.call(plot, c(
       list(x = d_x, y = d_y, type = "n",
-           log = if (use_log) "x" else "",
-           main = p, xlab = p, ylab = "Posterior density"),
+           log  = if (use_log) "x" else "",
+           main = "", xlab = "", ylab = "Posterior density"),
       dots))
 
-    # Full density (light shade).
     graphics::polygon(c(d_x[1], d_x, d_x[length(d_x)]),
                       c(0,      d_y, 0),
                       col = cols$light, border = NA)
-    # CrI band (mid shade).
     in_band <- d_x >= lo & d_x <= hi
     graphics::polygon(c(lo, d_x[in_band], hi),
                       c(0,  d_y[in_band], 0),
                       col = cols$fill, border = NA)
     graphics::lines(d_x, d_y, lwd = 1.4, col = cols$dark)
-    # Median: short tick at the baseline.
     y_tick <- -0.02 * max(d_y)
     graphics::segments(med, 0, med, y_tick, lwd = 2, col = cols$dark)
 
     scale_note <- if (use_log) "  (log x)" else ""
-    graphics::mtext(sprintf("median %.3g   (%d%% CrI %.3g, %.3g)%s",
-                            med, round(100 * prob), lo, hi, scale_note),
-                    side = 3, line = 0.2, cex = 0.78)
+    graphics::mtext(p, side = 3, line = 2.6,
+                    cex = 1.05, font = 2, col = cols$dark)
+    graphics::mtext(
+      sprintf("median = %.3g    [%.3g,  %.3g]    %d%% CrI%s",
+              med, lo, hi, round(100 * prob), scale_note),
+      side = 3, line = 1.0, cex = 0.78, col = "grey30")
   }
 
   invisible(fit)
