@@ -14,6 +14,7 @@ so every plot and summary below renders without requiring Stan.
 
 ``` r
 library(bayesqm)
+library(ggplot2)
 ```
 
 ## The Q-sort data
@@ -80,30 +81,30 @@ fit
 #>   Data:      N = 20 persons, J = 22 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-04-24 21:26:03
+#>   Fitted:    2026-04-24 21:50:45
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
 #> 
 #> Factor loadings (posterior median [95% CI], first 10 of 20 persons):
 #>     f1                  f2                 
-#> P1  0.84 [0.18, 1.51]   -0.01 [-0.74, 0.70]
-#> P2  -0.04 [-0.77, 0.69] 0.81 [0.13, 1.47]  
-#> P3  0.84 [0.12, 1.58]   0.03 [-0.63, 0.64] 
-#> P4  -0.00 [-0.67, 0.72] 0.86 [0.19, 1.61]  
-#> P5  0.84 [0.11, 1.57]   -0.01 [-0.68, 0.54]
-#> P6  -0.03 [-0.71, 0.72] 0.84 [0.20, 1.45]  
-#> P7  0.85 [0.16, 1.49]   -0.01 [-0.63, 0.64]
-#> P8  0.04 [-0.74, 0.73]  0.85 [0.15, 1.50]  
-#> P9  0.86 [0.14, 1.57]   -0.02 [-0.65, 0.71]
-#> P10 -0.03 [-0.76, 0.65] 0.82 [0.18, 1.52]  
+#> P1  0.72 [0.57, 0.87]   -0.04 [-0.22, 0.12]
+#> P2  0.12 [-0.04, 0.29]  0.82 [0.67, 0.98]  
+#> P3  0.73 [0.57, 0.91]   0.04 [-0.11, 0.21] 
+#> P4  -0.13 [-0.30, 0.01] 0.61 [0.44, 0.77]  
+#> P5  0.78 [0.62, 0.95]   -0.04 [-0.21, 0.11]
+#> P6  0.00 [-0.16, 0.16]  0.85 [0.70, 1.00]  
+#> P7  0.82 [0.69, 0.98]   0.08 [-0.07, 0.24] 
+#> P8  -0.09 [-0.25, 0.07] 0.58 [0.43, 0.77]  
+#> P9  0.56 [0.40, 0.72]   -0.04 [-0.21, 0.09]
+#> P10 -0.03 [-0.21, 0.11] 0.65 [0.50, 0.82]  
 #>   ... (10 more; see fit$loa_median / fit$ci_lower / fit$ci_upper)
 #> 
 #> Hyperparameters:
 #>  parameter mean median    sd lower upper
-#>         nu 20.0  19.89 3.875 12.62 27.61
-#>      sigma  0.5   0.49 0.081  0.36  0.66
-#>        tau  0.5   0.50 0.075  0.35  0.63
+#>         nu 19.7  19.68 3.709 12.24 26.49
+#>      sigma  0.5   0.51 0.078  0.36  0.65
+#>        tau  0.5   0.50 0.080  0.35  0.66
 #> 
 #> Use summary() for factor characteristics, distinguishing/consensus tables, and LOO.
 ```
@@ -168,20 +169,20 @@ The same information as a tidy data frame:
 
 ``` r
 head(compute_loadings(fit$Lambda_draws, prob = 0.95))
-#>   participant        f1_loa   f1_lower  f1_upper       f2_loa   f2_lower
-#> 1          P1  0.8633310349  0.1777652 1.5113499 -0.009803544 -0.7354845
-#> 2          P2 -0.0247606073 -0.7710033 0.6903140  0.820933826  0.1319667
-#> 3          P3  0.8370409716  0.1173374 1.5761078  0.021666685 -0.6254377
-#> 4          P4  0.0112271359 -0.6681498 0.7150664  0.859657693  0.1945868
-#> 5          P5  0.8387401685  0.1094005 1.5680236 -0.003677494 -0.6826606
-#> 6          P6 -0.0005321719 -0.7084376 0.7158515  0.852505282  0.1978190
+#>   participant       f1_loa   f1_lower   f1_upper      f2_loa   f2_lower
+#> 1          P1  0.724465890  0.5694408 0.87365976 -0.04467776 -0.2181482
+#> 2          P2  0.121618928 -0.0448359 0.28842984  0.82020002  0.6659145
+#> 3          P3  0.735303416  0.5696475 0.90862653  0.04951714 -0.1133779
+#> 4          P4 -0.131067733 -0.2999218 0.01401073  0.61150829  0.4357542
+#> 5          P5  0.783273983  0.6190436 0.94517785 -0.04072197 -0.2082932
+#> 6          P6 -0.001107792 -0.1624583 0.16479837  0.84841154  0.6952639
 #>    f2_upper
-#> 1 0.7007115
-#> 2 1.4739589
-#> 3 0.6360293
-#> 4 1.6134702
-#> 5 0.5440355
-#> 6 1.4452263
+#> 1 0.1218140
+#> 2 0.9811106
+#> 3 0.2096828
+#> 4 0.7695044
+#> 5 0.1125100
+#> 6 1.0021064
 ```
 
 ## Factor z-scores
@@ -231,10 +232,10 @@ For this vignette we use a synthetic run produced by
 [`demo_run()`](https://rdazadda.github.io/bayesqm/reference/demo_run.md):
 
 ``` r
-run <- demo_run(K_max = 4, k_peak = 3, k_sivula = 2, case = "gap")
+run <- demo_run(K_max = 5, k_peak = 3, k_sivula = 2, case = "gap")
 run
 #> Bayesian Q-methodology: multi-K comparison
-#>   K range:      1..4
+#>   K range:      1..5
 #>   ELPD peak:    K = 3  (automated adoption)
 #>   Sivula rule:  K = 2  (parsimony diagnostic)
 #>   Case:         gap  (ELPD peak > Sivula (weak discrimination between adjacent models))
@@ -242,21 +243,26 @@ run
 #> LOO comparison:
 #>  K    elpd   se delta_elpd se_delta ratio
 #>  1 -180.09 8.00                          
-#>  2 -170.91 7.00      -9.18     3.00  3.06
-#>  3 -165.42 6.00      -5.49     3.00  1.83
-#>  4 -170.20 5.00       4.78     3.00  1.59
+#>  2 -170.91 7.25      -9.18     3.00  3.06
+#>  3 -165.42 6.50      -5.49     3.00  1.83
+#>  4 -170.20 5.75       4.78     3.00  1.59
+#>  5 -179.61 5.00       9.41     3.00  3.14
 #> 
 #> Case 'gap': adopt k_peak if corroborated by external evidence, else fall back to k_sivula for parsimony.
 ```
 
 ``` r
-plot_elpd(run)
+make_elpd_diff(run, adopted = 3)
 ```
 
-![ELPD across K. Solid = peak (automated choice). Dashed =
-Sivula.](bayesqm-intro_files/figure-html/elpd-1.png)
+![ΔELPD vs K = 1 with the Sivula rejection band (\|ΔELPD\| \< 4). Red
+triangle marks the Sivula K, blue square the ELPD peak, orange diamond
+the K adopted by the
+analyst.](bayesqm-intro_files/figure-html/elpd-1.png)
 
-ELPD across K. Solid = peak (automated choice). Dashed = Sivula.
+ΔELPD vs K = 1 with the Sivula rejection band (\|ΔELPD\| \< 4). Red
+triangle marks the Sivula K, blue square the ELPD peak, orange diamond
+the K adopted by the analyst.
 
 The `run$case` field labels this relationship. When both methods pick
 the same K, the case is `agree` and the data supports that K
@@ -293,22 +299,26 @@ turns posterior dominance into a `Strong / Moderate / Weak` tier:
 ``` r
 head(classify_membership(fit$Lambda_draws))
 #>   participant dominant_factor dominant_label max_prob   tier
-#> 1          P1               1             f1   0.9300 Strong
-#> 2          P2               2             f2   0.9025 Strong
-#> 3          P3               1             f1   0.9075 Strong
-#> 4          P4               2             f2   0.9375 Strong
-#> 5          P5               1             f1   0.8925 Strong
-#> 6          P6               2             f2   0.9375 Strong
+#> 1          P1               1             f1        1 Strong
+#> 2          P2               2             f2        1 Strong
+#> 3          P3               1             f1        1 Strong
+#> 4          P4               2             f2        1 Strong
+#> 5          P5               1             f1        1 Strong
+#> 6          P6               2             f2        1 Strong
 ```
 
 ``` r
-plot_membership(fit)
+make_dominant_panel(fit)
 ```
 
-![Dominant-factor posterior probability with tier
-strip.](bayesqm-intro_files/figure-html/membership-1.png)
+![Blue tiles = posterior probability that each factor is dominant for a
+given participant (values printed in each cell). The right column shows
+the overall assignment verdict on an orange-red
+scale.](bayesqm-intro_files/figure-html/membership-1.png)
 
-Dominant-factor posterior probability with tier strip.
+Blue tiles = posterior probability that each factor is dominant for a
+given participant (values printed in each cell). The right column shows
+the overall assignment verdict on an orange-red scale.
 
 ## Posterior predictive check
 

@@ -25,6 +25,9 @@
 <url><loc>https://rdazadda.github.io/bayesqm/reference/generate_data.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/import-aliases.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/index.html</loc></url>
+<url><loc>https://rdazadda.github.io/bayesqm/reference/make_dominant_panel.html</loc></url>
+<url><loc>https://rdazadda.github.io/bayesqm/reference/make_elpd_diff.html</loc></url>
+<url><loc>https://rdazadda.github.io/bayesqm/reference/make_ppc_ridge.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/matchalign.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/plot.bayesqm_fit.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/plot_dist_cons.html</loc></url>

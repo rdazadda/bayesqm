@@ -53,24 +53,26 @@ summary(fit)
 #>   Data:      N = 12 persons, J = 15 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-04-24 21:25:58
+#>   Fitted:    2026-04-24 21:50:39
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
 #> 
 #> Factor characteristics:
 #>    nload eigenvals expl_var
-#> f1     6     4.349    36.24
-#> f2     6     4.212    35.10
+#> f1     6     3.204    26.70
+#> f2     6     3.122    26.01
 #> 
 #> Hyperparameters (posterior summary):
 #>  parameter   mean median     sd  lower  upper
-#>         nu 19.784 19.926 3.7919 11.789 26.876
-#>      sigma  0.499  0.502 0.0804  0.340  0.655
-#>        tau  0.505  0.505 0.0828  0.343  0.665
+#>         nu 20.233 20.246 4.2205 12.144 28.767
+#>      sigma  0.498  0.500 0.0786  0.345  0.646
+#>        tau  0.507  0.511 0.0820  0.358  0.660
 #> 
 #> Distinguishing / consensus statements (delta = 1.0, p > 0.95):
+#>   Consensus                6
+#>   Distinguishes all        6
 #> 
 #> MatchAlign diagnostics (mean Tucker phi per factor):
-#>   f1 = 0.960  f2 = 0.960  
+#>   f1 = 0.943  f2 = 0.945  
 ```
