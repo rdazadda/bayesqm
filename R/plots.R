@@ -666,7 +666,7 @@ plot_hyper <- function(fit, pars = c("nu", "sigma", "tau"),
     stop("No non-empty hyperparameter draws to plot.")
 
   old_par <- graphics::par(mfrow = c(1, length(avail)),
-                           mar  = c(5, 4.5, 5, 2.5),
+                           mar  = c(5, 4.5, 6, 2.5),
                            oma  = c(0, 0, 1, 0))
   on.exit(graphics::par(old_par), add = TRUE)
 
@@ -710,12 +710,15 @@ plot_hyper <- function(fit, pars = c("nu", "sigma", "tau"),
     graphics::segments(med, 0, med, y_tick, lwd = 2, col = cols$dark)
 
     scale_note <- if (use_log) "  (log x)" else ""
-    graphics::mtext(p, side = 3, line = 2.6,
-                    cex = 1.05, font = 2, col = cols$dark)
+    graphics::mtext(p, side = 3, line = 4.0,
+                    cex = 1.1, font = 2, col = cols$dark)
     graphics::mtext(
-      sprintf("median = %.3g;  %d%% CrI: [%.3g, %.3g]%s",
-              med, round(100 * prob), lo, hi, scale_note),
-      side = 3, line = 1.0, cex = 0.78, col = "grey30")
+      sprintf("median = %.3g", med),
+      side = 3, line = 2.3, cex = 0.78, col = "grey30")
+    graphics::mtext(
+      sprintf("%d%% CrI: [%.3g, %.3g]%s",
+              round(100 * prob), lo, hi, scale_note),
+      side = 3, line = 0.9, cex = 0.78, col = "grey30")
   }
 
   invisible(fit)
