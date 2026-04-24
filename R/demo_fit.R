@@ -92,3 +92,62 @@ demo_fit <- function(N = 20, J = 22, K = 2, Td = 400, seed = 1L) {
     ppc    = list(rmse.r = abs(rnorm(Td, 0.18, 0.03)))
   )
 }
+
+
+#' A synthetic bayesqm_run for examples and tutorials
+#'
+#' @description
+#' Returns a `bayesqm_run` object carrying a plausible ELPD trajectory
+#' across K = 1..K_max, with user-chosen peak K, Sivula K, and case
+#' label. Use it to demonstrate [run_bayes()] output and
+#' [plot_elpd()] without a Stan backend; it is not a substitute for
+#' `run_bayes()` on real data.
+#'
+#' @param K_max Largest K in the comparison (default 4).
+#' @param k_peak K value where ELPD peaks (default 3).
+#' @param k_sivula K chosen by the Sivula parsimony rule (default 2).
+#' @param case Case label: `"agree"`, `"gap"`, or `"reversed"`.
+#' @param seed Integer seed for reproducibility.
+#'
+#' @return A `bayesqm_run`.
+#'
+#' @examples
+#' run <- demo_run()
+#' run
+#' plot_elpd(run)
+#'
+#' @export
+demo_run <- function(K_max = 4L, k_peak = 3L, k_sivula = 2L,
+                     case = c("gap", "agree", "reversed"),
+                     seed = 1L) {
+  case <- match.arg(case)
+  set.seed(seed)
+
+  K <- seq_len(K_max)
+  # Build an ELPD curve that peaks at k_peak, gently declining on each
+  # side, with a plausible decreasing SE as K grows.
+  elpd <- -abs(K - k_peak) ^ 1.3 * 6 - 165 + rnorm(K_max, 0, 0.5)
+  se   <- seq(8, 5, length.out = K_max)
+
+  delta_elpd <- c(NA_real_, diff(-elpd))
+  se_delta   <- c(NA_real_, rep(3, K_max - 1L))
+  ratio      <- abs(delta_elpd) / se_delta
+
+  tab <- data.frame(K = K,
+                    elpd = elpd, se = se,
+                    delta_elpd = delta_elpd,
+                    se_delta   = se_delta,
+                    ratio      = ratio)
+
+  structure(
+    list(
+      call     = quote(run_bayes(qdata, K_max = K_max)),
+      fits     = vector("list", K_max),
+      tab      = tab,
+      loo_list = vector("list", K_max),
+      k_peak   = as.integer(k_peak),
+      k_sivula = as.integer(k_sivula),
+      case     = case
+    ),
+    class = "bayesqm_run")
+}

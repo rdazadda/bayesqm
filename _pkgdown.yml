@@ -119,6 +119,7 @@ reference:
     desc: "Data-generating functions and assessment utilities used in the paper."
     contents:
       - demo_fit
+      - demo_run
       - generate_data
       - assess_recovery
       - tucker_congruence

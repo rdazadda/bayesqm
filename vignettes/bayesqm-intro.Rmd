@@ -145,10 +145,21 @@ plot_zscore_posterior(fit, statement = 1)
 **peak-plus-Sivula** protocol: the ELPD peak is the automated choice;
 the Sivula (2025) parsimony rule is reported alongside.
 
+On real data you would call:
+
 ```{r, eval = FALSE}
 run <- run_bayes(qdata, K_max = 4, seed = 1,
                  chains = 2, iter = 1500, warmup = 800)
+```
+
+For this vignette we use a synthetic run produced by `demo_run()`:
+
+```{r}
+run <- demo_run(K_max = 4, k_peak = 3, k_sivula = 2, case = "gap")
 run
+```
+
+```{r elpd, fig.cap = "ELPD across K. Solid = peak (automated choice). Dashed = Sivula."}
 plot_elpd(run)
 ```
 
