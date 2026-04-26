@@ -48,6 +48,10 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
+          # cmdstanr lives on the Stan team's r-universe, not CRAN.
+          # Pak does not read Additional_repositories from DESCRIPTION,
+          # so the URL must be passed to the action directly.
+          extra-repositories: 'https://stan-dev.r-universe.dev'
 
       - uses: r-lib/actions/check-r-package@v2
         with:
