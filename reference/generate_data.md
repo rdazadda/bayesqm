@@ -82,9 +82,14 @@ get_distribution(J)
 
   Optional RNG seed; restored on exit.
 
-- type, sd:
+- type:
 
-  For `generate_noise()`.
+  For `generate_noise()`, one of `"normal"`, `"t"`, `"contaminated"`.
+  For `generate_loadings()`, `"simple"` or `"complex"`.
+
+- sd:
+
+  Residual SD for `generate_noise()`.
 
 - Y_cont:
 
@@ -93,10 +98,6 @@ get_distribution(J)
 - distr:
 
   Integer forced-distribution counts.
-
-- primary_range, cross_range, type:
-
-  For `generate_loadings()`.
 
 ## Value
 
