@@ -83,10 +83,10 @@ S3method(print, bayesqm_prior)
 
 importFrom(rstantools, posterior_interval)
 importFrom(rstantools, prior_summary)
-export(posterior_interval)
-export(prior_summary)
 
-importFrom(stats, cor, density, median, quantile, rbinom, rnorm, rt, runif, sd, setNames)
+importFrom(stats, aggregate, coef, cor, density, family, fitted,
+           median, nobs, quantile, rbeta, rbinom, rnorm, rt, runif,
+           residuals, sd, setNames, sigma, update)
 importFrom(utils, combn, head, read.csv, unzip)
 importFrom(graphics, abline, axis, box, boxplot, hist, image, layout, legend, lines, mtext, par, points, polygon, rect, segments, text, title)
 importFrom(grDevices, adjustcolor, colorRampPalette, grey.colors)

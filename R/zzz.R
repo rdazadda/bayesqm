@@ -3,6 +3,10 @@
 # packages. Without this, calling loo(fit) or as_draws_df(fit) would fall
 # back to the default method even after the user loads loo / posterior.
 
+# ggplot2's .data pronoun is referenced inside autoplot helpers. ggplot2
+# is in Suggests, so declare it as a known global to silence R CMD check.
+utils::globalVariables(".data")
+
 
 .onLoad <- function(libname, pkgname) {
   if (requireNamespace("loo", quietly = TRUE))

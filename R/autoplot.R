@@ -185,7 +185,7 @@ make_dominant_panel <- function(fit, title = NULL, anonymize = TRUE) {
   n.mod    <- sum(maxprob >  0.60 & maxprob <= 0.80)
   n.weak   <- sum(maxprob <= 0.60)
   subtitle_text <- sprintf(
-    "Strong (max P > 0.80): %d    Moderate (0.60–0.80): %d    Weak (≤ 0.60): %d",
+    "Strong (max P > 0.80): %d    Moderate (0.60-0.80): %d    Weak (<= 0.60): %d",
     n.strong, n.mod, n.weak)
 
   pid <- if (anonymize) sprintf("P%02d", seq_len(N)) else colnames(Y)

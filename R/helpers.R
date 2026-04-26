@@ -23,8 +23,10 @@
 #' @param seed Optional RNG seed; restored on exit.
 #' @param Y_cont Continuous scores (for `discretize_to_grid()`).
 #' @param distr Integer forced-distribution counts.
-#' @param type,sd For `generate_noise()`.
-#' @param primary_range,cross_range,type For `generate_loadings()`.
+#' @param type For `generate_noise()`, one of `"normal"`, `"t"`,
+#'   `"contaminated"`. For `generate_loadings()`, `"simple"` or
+#'   `"complex"`.
+#' @param sd Residual SD for `generate_noise()`.
 #'
 #' @return `generate_data()` returns a list with `Y`, `Lambda_true`,
 #'   `F_true`, `distribution`, `N`, `J`, `K`. The component helpers

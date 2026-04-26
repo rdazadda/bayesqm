@@ -63,13 +63,15 @@ cross-loadings.}
 
 \item{seed}{Optional RNG seed; restored on exit.}
 
-\item{type, sd}{For \code{generate_noise()}.}
+\item{type}{For \code{generate_noise()}, one of \code{"normal"}, \code{"t"},
+\code{"contaminated"}. For \code{generate_loadings()}, \code{"simple"} or
+\code{"complex"}.}
+
+\item{sd}{Residual SD for \code{generate_noise()}.}
 
 \item{Y_cont}{Continuous scores (for \code{discretize_to_grid()}).}
 
 \item{distr}{Integer forced-distribution counts.}
-
-\item{primary_range, cross_range, type}{For \code{generate_loadings()}.}
 }
 \value{
 \code{generate_data()} returns a list with \code{Y}, \code{Lambda_true},
