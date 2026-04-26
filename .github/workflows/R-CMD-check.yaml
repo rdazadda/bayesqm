@@ -19,7 +19,11 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
+          # macos-13 is x86_64; macos-latest (macos-14) is aarch64 / Apple
+          # Silicon, where diffobj's pre-built binary intermittently segfaults
+          # in dyn.load when waldo renders a failed-test diff. Pinning to
+          # macos-13 mirrors CRAN's own macOS test platform.
+          - {os: macos-13,       r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,  r: 'release'}
