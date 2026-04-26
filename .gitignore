@@ -5,3 +5,5 @@
 *.tar.gz
 *.Rcheck/
 docs/
+/doc/
+/Meta/

@@ -4,6 +4,8 @@ output:
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 2
+bibliography: REFERENCES.bib
+link-citations: true
 vignette: >
   %\VignetteIndexEntry{Getting started with bayesqm}
   %\VignetteEngine{knitr::rmarkdown}
@@ -58,8 +60,8 @@ qdata
 
 `fit_bayesian()` samples the posterior of a low-rank factor model
 with a Student-t likelihood (by default) and a hierarchical normal
-prior on the loadings, then resolves rotational ambiguity with
-MatchAlign:
+prior on the loadings, then resolves rotational ambiguity with the
+MatchAlign post-processing of @PoworoznekEtAl2025:
 
 ```{r, eval = FALSE}
 fit <- fit_bayesian(qdata, K = 3, chains = 4, iter = 2000,
@@ -77,15 +79,18 @@ diagnostic.
 
 ## Diagnostics
 
-Convergence statistics live in `fit$diagnostics`:
+Convergence statistics live in `fit$diagnostics`. The recommended
+thresholds are R-hat below 1.01, bulk and tail effective sample sizes
+above 400, and zero divergent transitions [@VehtariEtAl2021]:
 
 ```{r}
 fit$diagnostics
 ```
 
-`plot_tucker()` visualises the per-draw Tucker's phi between each
-aligned factor column and the MatchAlign pivot. Values near 1 indicate
-a stable alignment; bimodality signals residual label-switching.
+`plot_tucker()` visualises the per-draw Tucker phi between each
+aligned factor column and the MatchAlign pivot. Values near 1
+indicate a stable alignment; bimodality signals residual
+label-switching.
 
 ```{r tucker, fig.cap = "MatchAlign alignment quality by factor."}
 plot_tucker(fit)
@@ -95,8 +100,8 @@ plot_tucker(fit)
 
 Each participant has a posterior distribution over their loading on
 every factor. `plot_loading_posterior()` draws the loading forest,
-with nested 50 percent and 95 percent credible-interval whiskers and
-the classical Brown cut-off as a faint reference. Filled points are
+with nested 50% and 95% credible-interval whiskers and the classical
+@Brown1980 cut-off as a faint reference. Filled points are
 participants with `P(factor k dominant) > 0.5`.
 
 ```{r loadings, fig.cap = "Loadings with nested 50% and 95% credible intervals."}
@@ -115,12 +120,12 @@ head(compute_loadings(fit$Lambda_draws, prob = 0.95))
 (by factor 1's posterior mean, configurable via `sort_by`) so the
 reader can scan horizontally to compare factors.
 
-```{r zscores, fig.cap = "Posterior z-scores across factors with 50 / 95 CrIs."}
+```{r zscores, fig.cap = "Posterior z-scores across factors with 50% and 95% credible intervals."}
 plot(fit)
 ```
 
-For a single statement across factors, `plot_zscore_posterior()` gives
-the drill-down:
+For a single statement across factors, `plot_zscore_posterior()`
+gives the drill-down:
 
 ```{r zscore-one, fig.cap = "Posterior z-score for a single statement across factors."}
 plot_zscore_posterior(fit, statement = 1)
@@ -129,8 +134,9 @@ plot_zscore_posterior(fit, statement = 1)
 ## Choosing K
 
 `run_bayes()` fits the model for each K in a range and applies the
-**peak-plus-Sivula** protocol: the ELPD peak is the automated choice;
-the Sivula (2025) parsimony rule is reported alongside.
+**peak-plus-Sivula** protocol: the ELPD peak is the automated choice
+and the Sivula parsimony rule [@SivulaEtAl2025] is reported alongside
+as a diagnostic.
 
 On real data you would call:
 
@@ -144,27 +150,27 @@ run <- demo_run(K_max = 5, k_peak = 3, k_sivula = 1, case = "gap")
 run
 ```
 
-```{r elpd, fig.width = 7, fig.height = 4.2, fig.cap = "Delta-ELPD vs K = 1 with the Sivula rejection band at |Delta-ELPD| < 4. Red triangle marks the Sivula K, blue square marks the ELPD peak (the adopted K)."}
+```{r elpd, fig.width = 7, fig.height = 4.2, fig.cap = "ΔELPD across K with the Sivula non-promotion band at |ΔELPD| < 4. Triangle marks the Sivula K, square marks the ELPD peak (the adopted K)."}
 make_elpd_diff(run)
 ```
 
-The ELPD peak is always the adopted K. Sivula is a pure diagnostic:
-a number reported alongside the peak so readers can see how
-confidently the data discriminate between adjacent models. The
-`run$case` field labels the relationship between the two. When
-Sivula lands on the same K as the peak, the case is `agree`. When
-Sivula points to a smaller K than the peak, the case is `gap`. When
-Sivula exceeds the peak, the case is `reversed` and usually
-indicates numerical instability in the comparison itself. In every
-case the adopted K is the ELPD peak.
+The ELPD peak is always the adopted K. The Sivula diagnostic is
+reported alongside the peak so readers can see how confidently the
+data discriminate between adjacent models. The `run$case` field
+labels the relationship between the two: when Sivula lands on the
+same K as the peak, the case is `agree`; when Sivula points to a
+smaller K than the peak, the case is `gap`; when Sivula exceeds the
+peak, the case is `reversed` and usually indicates numerical
+instability in the comparison itself. In every case the adopted K is
+the ELPD peak.
 
 ## Distinguishing, consensus, and membership
 
 `bayesqm` replaces the classical z-score test with a direct posterior
 probability. For every statement and every factor pair,
-`P(|f_jk − f_jl| > δ)` answers *how confidently do the factors
-separate this statement?* The default `δ = 1` is on the standardised
-factor-score scale.
+P(|f_jk − f_jl| > δ) gives the probability that the two factors
+separate that statement by at least δ. The default δ = 1 is on the
+standardised factor-score scale.
 
 ```{r dist-cons, fig.cap = "Distinguishing-statement probability. Rows sorted so the most discriminating statements are at the top."}
 plot_dist_cons(fit, delta = 1.0)
@@ -178,17 +184,17 @@ Participant-level membership is probabilistic too.
 head(classify_membership(fit$Lambda_draws))
 ```
 
-```{r membership, fig.width = 6.5, fig.height = 5.5, fig.cap = "Blue tiles = posterior probability that each factor is dominant for a given participant (values printed in each cell). The right column shows the overall assignment verdict on an orange-red scale."}
+```{r membership, fig.width = 6.5, fig.height = 5.5, fig.cap = "Blue tiles: posterior probability that each factor is dominant for a given participant (values printed in each cell). The right column shows the overall assignment verdict on an orange-red scale."}
 make_dominant_panel(fit)
 ```
 
 ## Posterior predictive check
 
 `plot_ppc()` shows the posterior distribution of the RMSE between
-`cor(Y_rep)` and `cor(Y_obs)`. A well-specified model puts most mass
-at small RMSE.
+`cor(Y_rep)` and `cor(Y_obs)`. A well-specified model puts most
+posterior mass at small RMSE.
 
-```{r ppc, fig.cap = "PPC on the correlation matrix."}
+```{r ppc, fig.cap = "PPC on the by-person correlation matrix."}
 plot_ppc(fit)
 ```
 
@@ -200,7 +206,7 @@ plot_hyper(fit)
 
 ## Reporting and exporting
 
-`save_bayesqm_plot()` writes any plot to PDF / SVG / PNG / TIFF /
+`save_bayesqm_plot()` writes any plot to PDF, SVG, PNG, TIFF, or
 JPEG at journal-appropriate dimensions:
 
 ```{r, eval = FALSE}
@@ -241,3 +247,5 @@ bayesqm_set_colors("blue")
 - `?rename_factors`: relabel `f1..fK` with substantive factor names
 - `ggplot2::autoplot()`: ggplot2 / ggdist versions of every view
   above, when `ggplot2` and `ggdist` are installed
+
+## References

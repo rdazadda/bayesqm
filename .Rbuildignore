@@ -11,3 +11,5 @@
 ^docs$
 ^\.Rbuildignore$
 ^pkgdown$
+^doc$
+^Meta$
