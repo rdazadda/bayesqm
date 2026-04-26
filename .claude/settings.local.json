@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"C:/Users/rdazadda/OneDrive - University of Alaska/Desktop/bayesqm/inst/extdata\")",
+      "Bash(cp \"C:/Users/rdazadda/OneDrive - University of Alaska/Desktop/updated simulation studies/Real Data Analysis/Childhood obesity dataset.xlsx\" \"C:/Users/rdazadda/OneDrive - University of Alaska/Desktop/bayesqm/inst/extdata/childhood_obesity.xlsx\")",
+      "Bash(Rscript -e 'cat\\(\"\\\\nR_LIBS_USER =\", Sys.getenv\\(\"R_LIBS_USER\"\\), \"\\\\n\"\\); cat\\(\"Library paths:\\\\n\"\\); print\\(.libPaths\\(\\)\\)')",
+      "Bash(Rscript *)",
+      "Bash(tee data-raw/build.log)",
+      "WebFetch(domain:github.com)",
+      "Bash(awk -F: '{sum += $2} END {print \"Total tests:\", sum}')",
+      "Bash(curl -sL https://raw.githubusercontent.com/stan-dev/rstanarm/master/.github/workflows/R-CMD-check.yaml -o /tmp/rstanarm-rcc.yaml)",
+      "Bash(echo \"---EXIT $?---\")",
+      "Read(//tmp/**)",
+      "Bash(curl -sL https://raw.githubusercontent.com/stan-dev/bayesplot/master/.github/workflows/R-CMD-check.yaml -o /tmp/bayesplot-rcc.yaml)",
+      "Bash(curl -sL https://raw.githubusercontent.com/stan-dev/posterior/master/.github/workflows/R-CMD-check.yaml -o /tmp/posterior-rcc.yaml)",
+      "Bash(curl -sL \"https://raw.githubusercontent.com/r-lib/actions/v2/setup-r-dependencies/action.yml\" -o /tmp/action.yml)",
+      "Bash(curl -sL https://raw.githubusercontent.com/stan-dev/loo/master/.github/workflows/R-CMD-check.yaml -o /tmp/loo-rcc.yaml)",
+      "Bash(curl -sL \"https://raw.githubusercontent.com/r-lib/actions/v2/setup-r-dependencies/README.md\" -o /tmp/readme.md)",
+      "Bash(curl -sL -w \"HTTP: %{http_code}\\\\n\" \"https://raw.githubusercontent.com/r-lib/actions/v2/setup-r-dependencies/action.yml\" -o /tmp/action.yml)",
+      "Bash(curl -sL -w \"HTTP: %{http_code}\\\\n\" \"https://raw.githubusercontent.com/r-lib/actions/v2/setup-r/action.yml\" -o /c/Users/rdazadda/AppData/Local/Temp/setup-r-action.yml)",
+      "Read(//c/Users/rdazadda/AppData/Local/Temp/**)",
+      "Bash(sed -n '50,115p' /tmp/brms-DESCRIPTION)",
+      "Bash(sed -n '45,72p' /tmp/bayesplot-DESCRIPTION)",
+      "PowerShell(try { $issue = Invoke-RestMethod -Uri \"https://api.github.com/repos/r-lib/actions/issues/1028\" -Headers @{\"Accept\"=\"application/vnd.github+json\"; \"User-Agent\"=\"claude-code\"}; \"TITLE: $\\($issue.title\\)\"; \"STATE: $\\($issue.state\\)\"; \"---BODY---\"; $issue.body } catch { \"ERROR: $_\" })"
+    ]
+  }
+}

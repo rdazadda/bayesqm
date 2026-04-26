@@ -43,15 +43,21 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+          # cmdstanr lives on the Stan team's r-universe, not CRAN.
+          # `extra-repositories` is an input of setup-r (not of
+          # setup-r-dependencies); the URL is written into the runner's
+          # repos option so pak sees it during dependency resolution.
+          extra-repositories: 'https://stan-dev.r-universe.dev'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          # Listing cmdstanr in extra-packages forces pak to install it
+          # from the r-universe configured above, rather than treating
+          # it as a soft Suggests that pak can silently drop.
+          extra-packages: |
+            any::rcmdcheck
+            any::cmdstanr
           needs: check
-          # cmdstanr lives on the Stan team's r-universe, not CRAN.
-          # Pak does not read Additional_repositories from DESCRIPTION,
-          # so the URL must be passed to the action directly.
-          extra-repositories: 'https://stan-dev.r-universe.dev'
 
       - uses: r-lib/actions/check-r-package@v2
         with:
