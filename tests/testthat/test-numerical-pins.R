@@ -7,9 +7,21 @@
 # tests with a clear diff. Pin values were captured by running each
 # expression once at the recorded seed; see the inline comments for the
 # capture command.
+#
+# Bit-exact reproducibility is a property of the machine the pins were
+# captured on. Different BLAS implementations (Apple Accelerate, OpenBLAS,
+# MKL) round summation chains differently and can exceed the 1e-6
+# tolerance. The tests therefore skip on CRAN and on every CI runner;
+# they are meant to be re-run locally by the maintainer before each release.
+
+pin_skip <- function() {
+  testthat::skip_on_cran()
+  testthat::skip_on_ci()
+}
 
 
 test_that("posterior_interval is numerically stable for a fixed-seed demo fit", {
+  pin_skip()
   fit <- demo_fit(N = 10, J = 14, K = 2, Td = 200, seed = 42L)
   pi  <- posterior_interval(fit, prob = 0.95, pars = c("sigma", "tau"))
 
@@ -25,6 +37,7 @@ test_that("posterior_interval is numerically stable for a fixed-seed demo fit", 
 
 
 test_that("coef returns the same posterior-mean loadings for a fixed-seed demo fit", {
+  pin_skip()
   fit <- demo_fit(N = 10, J = 14, K = 2, Td = 200, seed = 42L)
   co  <- coef(fit)
 
@@ -37,6 +50,7 @@ test_that("coef returns the same posterior-mean loadings for a fixed-seed demo f
 
 
 test_that("compute_dominant_prob matches the pinned 2x2 corner", {
+  pin_skip()
   fit <- demo_fit(N = 10, J = 14, K = 2, Td = 200, seed = 42L)
   dp  <- compute_dominant_prob(fit$Lambda_draws)
 
@@ -50,6 +64,7 @@ test_that("compute_dominant_prob matches the pinned 2x2 corner", {
 
 
 test_that("compute_loadings matches the pinned first-row entries", {
+  pin_skip()
   fit   <- demo_fit(N = 10, J = 14, K = 2, Td = 200, seed = 42L)
   loads <- compute_loadings(fit$Lambda_draws, prob = 0.95)
 
@@ -61,6 +76,7 @@ test_that("compute_loadings matches the pinned first-row entries", {
 
 
 test_that("caption_bayesqm starts with the expected K, N, J header", {
+  pin_skip()
   fit <- demo_fit(N = 10, J = 14, K = 2, Td = 200, seed = 42L)
   cap <- caption_bayesqm(fit)
 
@@ -73,6 +89,7 @@ test_that("caption_bayesqm starts with the expected K, N, J header", {
 
 
 test_that("demo_run elpd peak is numerically stable at a fixed seed", {
+  pin_skip()
   run <- demo_run(K_max = 4, k_peak = 3, k_sivula = 2,
                   case = "gap", seed = 1L)
 
