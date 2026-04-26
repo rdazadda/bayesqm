@@ -11,15 +11,15 @@ plot_ppc(fit, breaks = 30, ...)
 
 \item{breaks}{Passed to \code{hist()}.}
 
-\item{...}{Passed to \code{hist()}.}
+\item{...}{Additional arguments forwarded to \code{hist()}.}
 }
 \value{
 The input, invisibly.
 }
 \description{
-Histogram of the replicated correlation-matrix RMSE stored on the
-fit (\code{fit$ppc$rmse.r}): for each posterior draw, the RMSE between
-the between-participant correlation matrix under the replicated
-data and under the observed data. Lower is better; the median and
-central credible-interval bounds are marked.
+Histogram of the replicated correlation-matrix RMSE stored on
+\code{fit$ppc$rmse.r}: per draw, the RMSE between \code{cor(Y_rep)} and
+\code{cor(Y_obs)}. Rendered in the bayesplot-idiom (filled bars, no
+border, suppressed y-axis) with the median and central credible
+interval marked.
 }

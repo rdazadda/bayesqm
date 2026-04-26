@@ -11,15 +11,14 @@ plot_dist_cons(fit, delta = 1, ...)
 
 \item{delta}{Minimum z-score separation (default 1.0).}
 
-\item{...}{Passed to \code{image()}.}
+\item{...}{Additional arguments forwarded to \code{image()}.}
 }
 \value{
 The input, invisibly.
 }
 \description{
-Heatmap of \code{P(|F_jk - F_jl| > delta)} with rows = statements and
-columns = factor pairs. High probability (dark) indicates that the
-statement reliably distinguishes that factor pair. Statements are
-ordered by their maximum distinguishing probability so the most
-discriminating statements cluster at the top.
+Heatmap of \verb{P(|F[j, k] - F[j, l]| > delta)} for every statement and
+every factor pair, rendered on a sequential blue ramp. Rows are
+ordered so the most discriminating statements are at the top. A
+vertical colour bar in the right margin gives the probability scale.
 }

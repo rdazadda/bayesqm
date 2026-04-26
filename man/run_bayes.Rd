@@ -33,7 +33,7 @@ select_k_sivula(
 \item{stan_dir}{Optional override of the Stan model directory.}
 
 \item{elpd_diff_threshold, se_ratio_threshold}{Sivula rule thresholds
-(paper defaults 4 and 2).}
+(defaults 4 and 2).}
 
 \item{...}{Passed to \code{\link[=fit_bayesian]{fit_bayesian()}}.}
 

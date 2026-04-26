@@ -21,6 +21,6 @@ matrix with a \code{"rotation"} attribute.
 \description{
 Linear-algebra utilities shared by MatchAlign and the recovery
 assessments. \code{tucker_congruence(x, y)} computes \code{sum(x*y) / sqrt(sum(x^2) * sum(y^2))}. \code{procrustes_rotation(X, Target)} finds
-the orthogonal \code{R} minimising \code{||X R - Target||_F} and returns
+the orthogonal \code{R} minimising \verb{||X R - Target||_F} and returns
 \code{X \%*\% R} with \code{R} attached as attribute \code{"rotation"}.
 }

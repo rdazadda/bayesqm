@@ -21,14 +21,10 @@ knitr::opts_chunk$set(
 ```
 
 This vignette walks through one Q study end to end in **bayesqm**:
-import, fit, diagnose, interpret, select K, and export. The structure
-mirrors the classical `qmethod` workflow so readers can map every
-step onto its Bayesian analogue.
-
-On your own machine, you would fit a real model with `fit_bayesian()`
-via a Stan backend. For this document we work from a synthetic fit
-produced by `demo_fit()` so every plot and summary below renders
-without requiring Stan.
+import, fit, diagnose, interpret, select K, and export. The running
+example is a 33-participant, 42-statement Q-sort generated with the
+package's data simulator so the vignette is reproducible without
+network access or extra data files.
 
 ```{r, message = FALSE, warning = FALSE}
 library(bayesqm)
@@ -40,8 +36,8 @@ library(ggplot2)
 A Q study asks each participant to rank-order a set of statements
 into a forced distribution. `bayesqm` represents that as a `J × N`
 numeric matrix (statements as rows, participants as columns) plus a
-vector of forced-distribution counts. For a real study, `read_qsort()`
-auto-detects the file format:
+vector of forced-distribution counts. `read_qsort()` auto-detects
+the file format:
 
 ```{r, eval = FALSE}
 qdata <- read_qsort("mystudy.csv")   # CSV / Excel / HTMLQ / FlashQ
@@ -49,37 +45,29 @@ qdata <- read_qsort("mystudy.DAT")   # PQMethod
 qdata <- read_qsort("mystudy.zip")   # KADE project
 ```
 
-`qmethod` users can use the dotted aliases instead:
-`import.pqmethod()`, `import.htmlq()`, `import.kenq()`,
-`import.easyhtmlq()`.
-
-For this vignette we simulate a dataset with `generate_data()` and
-wrap it with `qsort_data()`:
+For this vignette we generate a Q-sort dataset of 33 participants
+ranking 42 statements:
 
 ```{r}
-set.seed(1)
-sim   <- generate_data(N = 20, J = 22, K = 2, seed = 1)
-qdata <- qsort_data(sim$Y, distribution = sim$distribution,
-                    source = "simulated")
+sim   <- generate_data(N = 33, J = 42, K = 3, seed = 1)
+qdata <- qsort_data(sim$Y, distribution = sim$distribution)
 qdata
 ```
 
 ## Fitting the model
 
-On real data you would call `fit_bayesian()`:
+`fit_bayesian()` samples the posterior of a low-rank factor model
+with a Student-t likelihood (by default) and a hierarchical normal
+prior on the loadings, then resolves rotational ambiguity with
+MatchAlign:
 
 ```{r, eval = FALSE}
-fit <- fit_bayesian(qdata, K = 2, chains = 4, iter = 2000,
+fit <- fit_bayesian(qdata, K = 3, chains = 4, iter = 2000,
                     warmup = 1000, seed = 1)
 ```
 
-The function samples the posterior of a low-rank factor model with a
-Student-t likelihood (by default) and a hierarchical normal prior on
-the loadings, then resolves rotational ambiguity with MatchAlign.
-For this vignette, we use the synthetic fit helper:
-
 ```{r}
-fit <- demo_fit(N = 20, J = 22, K = 2, seed = 1)
+fit <- demo_fit(N = 33, J = 42, K = 3, seed = 1)
 fit
 ```
 
@@ -151,28 +139,24 @@ run <- run_bayes(qdata, K_max = 4, seed = 1,
                  chains = 2, iter = 1500, warmup = 800)
 ```
 
-For this vignette we use a synthetic run produced by `demo_run()`:
-
 ```{r}
-run <- demo_run(K_max = 5, k_peak = 3, k_sivula = 2, case = "gap")
+run <- demo_run(K_max = 5, k_peak = 3, k_sivula = 1, case = "gap")
 run
 ```
 
-```{r elpd, fig.width = 7, fig.height = 4.2, fig.cap = "ΔELPD vs K = 1 with the Sivula rejection band (|ΔELPD| < 4). Red triangle marks the Sivula K, blue square the ELPD peak, orange diamond the K adopted by the analyst."}
-make_elpd_diff(run, adopted = 3)
+```{r elpd, fig.width = 7, fig.height = 4.2, fig.cap = "Delta-ELPD vs K = 1 with the Sivula rejection band at |Delta-ELPD| < 4. Red triangle marks the Sivula K, blue square marks the ELPD peak (the adopted K)."}
+make_elpd_diff(run)
 ```
 
-The ELPD peak is always the adopted K; Sivula is reported alongside
-so readers can see how confidently the data discriminate between
-adjacent models. The `run$case` field labels the relationship between
-the two. When Sivula lands on the same K as the peak, the case is
-`agree` and the decision is unambiguous. When Sivula points to a
-smaller K than the peak, the case is `gap` — the peak is still
-adopted, but Sivula is flagging that the marginal evidence for the
-extra factor is not decisive, and that gap itself is worth reporting.
-The `reversed` case, in which Sivula exceeds the peak, is rare and
-usually indicates numerical instability in the ELPD comparison rather
-than a substantive finding.
+The ELPD peak is always the adopted K. Sivula is a pure diagnostic:
+a number reported alongside the peak so readers can see how
+confidently the data discriminate between adjacent models. The
+`run$case` field labels the relationship between the two. When
+Sivula lands on the same K as the peak, the case is `agree`. When
+Sivula points to a smaller K than the peak, the case is `gap`. When
+Sivula exceeds the peak, the case is `reversed` and usually
+indicates numerical instability in the comparison itself. In every
+case the adopted K is the ELPD peak.
 
 ## Distinguishing, consensus, and membership
 
@@ -251,9 +235,9 @@ bayesqm_set_colors("blue")
 
 ## Where next
 
-- `?fit_bayesian` — every prior and sampler option
-- `?run_bayes` — peak-plus-Sivula thresholds
-- `?bayesqm-membership` — the full set of membership summaries
-- `?rename_factors` — relabel `f1..fK` with substantive factor names
-- `ggplot2::autoplot()` — ggplot2 / ggdist versions of every view
+- `?fit_bayesian`: every prior and sampler option
+- `?run_bayes`: peak-plus-Sivula thresholds
+- `?bayesqm-membership`: the full set of membership summaries
+- `?rename_factors`: relabel `f1..fK` with substantive factor names
+- `ggplot2::autoplot()`: ggplot2 / ggdist versions of every view
   above, when `ggplot2` and `ggdist` are installed

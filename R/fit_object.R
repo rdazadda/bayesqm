@@ -1,8 +1,7 @@
 # fit_object.R
 # The bayesqm_fit and bayesqm_run S3 classes: constructors that assemble
 # qmethod-parallel slots ($brief, $loa, $zsc, $zsc_n, $f_char, $qdc) on
-# top of the raw Bayesian quantities, plus the print and summary methods
-# that shape the first impression users get at the console.
+# top of the raw Bayesian quantities, plus their print and summary methods.
 
 
 #' @keywords internal
@@ -25,8 +24,7 @@ new_bayesqm_fit <- function(call, Y, K, distribution, prob, robust, nu,
   dimnames(F_draws)[[2]] <- stmt_ids
   dimnames(F_draws)[[3]] <- fac_ids
 
-  zsc <- apply(F_draws, c(2, 3), mean)
-  dim(zsc) <- dim(F_draws)[2:3]
+  zsc <- .summarize_draws(F_draws, mean)
   dimnames(zsc) <- list(stmt_ids, fac_ids)
   zsc_n <- rank_to_grid(zsc, distribution)
 
@@ -168,8 +166,7 @@ compute_qdc <- function(F_draws, delta = 1.0, threshold = 0.95) {
                       stringsAsFactors = FALSE))
 
   Td <- dim(F_draws)[1]
-  F_hat <- apply(F_draws, c(2, 3), mean)
-  dim(F_hat) <- dim(F_draws)[2:3]
+  F_hat <- .summarize_draws(F_draws, mean)
   pairs <- combn(K, 2)
   n_pairs <- ncol(pairs)
 
@@ -396,8 +393,8 @@ print.bayesqm_run <- function(x, digits = 2, ...) {
   print(disp, row.names = FALSE)
 
   if (!is.na(x$case) && x$case == "gap")
-    cat("\nCase 'gap': adopt k_peak if corroborated by external evidence, ",
-        "else fall back to k_sivula for parsimony.\n", sep = "")
+    cat("\nCase 'gap': k_peak is adopted; Sivula is reported as a ",
+        "parsimony diagnostic only.\n", sep = "")
 
   invisible(x)
 }

@@ -2,9 +2,9 @@
 # Standard R accessor methods for bayesqm_fit: coef, fitted, residuals,
 # nobs, sigma, family, as.matrix, as.array, as.data.frame, update, plus
 # posterior_interval() and prior_summary() methods for the rstantools
-# generics (imported so we don't shadow them). Methods that depend on
-# optional packages (loo, posterior) are registered conditionally in
-# zzz.R's .onLoad() if those packages are available.
+# generics (imported to avoid shadowing). Methods that depend on optional
+# packages (loo, posterior) are registered conditionally in zzz.R's
+# .onLoad().
 
 
 #' Standard R accessors for bayesqm_fit

@@ -9,16 +9,19 @@ plot_membership(fit, sort = TRUE, ...)
 \arguments{
 \item{fit}{A \code{bayesqm_fit}.}
 
-\item{sort}{Logical; reorder participants by tier and dominant factor.}
+\item{sort}{Logical; apply the default ordering.}
 
-\item{...}{Passed to \code{image()}.}
+\item{...}{Additional arguments forwarded to \code{image()}.}
 }
 \value{
 The input, invisibly.
 }
 \description{
-Tiled heatmap of \code{P(argmax_k |Lambda[i, k]| = k)} with one row per
-participant and one column per factor, annotated by a right-side
-tier strip (Strong / Moderate / Weak following \code{\link[=classify_membership]{classify_membership()}}).
-Rows are sorted by tier and then by dominant factor.
+Tiled heatmap of \verb{P(argmax_k |Lambda[i, k]| = k)} with one row per
+participant, one column per factor, rendered on a sequential blue
+ramp. A right-side tier strip encodes Strong / Moderate / Weak
+membership (per \code{\link[=classify_membership]{classify_membership()}}). A horizontal colourbar
+under the plot gives the probability scale. Rows are sorted by
+dominant factor first, then tier, then probability -- so the block
+structure a reader wants to see is preserved.
 }

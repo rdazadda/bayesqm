@@ -13,16 +13,17 @@ plot_loading_posterior(fit, factors = NULL, highlight_flagged = TRUE, ...)
 
 \item{highlight_flagged}{Logical; fill flagged participants.}
 
-\item{...}{Unused.}
+\item{...}{Additional arguments forwarded to \code{plot()}.}
 }
 \value{
 The input, invisibly.
 }
 \description{
-One panel per factor, horizontal dotchart of posterior-median
-loadings with nested 50 percent (thick) and 95 percent (thin)
-credible intervals, ranked by posterior mean. A dashed vertical rule
-marks the classical Brown cut-off \code{1.96 / sqrt(J)}; when
-\code{highlight_flagged = TRUE}, participants in \code{fit$flagged} for that
-factor are drawn as filled points.
+Horizontal dotchart of every participant's loading, one panel per
+factor, ranked by posterior mean. Each loading is drawn as a
+median point with nested 50 percent (thick) and 95 percent (thin)
+credible-interval whiskers. A faint grey vertical rule marks
+Brown's descriptive cut-off \verb{+/- 1.96 / sqrt(J)}. When
+\code{highlight_flagged = TRUE}, participants in \code{fit$flagged[, k]} are
+drawn as filled points in the accent colour.
 }

@@ -58,7 +58,8 @@ get_distribution(J)
 
 \item{loading_type}{\code{"simple"} or \code{"complex"}.}
 
-\item{primary_range, cross_range, type}{For \code{generate_loadings()}.}
+\item{primary_range, cross_range}{Uniform ranges for primary and
+cross-loadings.}
 
 \item{seed}{Optional RNG seed; restored on exit.}
 
@@ -67,6 +68,8 @@ get_distribution(J)
 \item{Y_cont}{Continuous scores (for \code{discretize_to_grid()}).}
 
 \item{distr}{Integer forced-distribution counts.}
+
+\item{primary_range, cross_range, type}{For \code{generate_loadings()}.}
 }
 \value{
 \code{generate_data()} returns a list with \code{Y}, \code{Lambda_true},
@@ -74,8 +77,8 @@ get_distribution(J)
 return their respective raw objects.
 }
 \description{
-\code{generate_data()} is the top-level data-generating function used by
-the paper's simulation studies and by package tests. It builds a
+\code{generate_data()} is the top-level data-generating function used
+by the package's simulation studies and tests. It builds a
 loading matrix (\code{generate_loadings()}), factor scores, noise of the
 chosen type (\code{generate_noise()}), and discretises the continuous
 signal onto a forced Q-sort grid (\code{discretize_to_grid()}). See also

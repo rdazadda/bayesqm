@@ -1,7 +1,5 @@
 # rename_factors.R
-# Relabel every factor-indexed slot on a bayesqm_fit in one call. Without
-# this users have to rewrite colnames on six or seven matrices and parse
-# the qdc column names by hand.
+# Relabels every factor-indexed slot on a bayesqm_fit in a single call.
 
 
 #' Rename factors consistently across a bayesqm_fit
@@ -28,7 +26,7 @@
 #'
 #' @export
 rename_factors <- function(fit, new_names) {
-  stopifnot(inherits(fit, "bayesqm_fit"))
+  assert_bayesqm_fit(fit)
   K <- fit$brief$K
   if (length(new_names) != K)
     stop("new_names must have length K = ", K, ".")
@@ -54,10 +52,14 @@ rename_factors <- function(fit, new_names) {
   }
 
   # qdc columns have the form "f{k}_f{l}_diff" and "f{k}_f{l}_prob".
+  # Underscore is a regex word character so \b doesn't fence it; match
+  # the factor name explicitly between start/underscore and underscore/end.
   if (!is.null(fit$qdc) && ncol(fit$qdc) > 2) {
     nm <- names(fit$qdc)
     for (k in seq_len(K))
-      nm <- gsub(paste0("\\b", old_names[k], "\\b"), new_names[k], nm)
+      nm <- gsub(paste0("(^|_)", old_names[k], "(?=_|$)"),
+                 paste0("\\1", new_names[k]),
+                 nm, perl = TRUE)
     names(fit$qdc) <- nm
   }
 

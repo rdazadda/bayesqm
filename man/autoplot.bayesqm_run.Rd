@@ -2,20 +2,24 @@
 % Please edit documentation in R/autoplot.R
 \name{autoplot.bayesqm_run}
 \alias{autoplot.bayesqm_run}
-\title{ggplot2 rendering of the ELPD curve for a bayesqm_run}
+\title{ggplot2 renderings of a bayesqm_run}
 \usage{
-\method{autoplot}{bayesqm_run}(object, ...)
+autoplot.bayesqm_run(object, type = c("elpd", "ppc"), ...)
 }
 \arguments{
 \item{object}{A \code{bayesqm_run}.}
 
-\item{...}{Ignored.}
+\item{type}{One of \code{"elpd"} or \code{"ppc"}.}
+
+\item{...}{Passed to the underlying figure function (e.g.
+\code{adopted}, \code{title}).}
 }
 \value{
 A \code{ggplot} object.
 }
 \description{
-\code{\link[ggplot2:autoplot]{ggplot2::autoplot()}} method for a \code{bayesqm_run}. Draws ELPD
-against K with +/- 1.96 SE whiskers and peak / Sivula markers.
+Generic \code{\link[ggplot2:autoplot]{ggplot2::autoplot()}} method for \code{bayesqm_run}. Dispatches
+to \code{\link[=make_elpd_diff]{make_elpd_diff()}} when \code{type = "elpd"} (default) and
+\code{\link[=make_ppc_ridge]{make_ppc_ridge()}} when \code{type = "ppc"}.
 }
 \keyword{internal}

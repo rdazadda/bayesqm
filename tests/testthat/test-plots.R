@@ -250,8 +250,8 @@ test_that("plot_dist_cons cleans up layout() on exit", {
   fit <- make_fake_fit(N = 5, J = 10, K = 3)
   with_pdf_device({
     plot_dist_cons(fit)
-    # After the function returns, a fresh plot() should succeed --
-    # meaning the layout was reset.
+    # A fresh plot() must succeed after the function returns; this
+    # verifies that layout() was restored on exit.
     expect_silent(plot(1:3))
   })
 })

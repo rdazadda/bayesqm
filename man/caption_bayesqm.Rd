@@ -9,7 +9,7 @@ caption_bayesqm(fit, include_ref = TRUE, include_diag = TRUE)
 \arguments{
 \item{fit}{A \code{bayesqm_fit}.}
 
-\item{include_ref}{Logical; append the paper citation.}
+\item{include_ref}{Logical; append a brief package-attribution line.}
 
 \item{include_diag}{Logical; append the convergence-diagnostic line.}
 }
@@ -20,8 +20,7 @@ A length-1 character string.
 Returns a human-readable caption string summarising the model
 configuration (\code{K}, \code{N}, \code{J}, family), the sampler (backend, chains,
 post-warmup draws), the interval probability, and convergence
-diagnostics (max Rhat, divergent transitions). Optionally appends a
-citation to the accompanying Psychometrika paper.
+diagnostics (max Rhat, divergent transitions).
 }
 \examples{
 \dontrun{

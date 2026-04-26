@@ -63,14 +63,14 @@ test_that("caption_bayesqm returns a length-1 string with core metadata", {
   expect_true(grepl("Student-t|Gaussian", cap))
   expect_true(grepl("max Rhat", cap))
   expect_true(grepl("divergent", cap))
-  expect_true(grepl("Dacosta Azadda", cap))
+  expect_true(grepl("bayesqm R package", cap))
 })
 
 test_that("caption_bayesqm respects include_ref and include_diag toggles", {
   fit <- make_fake_fit(N = 6, J = 10, K = 2)
 
   cap <- caption_bayesqm(fit, include_ref = FALSE)
-  expect_false(grepl("Dacosta Azadda", cap))
+  expect_false(grepl("bayesqm R package", cap))
 
   cap <- caption_bayesqm(fit, include_diag = FALSE)
   expect_false(grepl("max Rhat", cap))
@@ -88,16 +88,13 @@ test_that("caption_bayesqm handles missing diagnostics gracefully", {
 
 test_that("plot_hyper auto-switches to log x when range spans orders of magnitude", {
   fit <- make_fake_fit(N = 5, J = 10, K = 2)
-  # Force tau onto (~0.01, ~5) -- range > 20 should trigger log scale.
+  # Force tau onto (~0.01, ~5); range > 20 triggers the auto-log branch.
   fit$hyperparams$tau <- exp(runif(200, log(0.01), log(5)))
 
   pdf(file = tempfile(fileext = ".pdf"))
   on.exit(dev.off(), add = TRUE)
 
-  # Should render without error; the log-scale path is the interesting one.
   expect_silent(plot_hyper(fit, pars = "tau"))
-  # User override to force linear also runs without error.
   expect_silent(plot_hyper(fit, pars = "tau", log = ""))
-  # User override to force log on narrow-range parameter also runs.
   expect_silent(plot_hyper(fit, pars = "sigma", log = "x"))
 })

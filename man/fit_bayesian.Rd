@@ -31,7 +31,7 @@ statements as rows and participants as columns.}
 \item{K}{Integer number of factors to extract.}
 
 \item{stan_dir}{Directory containing \code{stan/factor_model.stan}. \code{NULL}
-(the default) uses the copy shipped in \code{inst/stan/}.}
+(the default) uses the copy shipped in \verb{inst/stan/}.}
 
 \item{robust}{Logical; \code{TRUE} uses a Student-t likelihood, \code{FALSE}
 uses Normal.}
@@ -74,9 +74,6 @@ summary(fit)
 
 }
 \references{
-Dacosta Azadda, R. (2026). Bayesian Q Methodology: Probabilistic Factor
-Analysis for the Study of Subjectivity.
-
 Poworoznek et al. (2025). Efficiently Resolving Rotational Ambiguity in
 Bayesian Matrix Sampling with Matching. \emph{Bayesian Analysis}.
 }

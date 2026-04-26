@@ -86,11 +86,11 @@ reference:
       - plot_dist_cons
       - plot_hyper
 
-  - title: "Paper figure renderers (ggplot2)"
+  - title: "ggplot2 figure renderers"
     desc: >
-      Direct ports of the three main-text figures in the accompanying
-      paper: the ELPD curve, the dominant-factor panel, and the PPC
-      ridgeline. Also reachable through `ggplot2::autoplot()`.
+      Publication-grade ggplot2 figures for `bayesqm_run` and
+      `bayesqm_fit`: the ELPD curve, the dominant-factor panel, and
+      the PPC ridgeline. Also reachable through `ggplot2::autoplot()`.
     contents:
       - make_elpd_diff
       - make_dominant_panel
@@ -123,7 +123,7 @@ reference:
       - qsort_data-methods
 
   - title: "Simulation helpers"
-    desc: "Data-generating functions and assessment utilities used in the paper."
+    desc: "Data-generating functions and assessment utilities."
     contents:
       - demo_fit
       - demo_run

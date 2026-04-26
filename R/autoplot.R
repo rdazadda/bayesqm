@@ -1,7 +1,7 @@
 # autoplot.R
-# Direct ports of the paper's figure functions (figures_real_data.R),
-# plus the ggplot2 autoplot dispatchers for bayesqm_fit / bayesqm_run.
-# Methods are registered in .onLoad() only when ggplot2 is installed.
+# ggplot2 figure renderers for bayesqm_fit and bayesqm_run, plus the
+# autoplot dispatchers. Methods are registered in .onLoad() only when
+# ggplot2 is installed.
 
 
 .bq_need <- function(pkg) {
@@ -12,7 +12,7 @@
 }
 
 
-# Paper's publication theme.
+# Shared publication-grade ggplot2 theme.
 THEME_PUB <- function() {
   .bq_need("ggplot2")
   ggplot2::theme_bw(base_size = 11) +
@@ -33,22 +33,20 @@ THEME_PUB <- function() {
 #' Delta-ELPD plot with Sivula band, peak, and adopted-K annotations
 #'
 #' @description
-#' Direct port of the paper's Figure E1 renderer. Draws
-#' \eqn{\Delta}ELPD against K with +/- 1.96 SE whiskers, shades the
-#' Sivula rejection band (\eqn{|\Delta \mathrm{ELPD}| < 4}), and marks
-#' the Sivula-selected K (red triangle), the ELPD peak (blue square),
-#' and an optional adopted K (orange diamond).
+#' Draws \eqn{\Delta}ELPD against K with +/- 1.96 SE whiskers, shades
+#' the Sivula rejection band (\eqn{|\Delta \mathrm{ELPD}| < 4}), and
+#' marks the Sivula-selected K (red triangle), the ELPD peak (blue
+#' square), and an optional adopted K (orange diamond).
 #'
 #' @param run A `bayesqm_run` object.
 #' @param title Optional panel title.
-#' @param adopted Integer K adopted by the analyst (e.g. the value
-#'   reported in a paper). Marked with the orange diamond. `NULL`
-#'   suppresses this annotation.
+#' @param adopted Integer K adopted by the analyst. Marked with the
+#'   orange diamond. `NULL` suppresses this annotation.
 #'
 #' @return A `ggplot` object.
 #' @export
 make_elpd_diff <- function(run, title = NULL, adopted = NULL) {
-  stopifnot(inherits(run, "bayesqm_run"))
+  assert_bayesqm_run(run)
   .bq_need("ggplot2")
 
   K_ref  <- run$tab$K[1]
@@ -61,6 +59,7 @@ make_elpd_diff <- function(run, title = NULL, adopted = NULL) {
     elpd_diff[i] <- run$tab$elpd[i] - run$tab$elpd[1]
     if (k != K_ref &&
         !is.null(run$loo_list) &&
+        length(run$loo_list) >= i &&
         !is.null(run$loo_list[[1]]) &&
         !is.null(run$loo_list[[i]])) {
       comp <- tryCatch(
@@ -154,10 +153,10 @@ make_elpd_diff <- function(run, title = NULL, adopted = NULL) {
 #' Probabilistic dominant-factor panel
 #'
 #' @description
-#' Direct port of the paper's Figure E2 renderer. Draws a blue-gradient
-#' heatmap of `P(dominant factor = k)` per participant, with a right-
-#' hand "Assignment" strip (orange-red gradient) showing the verdict
-#' "Strong / Mod. / Weak F-k" for each participant.
+#' Draws a blue-gradient heatmap of `P(dominant factor = k)` per
+#' participant, with a right-hand "Assignment" strip (orange-red
+#' gradient) showing the verdict "Strong / Mod. / Weak F-k" for each
+#' participant.
 #'
 #' @param fit A `bayesqm_fit`.
 #' @param title Optional panel title.
@@ -167,7 +166,7 @@ make_elpd_diff <- function(run, title = NULL, adopted = NULL) {
 #' @return A `ggplot` object.
 #' @export
 make_dominant_panel <- function(fit, title = NULL, anonymize = TRUE) {
-  stopifnot(inherits(fit, "bayesqm_fit"))
+  assert_bayesqm_fit(fit)
   .bq_need("ggplot2")
   .bq_need("scales")
 
@@ -258,9 +257,9 @@ make_dominant_panel <- function(fit, title = NULL, anonymize = TRUE) {
 #' Posterior predictive RMSE ridgeline across K
 #'
 #' @description
-#' Direct port of the paper's Figure E4 renderer. Draws a ridgeline
-#' density of the posterior predictive correlation-matrix RMSE
-#' (\eqn{RMSE_R}) at every K in `run`, with a median tick per ridge.
+#' Draws a ridgeline density of the posterior predictive
+#' correlation-matrix RMSE (\eqn{RMSE_R}) at every K in `run`, with
+#' a median tick per ridge.
 #'
 #' @param run A `bayesqm_run`.
 #' @param title Optional panel title.
@@ -268,7 +267,7 @@ make_dominant_panel <- function(fit, title = NULL, anonymize = TRUE) {
 #' @return A `ggplot` object.
 #' @export
 make_ppc_ridge <- function(run, title = NULL) {
-  stopifnot(inherits(run, "bayesqm_run"))
+  assert_bayesqm_run(run)
   .bq_need("ggplot2")
   .bq_need("ggridges")
 
@@ -317,7 +316,7 @@ make_ppc_ridge <- function(run, title = NULL) {
 #'
 #' @description
 #' Generic [ggplot2::autoplot()] method for `bayesqm_fit`. Dispatches
-#' to the paper-figure renderer when `type = "membership"`; uses
+#' to [make_dominant_panel()] when `type = "membership"`; uses
 #' `ggdist::stat_pointinterval` / `stat_halfeye` for the remaining
 #' views.
 #'
@@ -352,8 +351,8 @@ autoplot.bayesqm_fit <- function(object,
 #'
 #' @description
 #' Generic [ggplot2::autoplot()] method for `bayesqm_run`. Dispatches
-#' to the paper-figure renderers for ELPD (`type = "elpd"`, default)
-#' and posterior-predictive RMSE ridgeline (`type = "ppc"`).
+#' to [make_elpd_diff()] when `type = "elpd"` (default) and
+#' [make_ppc_ridge()] when `type = "ppc"`.
 #'
 #' @param object A `bayesqm_run`.
 #' @param type One of `"elpd"` or `"ppc"`.

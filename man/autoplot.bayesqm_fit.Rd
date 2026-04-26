@@ -4,7 +4,7 @@
 \alias{autoplot.bayesqm_fit}
 \title{ggplot2 renderings of a bayesqm_fit}
 \usage{
-\method{autoplot}{bayesqm_fit}(
+autoplot.bayesqm_fit(
   object,
   type = c("loadings", "zscores", "membership", "hyper", "zscore_posterior"),
   statement = NULL,
@@ -20,15 +20,16 @@
 \item{statement}{For \code{type = "zscore_posterior"}, an integer index
 or statement name.}
 
-\item{...}{Ignored.}
+\item{...}{Passed to the underlying figure function (e.g. \code{title},
+\code{anonymize} for membership).}
 }
 \value{
 A \code{ggplot} object.
 }
 \description{
-Generic \code{\link[ggplot2:autoplot]{ggplot2::autoplot()}} method for \code{bayesqm_fit}. Unlike the
-base-R \code{\link[=plot.bayesqm_fit]{plot.bayesqm_fit()}}, these renderings use
-\code{ggdist::stat_pointinterval} and \code{ggdist::stat_halfeye} for
-publication-grade posterior summaries.
+Generic \code{\link[ggplot2:autoplot]{ggplot2::autoplot()}} method for \code{bayesqm_fit}. Dispatches
+to \code{\link[=make_dominant_panel]{make_dominant_panel()}} when \code{type = "membership"}; uses
+\code{ggdist::stat_pointinterval} / \code{stat_halfeye} for the remaining
+views.
 }
 \keyword{internal}

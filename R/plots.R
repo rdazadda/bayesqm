@@ -1,7 +1,7 @@
 # plots.R
-# Paper-quality base-R plots for bayesqm objects. Every function
-# visualises a quantity already on the fit -- aligned posterior draws,
-# PPC summaries, MatchAlign congruence, or the ELPD-over-K table. The
+# Base-R plots for bayesqm objects. Every function visualises a
+# quantity already on the fit (aligned posterior draws, PPC
+# summaries, MatchAlign congruence, or the ELPD-over-K table). The
 # family shares:
 #   - a bayesplot-compatible "blue" palette (light -> mid -> dark plus
 #     one muted-red accent), colourblind-safe and greyscale-legible;
@@ -66,16 +66,11 @@ plot.bayesqm_fit <- function(x, sort_by = 1L, prob = NULL,
   if (sort_by < 1L || sort_by > K)
     stop("sort_by must be an integer in 1:K.")
 
-  dm    <- dim(x$F_draws)[2:3]
-  med   <- apply(x$F_draws, c(2, 3), median);                   dim(med)  <- dm
-  o_lo  <- apply(x$F_draws, c(2, 3), quantile,
-                 probs = alpha / 2,     names = FALSE);         dim(o_lo) <- dm
-  o_hi  <- apply(x$F_draws, c(2, 3), quantile,
-                 probs = 1 - alpha / 2, names = FALSE);         dim(o_hi) <- dm
-  i_lo  <- apply(x$F_draws, c(2, 3), quantile,
-                 probs = 0.25, names = FALSE);                  dim(i_lo) <- dm
-  i_hi  <- apply(x$F_draws, c(2, 3), quantile,
-                 probs = 0.75, names = FALSE);                  dim(i_hi) <- dm
+  med  <- .summarize_draws(x$F_draws, median)
+  o_lo <- .summarize_draws(x$F_draws, quantile, probs = alpha / 2,     names = FALSE)
+  o_hi <- .summarize_draws(x$F_draws, quantile, probs = 1 - alpha / 2, names = FALSE)
+  i_lo <- .summarize_draws(x$F_draws, quantile, probs = 0.25,          names = FALSE)
+  i_hi <- .summarize_draws(x$F_draws, quantile, probs = 0.75,          names = FALSE)
 
   labels <- dimnames(x$F_draws)[[2]]
   if (is.null(labels)) labels <- paste0("S", seq_len(nrow(med)))
@@ -133,7 +128,7 @@ plot.bayesqm_fit <- function(x, sort_by = 1L, prob = NULL,
 #' @return The input, invisibly.
 #' @export
 plot_elpd <- function(run, ...) {
-  stopifnot(inherits(run, "bayesqm_run"))
+  assert_bayesqm_run(run)
   cols <- .bq_col()
 
   tab <- run$tab
@@ -203,7 +198,7 @@ plot_elpd <- function(run, ...) {
 #' @return The input, invisibly.
 #' @export
 plot_membership <- function(fit, sort = TRUE, ...) {
-  stopifnot(inherits(fit, "bayesqm_fit"))
+  assert_bayesqm_fit(fit)
   cols <- .bq_col()
 
   prob <- compute_dominant_prob(fit$Lambda_draws)
@@ -284,7 +279,7 @@ plot_membership <- function(fit, sort = TRUE, ...) {
 #' @return The input, invisibly.
 #' @export
 plot_ppc <- function(fit, breaks = 30, ...) {
-  stopifnot(inherits(fit, "bayesqm_fit"))
+  assert_bayesqm_fit(fit)
   cols <- .bq_col()
 
   rmse <- fit$ppc$rmse.r
@@ -342,7 +337,7 @@ plot_ppc <- function(fit, breaks = 30, ...) {
 #' @export
 plot_loading_posterior <- function(fit, factors = NULL,
                                    highlight_flagged = TRUE, ...) {
-  stopifnot(inherits(fit, "bayesqm_fit"))
+  assert_bayesqm_fit(fit)
   cols <- .bq_col()
 
   L <- fit$Lambda_draws
@@ -365,16 +360,11 @@ plot_loading_posterior <- function(fit, factors = NULL,
   prob    <- fit$brief$prob
   alpha_o <- 1 - prob
 
-  dm   <- c(N, K)
-  med  <- apply(L, c(2, 3), median);                            dim(med)  <- dm
-  o_lo <- apply(L, c(2, 3), quantile, probs = alpha_o / 2,
-                names = FALSE);                                 dim(o_lo) <- dm
-  o_hi <- apply(L, c(2, 3), quantile, probs = 1 - alpha_o / 2,
-                names = FALSE);                                 dim(o_hi) <- dm
-  i_lo <- apply(L, c(2, 3), quantile, probs = 0.25,
-                names = FALSE);                                 dim(i_lo) <- dm
-  i_hi <- apply(L, c(2, 3), quantile, probs = 0.75,
-                names = FALSE);                                 dim(i_hi) <- dm
+  med  <- .summarize_draws(L, median)
+  o_lo <- .summarize_draws(L, quantile, probs = alpha_o / 2,     names = FALSE)
+  o_hi <- .summarize_draws(L, quantile, probs = 1 - alpha_o / 2, names = FALSE)
+  i_lo <- .summarize_draws(L, quantile, probs = 0.25,            names = FALSE)
+  i_hi <- .summarize_draws(L, quantile, probs = 0.75,            names = FALSE)
 
   brown <- 1.96 / sqrt(fit$brief$J)
   xlim  <- range(c(o_lo, o_hi, -brown, brown), na.rm = TRUE)
@@ -440,7 +430,7 @@ plot_loading_posterior <- function(fit, factors = NULL,
 #' @return The input, invisibly.
 #' @export
 plot_zscore_posterior <- function(fit, statement, ...) {
-  stopifnot(inherits(fit, "bayesqm_fit"))
+  assert_bayesqm_fit(fit)
   cols <- .bq_col()
 
   F <- fit$F_draws
@@ -520,7 +510,7 @@ plot_zscore_posterior <- function(fit, statement, ...) {
 #' @return The input, invisibly.
 #' @export
 plot_tucker <- function(fit, ...) {
-  stopifnot(inherits(fit, "bayesqm_fit"))
+  assert_bayesqm_fit(fit)
   cols <- .bq_col()
 
   cng <- fit$align_info$congruence
@@ -584,7 +574,7 @@ plot_tucker <- function(fit, ...) {
 #' @return The input, invisibly.
 #' @export
 plot_dist_cons <- function(fit, delta = 1.0, ...) {
-  stopifnot(inherits(fit, "bayesqm_fit"))
+  assert_bayesqm_fit(fit)
   if (fit$brief$K < 2) stop("plot_dist_cons requires K >= 2.")
   cols <- .bq_col()
 
@@ -651,7 +641,7 @@ plot_dist_cons <- function(fit, delta = 1.0, ...) {
 #' @export
 plot_hyper <- function(fit, pars = c("nu", "sigma", "tau"),
                        log = NULL, ...) {
-  stopifnot(inherits(fit, "bayesqm_fit"))
+  assert_bayesqm_fit(fit)
   cols <- .bq_col()
 
   hp    <- fit$hyperparams

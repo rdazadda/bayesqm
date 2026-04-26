@@ -2,21 +2,22 @@
 % Please edit documentation in R/plots.R
 \name{plot_elpd}
 \alias{plot_elpd}
-\title{ELPD across K with peak and Sivula markers}
+\title{ELPD across K with peak and Sivula annotations}
 \usage{
 plot_elpd(run, ...)
 }
 \arguments{
-\item{run}{A \code{bayesqm_run} object.}
+\item{run}{A \code{bayesqm_run}.}
 
-\item{...}{Passed to \code{plot()}.}
+\item{...}{Additional arguments forwarded to \code{plot()}.}
 }
 \value{
 The input, invisibly.
 }
 \description{
-Plots the ELPD across the K values enumerated by \code{\link[=run_bayes]{run_bayes()}}, with
-+/- 1.96 SE bars, a dashed vertical rule at the Sivula K and a solid
-vertical rule at the ELPD-peak K. The plot title reports the
+ELPD against K with +/- 1.96 SE whiskers, a solid vertical rule at
+the ELPD peak, and a dashed rule at the Sivula (parsimony) K. Both
+rules are drawn in the primary blue, distinguished by line type and
+by text annotations at the top of the axis. The title reports the
 peak-plus-Sivula case (\code{agree}, \code{gap}, \code{reversed}).
 }

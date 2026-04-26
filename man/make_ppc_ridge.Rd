@@ -15,7 +15,7 @@ make_ppc_ridge(run, title = NULL)
 A \code{ggplot} object.
 }
 \description{
-Direct port of the paper's Figure E4 renderer. Draws a ridgeline
-density of the posterior predictive correlation-matrix RMSE
-(\eqn{RMSE_R}) at every K in \code{run}, with a median tick per ridge.
+Draws a ridgeline density of the posterior predictive
+correlation-matrix RMSE (\eqn{RMSE_R}) at every K in \code{run}, with
+a median tick per ridge.
 }

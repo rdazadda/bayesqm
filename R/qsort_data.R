@@ -1,4 +1,4 @@
-# data.R
+# qsort_data.R
 # The qsort_data class: a small container for a Q-sort dataset with its
 # statement labels, participant IDs, forced distribution, and metadata.
 # Also the validation helpers shared by the readers and the constructor.

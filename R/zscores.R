@@ -31,14 +31,9 @@ compute_zscores <- function(F_draws, prob = 0.95) {
   qlo <- alpha / 2
   qhi <- 1 - qlo
 
-  dm <- dim(F_draws)[2:3]
-  mean_mat  <- apply(F_draws, c(2, 3), mean);  dim(mean_mat)  <- dm
-  lower_mat <- apply(F_draws, c(2, 3),
-                     function(v) quantile(v, probs = qlo, names = FALSE))
-  dim(lower_mat) <- dm
-  upper_mat <- apply(F_draws, c(2, 3),
-                     function(v) quantile(v, probs = qhi, names = FALSE))
-  dim(upper_mat) <- dm
+  mean_mat  <- .summarize_draws(F_draws, mean)
+  lower_mat <- .summarize_draws(F_draws, quantile, probs = qlo, names = FALSE)
+  upper_mat <- .summarize_draws(F_draws, quantile, probs = qhi, names = FALSE)
 
   out <- data.frame(statement = rn, stringsAsFactors = FALSE)
   for (k in seq_len(K)) {

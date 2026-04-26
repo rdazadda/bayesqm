@@ -17,7 +17,7 @@
 #' @param K_max Largest K to try (default 5).
 #' @param stan_dir Optional override of the Stan model directory.
 #' @param elpd_diff_threshold,se_ratio_threshold Sivula rule thresholds
-#'   (paper defaults 4 and 2).
+#'   (defaults 4 and 2).
 #' @param ... Passed to [fit_bayesian()].
 #' @param elpds,loo_list,K_candidates Internal inputs for
 #'   `select_k_peak()` and `select_k_sivula()`.
@@ -98,10 +98,9 @@ select_k_peak <- function(elpds, K_candidates) {
 }
 
 
-# Sivula et al. (2025) parsimony diagnostic: starting from the simplest
-# candidate, advance to a larger K only if the ELPD difference exceeds
+# Sivula parsimony diagnostic: starting from the simplest candidate,
+# advance to a larger K only if the ELPD difference exceeds
 # elpd_diff_threshold AND the |diff| / SE ratio exceeds se_ratio_threshold.
-# Paper defaults: 4 and 2.
 #' @rdname run_bayes
 #' @export
 select_k_sivula <- function(elpds, loo_list, K_candidates,

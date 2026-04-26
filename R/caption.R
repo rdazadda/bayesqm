@@ -1,9 +1,7 @@
 # caption.R
-# A single-function helper that returns a ready-to-paste figure caption
-# drawn from whatever the fit already knows about itself. Reviewers
-# always ask for N, K, chains, and convergence diagnostics; rather than
-# have every user reconstruct that sentence each time, fetch it from
-# $brief and $diagnostics.
+# Builds a one-line figure caption summarising the model configuration,
+# sampler settings, and convergence diagnostics from fit$brief and
+# fit$diagnostics.
 
 
 #' Dynamic figure caption for a bayesqm_fit
@@ -12,11 +10,10 @@
 #' Returns a human-readable caption string summarising the model
 #' configuration (`K`, `N`, `J`, family), the sampler (backend, chains,
 #' post-warmup draws), the interval probability, and convergence
-#' diagnostics (max Rhat, divergent transitions). Optionally appends a
-#' citation to the accompanying Psychometrika paper.
+#' diagnostics (max Rhat, divergent transitions).
 #'
 #' @param fit A `bayesqm_fit`.
-#' @param include_ref Logical; append the paper citation.
+#' @param include_ref Logical; append a brief package-attribution line.
 #' @param include_diag Logical; append the convergence-diagnostic line.
 #'
 #' @return A length-1 character string.
@@ -28,7 +25,7 @@
 #'
 #' @export
 caption_bayesqm <- function(fit, include_ref = TRUE, include_diag = TRUE) {
-  stopifnot(inherits(fit, "bayesqm_fit"))
+  assert_bayesqm_fit(fit)
   b <- fit$brief
   d <- if (is.null(fit$diagnostics)) list() else fit$diagnostics
 
@@ -59,8 +56,7 @@ caption_bayesqm <- function(fit, include_ref = TRUE, include_diag = TRUE) {
   out <- paste0(paste(parts, collapse = "; "), ".")
 
   if (isTRUE(include_ref))
-    out <- paste(out,
-                 "Fitted with the bayesqm R package (Dacosta Azadda, 2026).")
+    out <- paste(out, "Fitted with the bayesqm R package.")
 
   out
 }

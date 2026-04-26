@@ -12,14 +12,14 @@ make_dominant_panel(fit, title = NULL, anonymize = TRUE)
 \item{title}{Optional panel title.}
 
 \item{anonymize}{Logical; when \code{TRUE}, participants are relabelled
-\verb{P01..PNN}.}
+\code{P01..PNN}.}
 }
 \value{
 A \code{ggplot} object.
 }
 \description{
-Direct port of the paper's Figure E2 renderer. Draws a blue-gradient
-heatmap of \code{P(dominant factor = k)} per participant, with a right-
-hand "Assignment" strip (orange-red gradient) showing the verdict
-"Strong / Mod. / Weak F-k" for each participant.
+Draws a blue-gradient heatmap of \verb{P(dominant factor = k)} per
+participant, with a right-hand "Assignment" strip (orange-red
+gradient) showing the verdict "Strong / Mod. / Weak F-k" for each
+participant.
 }

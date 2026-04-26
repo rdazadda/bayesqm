@@ -32,8 +32,8 @@ draws.}
 \item{delta}{Minimum separation on the standardized factor-score
 scale (default \code{1.0}).}
 
-\item{strong, moderate}{Tier cutoffs on \code{max P(dominant)} (defaults
-0.80 and 0.60 following the paper).}
+\item{strong, moderate}{Tier cutoffs on \verb{max P(dominant)} (defaults
+0.80 and 0.60).}
 }
 \value{
 \code{compute_threshold_prob()}, \code{compute_dominant_prob()} return
@@ -43,16 +43,16 @@ length-\code{J} named vector. \code{classify_membership()} returns a data
 frame.
 }
 \description{
-The paper's Section 6 summaries, each computed entirely from posterior
-draws:
+Probabilistic summaries of factor membership and statement
+interpretation, each computed entirely from posterior draws:
 \itemize{
 \item \code{compute_threshold_prob()} returns the \verb{N x K} posterior
-probability that \code{|lambda_ik| > threshold}, i.e. the Bayesian
+probability that \verb{|lambda_ik| > threshold}, i.e. the Bayesian
 version of the Brown (1980) flagging rule.
 \item \code{compute_dominant_prob()} returns the \verb{N x K} posterior
 probability that factor \code{k} is the dominant factor for participant
 \code{i}.
-\item \code{compute_distinguishing_prob()} returns \code{P(|f_jk - f_jl| > delta)}
+\item \code{compute_distinguishing_prob()} returns \verb{P(|f_jk - f_jl| > delta)}
 for every pair of factors.
 \item \code{compute_consensus_prob()} returns the joint probability that
 \emph{every} factor pair's separation stays below \code{delta}.

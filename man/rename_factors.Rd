@@ -16,7 +16,7 @@ labels.}
 The input fit with every factor label replaced.
 }
 \description{
-Replaces the default \verb{f1..fK} factor labels everywhere they appear on
+Replaces the default \code{f1..fK} factor labels everywhere they appear on
 the fit: posterior-mean and credible-interval loading matrices, the
 factor-score matrices, the factor-characteristics table, the
 correlation matrix, the flagged matrix, the distinguishing /

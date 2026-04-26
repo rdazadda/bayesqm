@@ -16,7 +16,7 @@ loading draws (e.g. \code{fit$Lambda_draws}).}
 \value{
 A data frame with columns \code{participant}, and three numeric
 columns per factor: \code{fk_loa} (posterior mean), \code{fk_lower}, and
-\code{fk_upper}, for \code{k = 1..K}.
+\code{fk_upper}, for \verb{k = 1..K}.
 }
 \description{
 Posterior mean and central credible-interval bounds for each

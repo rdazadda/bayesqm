@@ -48,7 +48,6 @@ test_that("plots use the active scheme", {
   pdf(file = tempfile(fileext = ".pdf"))
   on.exit(dev.off(), add = TRUE)
 
-  # Just verify it runs end-to-end under a non-default scheme.
   expect_silent(plot(fit))
   expect_silent(plot_loading_posterior(fit))
 })

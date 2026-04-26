@@ -1,9 +1,8 @@
-# Demo fit constructors. Produce reproducible synthetic bayesqm_fit /
-# bayesqm_run objects with structure that *looks* like a real Q-sort
-# analysis when plotted: participants load predominantly on one factor,
-# some statements polarise the factors, some are consensus, and the
-# posterior spread is tight enough that credible intervals separate
-# from zero.
+# Demo constructors for bayesqm_fit and bayesqm_run. Produce reproducible
+# synthetic objects with realistic Q-methodology structure: participants
+# load predominantly on one factor, statements partition into polarising,
+# consensus, neutral, and partial groups, and posterior spread is tight
+# enough for credible intervals to separate from zero.
 
 
 #' A synthetic bayesqm_fit for examples and tutorials

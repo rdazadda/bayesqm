@@ -72,9 +72,6 @@
 #'   `backend`).
 #'
 #' @references
-#' Dacosta Azadda, R. (2026). Bayesian Q Methodology: Probabilistic Factor
-#'   Analysis for the Study of Subjectivity. *Psychometrika* (in press).
-#'
 #' Poworoznek, E., Anceschi, N., Ferrari, F., & Dunson, D. (2025). Efficiently
 #'   Resolving Rotational Ambiguity in Bayesian Matrix Sampling with
 #'   Matching. *Bayesian Analysis*.

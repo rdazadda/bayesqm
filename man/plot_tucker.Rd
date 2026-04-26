@@ -9,14 +9,16 @@ plot_tucker(fit, ...)
 \arguments{
 \item{fit}{A \code{bayesqm_fit}.}
 
-\item{...}{Passed to \code{boxplot()}.}
+\item{...}{Additional arguments forwarded to \code{boxplot()}.}
 }
 \value{
 The input, invisibly.
 }
 \description{
 Boxplot of the per-draw Tucker's phi between each aligned loading
-column and its pivot, stored in \code{fit$align_info$congruence}. A
-dashed reference line is drawn at 0.95 (a common near-identity
-threshold for rotational agreement).
+column and the MatchAlign pivot, stored on
+\code{fit$align_info$congruence}. A semi-transparent strip of the
+individual draws is overlaid so bimodality -- the visible signature
+of residual label-switching -- is not hidden by the box. A dashed
+rule at 0.95 marks the conventional near-identity threshold.
 }

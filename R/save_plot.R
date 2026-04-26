@@ -1,9 +1,8 @@
 # save_plot.R
-# A single helper that opens an appropriate graphics device from the file
-# extension, evaluates a plot expression (lazy), closes the device, and
-# returns the path. Spares every user the same `pdf(...); plot(...); dev.off()`
-# ritual and encodes journal-appropriate defaults (7.2" double-column
-# width, 5" height, 300 dpi for raster formats).
+# Opens the appropriate graphics device for the file extension, evaluates
+# the (lazily evaluated) plot expression on it, closes the device, and
+# returns the path. Defaults to a 7.2 x 5 inch figure at 300 dpi for
+# raster formats.
 
 
 #' Save a bayesqm plot to file

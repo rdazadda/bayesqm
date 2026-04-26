@@ -8,8 +8,6 @@ test_that("$flagged is a logical N x K matrix on every fit", {
 })
 
 test_that("$flagged marks at most one factor per participant", {
-  # With P(dominant = k) > 0.5 as the rule, the flagged column count per
-  # row is 0 or 1 -- only one factor can clear a majority threshold.
   fit <- make_fake_fit(N = 10, J = 12, K = 3, seed = 1L)
   row_counts <- rowSums(fit$flagged)
   expect_true(all(row_counts <= 1))

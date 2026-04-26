@@ -11,7 +11,7 @@ test_that("new_bayesqm_fit populates qmethod-parallel slots", {
     expect_true(slot %in% names(fit),
                 info = paste0("missing slot: ", slot))
 
-  # Uses qmethod's slot name, not $data.
+  # qmethod compatibility: the slot is $dataset, not $data.
   expect_false("data" %in% names(fit))
 })
 
@@ -59,7 +59,7 @@ test_that("f_char has characteristics and cor_zsc with correct shape", {
                     names(fit$f_char$characteristics)))
   expect_equal(nrow(fit$f_char$characteristics), 3L)
   expect_equal(dim(fit$f_char$cor_zsc), c(3, 3))
-  expect_equal(diag(fit$f_char$cor_zsc), c(1, 1, 1))
+  expect_equal(unname(diag(fit$f_char$cor_zsc)), c(1, 1, 1))
 })
 
 test_that("qdc has the qmethod-compatible dist.and.cons column", {

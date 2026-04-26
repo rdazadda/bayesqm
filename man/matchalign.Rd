@@ -24,5 +24,7 @@ pivot selection, greedy L2 signed-permutation matching, and Procrustes
 rotation.
 }
 \references{
-Poworoznek et al. (2025). \emph{Bayesian Analysis}.
+Poworoznek, E., Anceschi, N., Ferrari, F., & Dunson, D. (2025).
+Efficiently Resolving Rotational Ambiguity in Bayesian Matrix
+Sampling with Matching. \emph{Bayesian Analysis}.
 }

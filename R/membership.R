@@ -1,13 +1,13 @@
 # membership.R
 # Posterior summaries of factor membership and statement interpretation.
-# Input draws must be MatchAlign-aligned or these summaries are meaningless.
+# Input draws must be MatchAlign-aligned for these summaries to be valid.
 
 
 #' Probabilistic factor-membership summaries
 #'
 #' @description
-#' The paper's Section 6 summaries, each computed entirely from posterior
-#' draws:
+#' Probabilistic summaries of factor membership and statement
+#' interpretation, each computed entirely from posterior draws:
 #'
 #' - `compute_threshold_prob()` returns the `N x K` posterior
 #'   probability that `|lambda_ik| > threshold`, i.e. the Bayesian
@@ -31,7 +31,7 @@
 #' @param delta Minimum separation on the standardized factor-score
 #'   scale (default `1.0`).
 #' @param strong,moderate Tier cutoffs on `max P(dominant)` (defaults
-#'   0.80 and 0.60 following the paper).
+#'   0.80 and 0.60).
 #'
 #' @return `compute_threshold_prob()`, `compute_dominant_prob()` return
 #'   `N x K` matrices. `compute_distinguishing_prob()` returns a
@@ -46,8 +46,7 @@ compute_threshold_prob <- function(Lambda_draws, threshold) {
   N <- dim(Lambda_draws)[2]
   K <- dim(Lambda_draws)[3]
 
-  prob <- apply(abs(Lambda_draws) > threshold, c(2, 3), mean)
-  dim(prob) <- dim(Lambda_draws)[2:3]
+  prob <- .summarize_draws(abs(Lambda_draws) > threshold, mean)
 
   rn <- dimnames(Lambda_draws)[[2]]
   cn <- dimnames(Lambda_draws)[[3]]

@@ -34,9 +34,6 @@
 #'   accessors.
 #'
 #' @references
-#' Dacosta Azadda, R. (2026). Bayesian Q Methodology: Probabilistic Factor
-#'   Analysis for the Study of Subjectivity.
-#'
 #' Poworoznek et al. (2025). Efficiently Resolving Rotational Ambiguity in
 #'   Bayesian Matrix Sampling with Matching. *Bayesian Analysis*.
 #'
@@ -98,7 +95,7 @@ fit_bayesian <- function(Y, K, stan_dir = NULL, robust = TRUE, nu = "estimate",
 
   draws <- extract_draws(fit, N, J, K, be)
 
-  # thin for MatchAlign (and for consistent draws in all posterior summaries)
+  # Thin so MatchAlign and the posterior summaries operate on a consistent draw set.
   nt <- dim(draws$Lambda)[1]
   if (nt == 0) stop("Backend returned zero post-warmup draws.")
   if (!is.null(max_draws) && nt > max_draws) {
@@ -111,13 +108,11 @@ fit_bayesian <- function(Y, K, stan_dir = NULL, robust = TRUE, nu = "estimate",
   }
 
   aln <- matchalign(draws$Lambda, draws$Fmat)
-  dm <- dim(aln$Lambda)[2:3]
-  Lhat <- apply(aln$Lambda, c(2, 3), mean);   dim(Lhat) <- dm
-  Lmed <- apply(aln$Lambda, c(2, 3), median); dim(Lmed) <- dm
+  Lhat <- .summarize_draws(aln$Lambda, mean)
+  Lmed <- .summarize_draws(aln$Lambda, median)
   alpha <- 1 - prob
-  ci_lo <- apply(aln$Lambda, c(2, 3), quantile, probs =     alpha / 2)
-  ci_hi <- apply(aln$Lambda, c(2, 3), quantile, probs = 1 - alpha / 2)
-  dim(ci_lo) <- dm; dim(ci_hi) <- dm
+  ci_lo <- .summarize_draws(aln$Lambda, quantile, probs =     alpha / 2, names = FALSE)
+  ci_hi <- .summarize_draws(aln$Lambda, quantile, probs = 1 - alpha / 2, names = FALSE)
 
   loo_el <- tryCatch(compute_loo(fit, be), error = function(e) NULL)
   loo_ps <- tryCatch(compute_loo_person(fit, be), error = function(e) NULL)
@@ -180,11 +175,20 @@ sample_cmdstanr <- function(sf, data, chains, iter, warmup, seed, ad) {
   ext <- if (.Platform$OS.type == "windows") ".exe" else ""
   exe <- file.path(cache, paste0(tools::file_path_sans_ext(basename(sf)), ext))
   mod <- cmdstanr::cmdstan_model(sf, exe_file = exe)
+
+  # Isolate sampler CSVs in a per-call directory under tempdir(). The default
+  # output_dir is tempdir() itself; on Windows that namespace can be touched
+  # by other processes (snapshot tests, antivirus, GC) between sampling and
+  # the post-hoc CSV read, leading to spurious "file does not exist" errors.
+  out_dir <- tempfile("bq_stan_")
+  dir.create(out_dir, recursive = TRUE)
+
   mod$sample(data = data, chains = chains,
              parallel_chains = min(chains, max(1, parallel::detectCores() - 1)),
              iter_warmup = warmup, iter_sampling = iter - warmup,
              seed = seed, refresh = max(100, (iter - warmup) %/% 5),
-             show_messages = FALSE, adapt_delta = ad, max_treedepth = 12)
+             show_messages = FALSE, adapt_delta = ad, max_treedepth = 12,
+             output_dir = out_dir)
 }
 
 #' @keywords internal
@@ -197,22 +201,33 @@ sample_rstan <- function(sf, data, chains, iter, warmup, seed, ad) {
               control = list(adapt_delta = ad, max_treedepth = 12))
 }
 
+# Pull a Stan-indexed parameter (e.g. "Lambda[i,k]") out of a draws data
+# frame and reshape it into a [draws, dim_lengths[1], dim_lengths[2]] array.
+# Returns NULL if no columns of that parameter are present in `dd`.
+#' @keywords internal
+#' @noRd
+extract_indexed <- function(dd, name, dim_lengths) {
+  cols <- grep(paste0("^", name, "\\["), names(dd), value = TRUE)
+  if (length(cols) == 0L) return(NULL)
+  m <- regmatches(cols, regexec(paste0(name, "\\[(\\d+),(\\d+)\\]"), cols))
+  ix <- do.call(rbind, lapply(m, function(x) as.integer(x[2:3])))
+  out <- array(NA_real_, c(nrow(dd), dim_lengths))
+  for (j in seq_along(cols))
+    out[, ix[j, 1], ix[j, 2]] <- dd[[cols[j]]]
+  out
+}
+
+
 #' @keywords internal
 #' @noRd
 extract_draws <- function(fit, N, J, K, be) {
   if (be == "cmdstanr") {
     dd <- as.data.frame(fit$draws(format = "df"))
     nd <- nrow(dd)
-    Lambda <- array(NA_real_, c(nd, N, K))
-    Fmat   <- array(NA_real_, c(nd, J, K))
-    for (i in seq_len(N)) for (k in seq_len(K)) {
-      col <- paste0("Lambda[", i, ",", k, "]")
-      if (col %in% names(dd)) Lambda[, i, k] <- dd[[col]]
-    }
-    for (m in seq_len(J)) for (k in seq_len(K)) {
-      col <- paste0("F[", m, ",", k, "]")
-      if (col %in% names(dd)) Fmat[, m, k] <- dd[[col]]
-    }
+    Lambda <- extract_indexed(dd, "Lambda", c(N, K))
+    Fmat   <- extract_indexed(dd, "F",      c(J, K))
+    if (is.null(Lambda)) Lambda <- array(NA_real_, c(nd, N, K))
+    if (is.null(Fmat))   Fmat   <- array(NA_real_, c(nd, J, K))
     nu    <- if ("nu" %in% names(dd)) dd[["nu"]] else rep(NA_real_, nd)
     sigma <- if ("sigma" %in% names(dd)) dd[["sigma"]] else rep(NA_real_, nd)
     tau   <- if ("tau" %in% names(dd)) dd[["tau"]] else rep(NA_real_, nd)
@@ -323,7 +338,9 @@ compute_ppc <- function(fit, Y, be) {
 #'   `pivot` index used.
 #'
 #' @references
-#' Poworoznek et al. (2025). *Bayesian Analysis*.
+#' Poworoznek, E., Anceschi, N., Ferrari, F., & Dunson, D. (2025).
+#'   Efficiently Resolving Rotational Ambiguity in Bayesian Matrix
+#'   Sampling with Matching. *Bayesian Analysis*.
 #'
 #' @export
 matchalign <- function(Lambda_draws, F_draws) {
@@ -359,7 +376,11 @@ matchalign <- function(Lambda_draws, F_draws) {
   else piv <- 1L
   Lp <- rL[piv, , , drop = FALSE]; dim(Lp) <- c(N, K)
 
-  # Step 3: Greedy L2 signed-permutation matching to pivot
+  # Step 3: signed-permutation matching to pivot. For K > 1, the K x K
+  # assignment problem is solved with lpSolve when available; falls back
+  # to a greedy K^2 sweep otherwise.
+  has.lp <- K > 1 && requireNamespace("lpSolve", quietly = TRUE)
+
   for (s in seq_len(nd)) {
     Ls <- rL[s, , , drop = FALSE]; dim(Ls) <- c(N, K)
     Fs <- rF[s, , , drop = FALSE]; dim(Fs) <- c(J, K)
@@ -369,24 +390,36 @@ matchalign <- function(Lambda_draws, F_draws) {
         Ls[, 1] <- -Ls[, 1]; Fs[, 1] <- -Fs[, 1]
       }
     } else {
-      perm <- integer(K)
-      sgn  <- integer(K)
-      used <- logical(K)
-      for (k in seq_len(K)) {
-        best.dist <- Inf
-        best.j <- 0L
-        best.s <- 1L
-        for (j in seq_len(K)) {
-          if (used[j]) next
-          d.pos <- sum((Ls[, j] - Lp[, k])^2)
-          d.neg <- sum((Ls[, j] + Lp[, k])^2)
-          if (d.pos < best.dist) { best.dist <- d.pos; best.j <- j; best.s <-  1L }
-          if (d.neg < best.dist) { best.dist <- d.neg; best.j <- j; best.s <- -1L }
+      cost <- matrix(NA_real_, K, K)
+      sgn_mat <- matrix(1L, K, K)
+      for (k in seq_len(K)) for (j in seq_len(K)) {
+        d.pos <- sum((Ls[, j] - Lp[, k])^2)
+        d.neg <- sum((Ls[, j] + Lp[, k])^2)
+        if (d.neg < d.pos) {
+          cost[k, j] <- d.neg; sgn_mat[k, j] <- -1L
+        } else {
+          cost[k, j] <- d.pos
         }
-        perm[k] <- best.j
-        sgn[k]  <- best.s
-        used[best.j] <- TRUE
       }
+
+      if (has.lp) {
+        sol  <- lpSolve::lp.assign(cost)$solution
+        perm <- apply(sol, 1, which.max)
+      } else {
+        perm <- integer(K); used <- logical(K)
+        for (k in seq_len(K)) {
+          best.dist <- Inf; best.j <- 0L
+          for (j in seq_len(K)) {
+            if (used[j]) next
+            if (cost[k, j] < best.dist) {
+              best.dist <- cost[k, j]; best.j <- j
+            }
+          }
+          perm[k] <- best.j; used[best.j] <- TRUE
+        }
+      }
+      sgn <- sgn_mat[cbind(seq_len(K), perm)]
+
       Ls <- Ls[, perm, drop = FALSE]
       Fs <- Fs[, perm, drop = FALSE]
       for (k in seq_len(K)) { Ls[, k] <- Ls[, k] * sgn[k]; Fs[, k] <- Fs[, k] * sgn[k] }

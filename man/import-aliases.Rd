@@ -28,5 +28,5 @@ A \code{qsort_data} object.
 Thin aliases that forward to \code{\link[=read_pqmethod]{read_pqmethod()}}, \code{\link[=read_qsort]{read_qsort()}} (HTMLQ
 auto-detection), \code{\link[=read_kenq]{read_kenq()}}, and \code{\link[=read_easyhtml_firebase]{read_easyhtml_firebase()}}. These
 exist only so scripts written against the \code{qmethod} package continue
-to work; new code should call the \code{read_*} functions directly.
+to work; new code should call the \verb{read_*} functions directly.
 }

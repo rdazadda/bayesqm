@@ -5,8 +5,8 @@
 #' Simulate Q-sort data
 #'
 #' @description
-#' `generate_data()` is the top-level data-generating function used by
-#' the paper's simulation studies and by package tests. It builds a
+#' `generate_data()` is the top-level data-generating function used
+#' by the package's simulation studies and tests. It builds a
 #' loading matrix (`generate_loadings()`), factor scores, noise of the
 #' chosen type (`generate_noise()`), and discretises the continuous
 #' signal onto a forced Q-sort grid (`discretize_to_grid()`). See also

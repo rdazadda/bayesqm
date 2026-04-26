@@ -11,17 +11,15 @@ make_elpd_diff(run, title = NULL, adopted = NULL)
 
 \item{title}{Optional panel title.}
 
-\item{adopted}{Integer K adopted by the analyst (e.g. the value
-reported in a paper). Marked with the orange diamond. \code{NULL}
-suppresses this annotation.}
+\item{adopted}{Integer K adopted by the analyst. Marked with the
+orange diamond. \code{NULL} suppresses this annotation.}
 }
 \value{
 A \code{ggplot} object.
 }
 \description{
-Direct port of the paper's Figure E1 renderer. Draws
-\eqn{\Delta}ELPD against K with +/- 1.96 SE whiskers, shades the
-Sivula rejection band (\eqn{|\Delta \mathrm{ELPD}| < 4}), and marks
-the Sivula-selected K (red triangle), the ELPD peak (blue square),
-and an optional adopted K (orange diamond).
+Draws \eqn{\Delta}ELPD against K with +/- 1.96 SE whiskers, shades
+the Sivula rejection band (\eqn{|\Delta \mathrm{ELPD}| < 4}), and
+marks the Sivula-selected K (red triangle), the ELPD peak (blue
+square), and an optional adopted K (orange diamond).
 }

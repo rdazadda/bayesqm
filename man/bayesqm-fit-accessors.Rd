@@ -59,7 +59,7 @@ residual scale, \code{nobs()} is the number of participants, and
 \code{family()} returns a small \code{bayesqm_family} list with \verb{$family},
 \verb{$link}, and \verb{$nu}. \code{as.matrix()}, \code{as.array()}, and \code{as.data.frame()}
 return the posterior draws in Stan-style parameter naming
-(\verb{Lambda[i,k]}, \verb{F[j,k]}, \code{nu}, \code{sigma}, \code{tau}), which the
+(\code{Lambda[i,k]}, \code{F[j,k]}, \code{nu}, \code{sigma}, \code{tau}), which the
 \pkg{posterior}, \pkg{bayesplot}, and \pkg{tidybayes} packages
 consume natively.
 
