@@ -24,9 +24,7 @@ knitr::opts_chunk$set(
 
 This vignette walks through one Q study end to end in **bayesqm**:
 import, fit, diagnose, interpret, select K, and export. The running
-example is a 33-participant, 42-statement Q-sort generated with the
-package's data simulator so the vignette is reproducible without
-network access or extra data files.
+example is a synthetic 33-participant, 42-statement Q-sort.
 
 ```{r, message = FALSE, warning = FALSE}
 library(bayesqm)
@@ -47,8 +45,7 @@ qdata <- read_qsort("mystudy.DAT")   # PQMethod
 qdata <- read_qsort("mystudy.zip")   # KADE project
 ```
 
-For this vignette we generate a Q-sort dataset of 33 participants
-ranking 42 statements:
+The example dataset:
 
 ```{r}
 sim   <- generate_data(N = 33, J = 42, K = 3, seed = 1)
@@ -79,9 +76,10 @@ diagnostic.
 
 ## Diagnostics
 
-Convergence statistics live in `fit$diagnostics`. The recommended
-thresholds are R-hat below 1.01, bulk and tail effective sample sizes
-above 400, and zero divergent transitions [@VehtariEtAl2021]:
+Convergence statistics are stored on `fit$diagnostics`. The
+recommended thresholds are R-hat below 1.01, bulk and tail effective
+sample sizes above 400, and zero divergent transitions
+[@VehtariEtAl2021]:
 
 ```{r}
 fit$diagnostics
@@ -116,16 +114,16 @@ head(compute_loadings(fit$Lambda_draws, prob = 0.95))
 
 ## Factor z-scores
 
-`plot()` gives a cross-panel z-score dotchart; rows share an order
-(by factor 1's posterior mean, configurable via `sort_by`) so the
-reader can scan horizontally to compare factors.
+`plot()` produces a cross-panel z-score dotchart; rows share an
+order (by factor 1's posterior mean, configurable via `sort_by`) so
+factors can be compared horizontally.
 
 ```{r zscores, fig.cap = "Posterior z-scores across factors with 50% and 95% credible intervals."}
 plot(fit)
 ```
 
 For a single statement across factors, `plot_zscore_posterior()`
-gives the drill-down:
+shows the per-factor view:
 
 ```{r zscore-one, fig.cap = "Posterior z-score for a single statement across factors."}
 plot_zscore_posterior(fit, statement = 1)
@@ -138,7 +136,7 @@ plot_zscore_posterior(fit, statement = 1)
 and the Sivula parsimony rule [@SivulaEtAl2025] is reported alongside
 as a diagnostic.
 
-On real data you would call:
+On real data:
 
 ```{r, eval = FALSE}
 run <- run_bayes(qdata, K_max = 4, seed = 1,
@@ -155,14 +153,11 @@ make_elpd_diff(run)
 ```
 
 The ELPD peak is always the adopted K. The Sivula diagnostic is
-reported alongside the peak so readers can see how confidently the
-data discriminate between adjacent models. The `run$case` field
-labels the relationship between the two: when Sivula lands on the
-same K as the peak, the case is `agree`; when Sivula points to a
-smaller K than the peak, the case is `gap`; when Sivula exceeds the
-peak, the case is `reversed` and usually indicates numerical
-instability in the comparison itself. In every case the adopted K is
-the ELPD peak.
+reported alongside as a parsimony check. The `run$case` field labels
+the relationship between the two: when Sivula lands on the same K as
+the peak, the case is `agree`; when Sivula points to a smaller K
+than the peak, the case is `gap`; when Sivula exceeds the peak, the
+case is `reversed` (rare in practice).
 
 ## Distinguishing, consensus, and membership
 
@@ -176,7 +171,7 @@ standardised factor-score scale.
 plot_dist_cons(fit, delta = 1.0)
 ```
 
-Participant-level membership is probabilistic too.
+Participant-level membership is also probabilistic.
 `classify_membership()` turns posterior dominance into a
 `Strong / Moderate / Weak` tier:
 
@@ -207,7 +202,7 @@ plot_hyper(fit)
 ## Reporting and exporting
 
 `save_bayesqm_plot()` writes any plot to PDF, SVG, PNG, TIFF, or
-JPEG at journal-appropriate dimensions:
+JPEG at the chosen dimensions:
 
 ```{r, eval = FALSE}
 save_bayesqm_plot("fig_loadings.pdf", plot_loading_posterior(fit))
@@ -215,9 +210,9 @@ save_bayesqm_plot("fig_elpd.pdf",      plot_elpd(run),
                   width = 3.5, height = 3)
 ```
 
-`caption_bayesqm()` returns a ready-to-paste figure caption with
-model configuration, sample sizes, interval probability, and
-convergence diagnostics:
+`caption_bayesqm()` returns a figure caption with model
+configuration, sample sizes, interval probability, and convergence
+diagnostics:
 
 ```{r}
 caption_bayesqm(fit)

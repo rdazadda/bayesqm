@@ -83,24 +83,25 @@ summaries:
 
 The `$case` field labels their relationship as `agree`, `gap`, or
 `reversed`. The ELPD peak is always the adopted K; the case label
-tells the reader how confidently the data discriminate between
-adjacent models, and the gap, when present, is itself a reportable
-finding rather than something to paper over.
+indicates how confidently the data discriminate between adjacent
+models, and a gap between the two is itself diagnostic information.
 
 ## Probabilistic factor membership
 
-Membership is summarized at three levels of resolution:
+Rather than dichotomizing each loading into flagged or unflagged,
+`bayesqm` reports the posterior probability that factor k is
+participant i's dominant factor, P(dominant_i = k | Y).
+`classify_membership()` turns these probabilities into a
+per-participant Strong / Moderate / Weak tier:
 
 ```r
-compute_threshold_prob(fit$Lambda_draws, threshold = 1.96 / sqrt(fit$brief$J))
 compute_dominant_prob(fit$Lambda_draws)
-classify_membership(fit$Lambda_draws)   # Strong / Moderate / Weak tiers
+classify_membership(fit$Lambda_draws)
 plot_membership(fit)
 ```
 
-Distinguishing and consensus statements use posterior probabilities of
-pairwise factor-score separations rather than thresholded standard
-errors:
+Distinguishing and consensus statements use posterior probabilities
+of pairwise factor-score separations:
 
 ```r
 compute_distinguishing_prob(fit$F_draws, delta = 1.0)
@@ -127,18 +128,17 @@ plot_elpd(run)                  # ELPD across K with peak / Sivula annotations
 ```
 
 For figure export, `save_bayesqm_plot()` opens the appropriate device
-from the file extension and `caption_bayesqm()` returns a
-ready-to-paste figure caption that reports K, N, J, chains, coverage
-probability, and convergence diagnostics.
+from the file extension and `caption_bayesqm()` returns a figure
+caption that reports K, N, J, chains, coverage probability, and
+convergence diagnostics.
 
 ## Compatibility with `qmethod`
 
 `bayesqm_fit` deliberately mirrors the slot names from the `qmethod`
-package (Zabala, 2014): `$dataset`, `$loa`, `$zsc`, `$zsc_n`,
+package (Zabala, 2015): `$dataset`, `$loa`, `$zsc`, `$zsc_n`,
 `$f_char`, `$qdc`, `$flagged`. It uses the same
 distinguishing-statement vocabulary (`"Distinguishes all"`,
-`"Consensus"`, `"Distinguishes f1, f3"`, `""`). Scripts written
-against `qmethod` largely keep working. Intentional Bayesian
+`"Consensus"`, `"Distinguishes f1, f3"`, `""`). Intentional Bayesian
 divergences are documented in `?bayesqm-package`:
 
 - `$flagged` is defined probabilistically as
@@ -170,7 +170,7 @@ citation("bayesqm")
 ## Where to look next
 
 - `vignette("bayesqm-intro")` walks the full workflow end to end on
-  a reproducible synthetic Q-sort.
+  a synthetic Q-sort.
 - `?fit_bayesian` documents every prior and sampler option.
 - `?run_bayes` covers the peak-plus-Sivula thresholds and the three
   case labels.
