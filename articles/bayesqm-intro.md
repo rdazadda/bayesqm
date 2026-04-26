@@ -45,7 +45,8 @@ qdata
 [`fit_bayesian()`](https://rdazadda.github.io/bayesqm/reference/fit_bayesian.md)
 samples the posterior of a low-rank factor model with a Student-t
 likelihood (by default) and a hierarchical normal prior on the loadings,
-then resolves rotational ambiguity with MatchAlign:
+then resolves rotational ambiguity with the MatchAlign post-processing
+of Poworoznek et al. ([2025](#ref-PoworoznekEtAl2025)):
 
 ``` r
 fit <- fit_bayesian(qdata, K = 3, chains = 4, iter = 2000,
@@ -62,7 +63,7 @@ fit
 #>   Data:      N = 33 persons, J = 42 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-04-26 09:18:09
+#>   Fitted:    2026-04-26 10:12:30
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
@@ -96,7 +97,10 @@ diagnostic.
 
 ## Diagnostics
 
-Convergence statistics live in `fit$diagnostics`:
+Convergence statistics live in `fit$diagnostics`. The recommended
+thresholds are R-hat below 1.01, bulk and tail effective sample sizes
+above 400, and zero divergent transitions ([Vehtari et al.
+2021](#ref-VehtariEtAl2021)):
 
 ``` r
 fit$diagnostics
@@ -114,7 +118,7 @@ fit$diagnostics
 ```
 
 [`plot_tucker()`](https://rdazadda.github.io/bayesqm/reference/plot_tucker.md)
-visualises the per-draw Tucker’s phi between each aligned factor column
+visualises the per-draw Tucker phi between each aligned factor column
 and the MatchAlign pivot. Values near 1 indicate a stable alignment;
 bimodality signals residual label-switching.
 
@@ -132,9 +136,9 @@ MatchAlign alignment quality by factor.
 Each participant has a posterior distribution over their loading on
 every factor.
 [`plot_loading_posterior()`](https://rdazadda.github.io/bayesqm/reference/plot_loading_posterior.md)
-draws the loading forest, with nested 50 percent and 95 percent
-credible-interval whiskers and the classical Brown cut-off as a faint
-reference. Filled points are participants with
+draws the loading forest, with nested 50% and 95% credible-interval
+whiskers and the classical Brown ([1980](#ref-Brown1980)) cut-off as a
+faint reference. Filled points are participants with
 `P(factor k dominant) > 0.5`.
 
 ``` r
@@ -177,10 +181,10 @@ horizontally to compare factors.
 plot(fit)
 ```
 
-![Posterior z-scores across factors with 50 / 95
-CrIs.](bayesqm-intro_files/figure-html/zscores-1.png)
+![Posterior z-scores across factors with 50% and 95% credible
+intervals.](bayesqm-intro_files/figure-html/zscores-1.png)
 
-Posterior z-scores across factors with 50 / 95 CrIs.
+Posterior z-scores across factors with 50% and 95% credible intervals.
 
 For a single statement across factors,
 [`plot_zscore_posterior()`](https://rdazadda.github.io/bayesqm/reference/plot_zscore_posterior.md)
@@ -199,8 +203,9 @@ Posterior z-score for a single statement across factors.
 
 [`run_bayes()`](https://rdazadda.github.io/bayesqm/reference/run_bayes.md)
 fits the model for each K in a range and applies the
-**peak-plus-Sivula** protocol: the ELPD peak is the automated choice;
-the Sivula (2025) parsimony rule is reported alongside.
+**peak-plus-Sivula** protocol: the ELPD peak is the automated choice and
+the Sivula parsimony rule ([Sivula et al. 2025](#ref-SivulaEtAl2025)) is
+reported alongside as a diagnostic.
 
 On real data you would call:
 
@@ -233,30 +238,29 @@ run
 make_elpd_diff(run)
 ```
 
-![Delta-ELPD vs K = 1 with the Sivula rejection band at \|Delta-ELPD\|
-\< 4. Red triangle marks the Sivula K, blue square marks the ELPD peak
-(the adopted K).](bayesqm-intro_files/figure-html/elpd-1.png)
+![ΔELPD across K with the Sivula non-promotion band at \|ΔELPD\| \< 4.
+Triangle marks the Sivula K, square marks the ELPD peak (the adopted
+K).](bayesqm-intro_files/figure-html/elpd-1.png)
 
-Delta-ELPD vs K = 1 with the Sivula rejection band at \|Delta-ELPD\| \<
-4. Red triangle marks the Sivula K, blue square marks the ELPD peak (the
-adopted K).
+ΔELPD across K with the Sivula non-promotion band at \|ΔELPD\| \< 4.
+Triangle marks the Sivula K, square marks the ELPD peak (the adopted K).
 
-The ELPD peak is always the adopted K. Sivula is a pure diagnostic: a
-number reported alongside the peak so readers can see how confidently
-the data discriminate between adjacent models. The `run$case` field
-labels the relationship between the two. When Sivula lands on the same K
-as the peak, the case is `agree`. When Sivula points to a smaller K than
-the peak, the case is `gap`. When Sivula exceeds the peak, the case is
+The ELPD peak is always the adopted K. The Sivula diagnostic is reported
+alongside the peak so readers can see how confidently the data
+discriminate between adjacent models. The `run$case` field labels the
+relationship between the two: when Sivula lands on the same K as the
+peak, the case is `agree`; when Sivula points to a smaller K than the
+peak, the case is `gap`; when Sivula exceeds the peak, the case is
 `reversed` and usually indicates numerical instability in the comparison
 itself. In every case the adopted K is the ELPD peak.
 
 ## Distinguishing, consensus, and membership
 
 `bayesqm` replaces the classical z-score test with a direct posterior
-probability. For every statement and every factor pair,
-`P(|f_jk − f_jl| > δ)` answers *how confidently do the factors separate
-this statement?* The default `δ = 1` is on the standardised factor-score
-scale.
+probability. For every statement and every factor pair, P(\|f_jk −
+f_jl\| \> δ) gives the probability that the two factors separate that
+statement by at least δ. The default δ = 1 is on the standardised
+factor-score scale.
 
 ``` r
 plot_dist_cons(fit, delta = 1.0)
@@ -288,12 +292,12 @@ head(classify_membership(fit$Lambda_draws))
 make_dominant_panel(fit)
 ```
 
-![Blue tiles = posterior probability that each factor is dominant for a
+![Blue tiles: posterior probability that each factor is dominant for a
 given participant (values printed in each cell). The right column shows
 the overall assignment verdict on an orange-red
 scale.](bayesqm-intro_files/figure-html/membership-1.png)
 
-Blue tiles = posterior probability that each factor is dominant for a
+Blue tiles: posterior probability that each factor is dominant for a
 given participant (values printed in each cell). The right column shows
 the overall assignment verdict on an orange-red scale.
 
@@ -301,16 +305,17 @@ the overall assignment verdict on an orange-red scale.
 
 [`plot_ppc()`](https://rdazadda.github.io/bayesqm/reference/plot_ppc.md)
 shows the posterior distribution of the RMSE between `cor(Y_rep)` and
-`cor(Y_obs)`. A well-specified model puts most mass at small RMSE.
+`cor(Y_obs)`. A well-specified model puts most posterior mass at small
+RMSE.
 
 ``` r
 plot_ppc(fit)
 ```
 
-![PPC on the correlation
+![PPC on the by-person correlation
 matrix.](bayesqm-intro_files/figure-html/ppc-1.png)
 
-PPC on the correlation matrix.
+PPC on the by-person correlation matrix.
 
 ## Hyperparameters
 
@@ -326,7 +331,7 @@ Posterior densities of nu, sigma, and tau.
 ## Reporting and exporting
 
 [`save_bayesqm_plot()`](https://rdazadda.github.io/bayesqm/reference/save_bayesqm_plot.md)
-writes any plot to PDF / SVG / PNG / TIFF / JPEG at journal-appropriate
+writes any plot to PDF, SVG, PNG, TIFF, or JPEG at journal-appropriate
 dimensions:
 
 ``` r
@@ -373,3 +378,24 @@ bayesqm_set_colors("blue")
 - [`ggplot2::autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html):
   ggplot2 / ggdist versions of every view above, when `ggplot2` and
   `ggdist` are installed
+
+## References
+
+Brown, Steven R. 1980. *Political Subjectivity: Applications of q
+Methodology in Political Science*. New Haven, CT: Yale University Press.
+
+Poworoznek, Evan, Niccolo Anceschi, Federico Ferrari, and David Dunson.
+2025. “Efficiently Resolving Rotational Ambiguity in Bayesian Matrix
+Sampling with Matching.” *Bayesian Analysis*, 1–22.
+<https://doi.org/10.1214/25-BA1544>.
+
+Sivula, Tuomas, Måns Magnusson, Asael Alonzo Matamoros, and Aki Vehtari.
+2025. “Uncertainty in Bayesian Leave-One-Out Cross-Validation Based
+Model Comparison.” *Bayesian Analysis*, 1–31.
+<https://doi.org/10.1214/25-BA1569>.
+
+Vehtari, Aki, Andrew Gelman, Daniel Simpson, Bob Carpenter, and
+Paul-Christian Bürkner. 2021. “Rank-Normalization, Folding, and
+Localization: An Improved $\widehat{R}$ for Assessing Convergence of
+MCMC (with Discussion).” *Bayesian Analysis* 16 (2): 667–718.
+<https://doi.org/10.1214/20-BA1221>.

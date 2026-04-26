@@ -107,7 +107,8 @@ ranking 42 statements:</p>
 <p><code><a href="../reference/fit_bayesian.html">fit_bayesian()</a></code> samples the posterior of a low-rank
 factor model with a Student-t likelihood (by default) and a hierarchical
 normal prior on the loadings, then resolves rotational ambiguity with
-MatchAlign:</p>
+the MatchAlign post-processing of <span class="citation">Poworoznek et
+al. (<a href="#ref-PoworoznekEtAl2025">2025</a>)</span>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_bayesian.html">fit_bayesian</a></span><span class="op">(</span><span class="va">qdata</span>, K <span class="op">=</span> <span class="fl">3</span>, chains <span class="op">=</span> <span class="fl">4</span>, iter <span class="op">=</span> <span class="fl">2000</span>,</span>
 <span>                    warmup <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
@@ -121,7 +122,7 @@ MatchAlign:</p>
 <span><span class="co">#&gt;   Data:      N = 33 persons, J = 42 statements</span></span>
 <span><span class="co">#&gt;   Draws:     4 chains x 1000 post-warmup = 4000 total</span></span>
 <span><span class="co">#&gt;   Backend:   demo</span></span>
-<span><span class="co">#&gt;   Fitted:    2026-04-26 09:18:09</span></span>
+<span><span class="co">#&gt;   Fitted:    2026-04-26 10:12:30</span></span>
 <span><span class="co">#&gt;   Max Rhat:  1.010</span></span>
 <span><span class="co">#&gt;   Min ESS:   bulk 820 / tail 950</span></span>
 <span><span class="co">#&gt;   Divergent: 0</span></span>
@@ -154,7 +155,10 @@ MatchAlign diagnostic.</p>
 <div class="section level2">
 <h2 id="diagnostics">Diagnostics<a class="anchor" aria-label="anchor" href="#diagnostics"></a>
 </h2>
-<p>Convergence statistics live in <code>fit$diagnostics</code>:</p>
+<p>Convergence statistics live in <code>fit$diagnostics</code>. The
+recommended thresholds are R-hat below 1.01, bulk and tail effective
+sample sizes above 400, and zero divergent transitions <span class="citation">(<a href="#ref-VehtariEtAl2021">Vehtari et al.
+2021</a>)</span>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span><span class="op">$</span><span class="va">diagnostics</span></span>
 <span><span class="co">#&gt; $rhat_max</span></span>
@@ -168,9 +172,9 @@ MatchAlign diagnostic.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $divergences</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
-<p><code><a href="../reference/plot_tucker.html">plot_tucker()</a></code> visualises the per-draw Tucker’s phi
-between each aligned factor column and the MatchAlign pivot. Values near
-1 indicate a stable alignment; bimodality signals residual
+<p><code><a href="../reference/plot_tucker.html">plot_tucker()</a></code> visualises the per-draw Tucker phi between
+each aligned factor column and the MatchAlign pivot. Values near 1
+indicate a stable alignment; bimodality signals residual
 label-switching.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_tucker.html">plot_tucker</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
@@ -185,9 +189,10 @@ MatchAlign alignment quality by factor.
 </h2>
 <p>Each participant has a posterior distribution over their loading on
 every factor. <code><a href="../reference/plot_loading_posterior.html">plot_loading_posterior()</a></code> draws the loading
-forest, with nested 50 percent and 95 percent credible-interval whiskers
-and the classical Brown cut-off as a faint reference. Filled points are
-participants with <code>P(factor k dominant) &gt; 0.5</code>.</p>
+forest, with nested 50% and 95% credible-interval whiskers and the
+classical <span class="citation">Brown (<a href="#ref-Brown1980">1980</a>)</span> cut-off as a faint reference.
+Filled points are participants with
+<code>P(factor k dominant) &gt; 0.5</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_loading_posterior.html">plot_loading_posterior</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -223,8 +228,8 @@ factors.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="bayesqm-intro_files/figure-html/zscores-1.png" class="r-plt" alt="Posterior z-scores across factors with 50 / 95 CrIs." width="770"><p class="caption">
-Posterior z-scores across factors with 50 / 95 CrIs.
+<img src="bayesqm-intro_files/figure-html/zscores-1.png" class="r-plt" alt="Posterior z-scores across factors with 50% and 95% credible intervals." width="770"><p class="caption">
+Posterior z-scores across factors with 50% and 95% credible intervals.
 </p>
 </div>
 <p>For a single statement across factors,
@@ -242,8 +247,8 @@ Posterior z-score for a single statement across factors.
 </h2>
 <p><code><a href="../reference/run_bayes.html">run_bayes()</a></code> fits the model for each K in a range and
 applies the <strong>peak-plus-Sivula</strong> protocol: the ELPD peak is
-the automated choice; the Sivula (2025) parsimony rule is reported
-alongside.</p>
+the automated choice and the Sivula parsimony rule <span class="citation">(<a href="#ref-SivulaEtAl2025">Sivula et al.
+2025</a>)</span> is reported alongside as a diagnostic.</p>
 <p>On real data you would call:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_bayes.html">run_bayes</a></span><span class="op">(</span><span class="va">qdata</span>, K_max <span class="op">=</span> <span class="fl">4</span>, seed <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -269,18 +274,17 @@ alongside.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/make_elpd_diff.html">make_elpd_diff</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="bayesqm-intro_files/figure-html/elpd-1.png" class="r-plt" alt="Delta-ELPD vs K = 1 with the Sivula rejection band at |Delta-ELPD| &lt; 4. Red triangle marks the Sivula K, blue square marks the ELPD peak (the adopted K)." width="770"><p class="caption">
-Delta-ELPD vs K = 1 with the Sivula rejection band at |Delta-ELPD| &lt;
-4. Red triangle marks the Sivula K, blue square marks the ELPD peak (the
-adopted K).
+<img src="bayesqm-intro_files/figure-html/elpd-1.png" class="r-plt" alt="ΔELPD across K with the Sivula non-promotion band at |ΔELPD| &lt; 4. Triangle marks the Sivula K, square marks the ELPD peak (the adopted K)." width="770"><p class="caption">
+ΔELPD across K with the Sivula non-promotion band at |ΔELPD| &lt; 4.
+Triangle marks the Sivula K, square marks the ELPD peak (the adopted K).
 </p>
 </div>
-<p>The ELPD peak is always the adopted K. Sivula is a pure diagnostic: a
-number reported alongside the peak so readers can see how confidently
-the data discriminate between adjacent models. The <code>run$case</code>
-field labels the relationship between the two. When Sivula lands on the
-same K as the peak, the case is <code>agree</code>. When Sivula points
-to a smaller K than the peak, the case is <code>gap</code>. When Sivula
+<p>The ELPD peak is always the adopted K. The Sivula diagnostic is
+reported alongside the peak so readers can see how confidently the data
+discriminate between adjacent models. The <code>run$case</code> field
+labels the relationship between the two: when Sivula lands on the same K
+as the peak, the case is <code>agree</code>; when Sivula points to a
+smaller K than the peak, the case is <code>gap</code>; when Sivula
 exceeds the peak, the case is <code>reversed</code> and usually
 indicates numerical instability in the comparison itself. In every case
 the adopted K is the ELPD peak.</p>
@@ -290,9 +294,9 @@ the adopted K is the ELPD peak.</p>
 </h2>
 <p><code>bayesqm</code> replaces the classical z-score test with a
 direct posterior probability. For every statement and every factor pair,
-<code>P(|f_jk − f_jl| &gt; δ)</code> answers <em>how confidently do the
-factors separate this statement?</em> The default <code>δ = 1</code> is
-on the standardised factor-score scale.</p>
+P(|f_jk − f_jl| &gt; δ) gives the probability that the two factors
+separate that statement by at least δ. The default δ = 1 is on the
+standardised factor-score scale.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_dist_cons.html">plot_dist_cons</a></span><span class="op">(</span><span class="va">fit</span>, delta <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -316,8 +320,8 @@ discriminating statements are at the top.
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/make_dominant_panel.html">make_dominant_panel</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="bayesqm-intro_files/figure-html/membership-1.png" class="r-plt" alt="Blue tiles = posterior probability that each factor is dominant for a given participant (values printed in each cell). The right column shows the overall assignment verdict on an orange-red scale." width="715"><p class="caption">
-Blue tiles = posterior probability that each factor is dominant for a
+<img src="bayesqm-intro_files/figure-html/membership-1.png" class="r-plt" alt="Blue tiles: posterior probability that each factor is dominant for a given participant (values printed in each cell). The right column shows the overall assignment verdict on an orange-red scale." width="715"><p class="caption">
+Blue tiles: posterior probability that each factor is dominant for a
 given participant (values printed in each cell). The right column shows
 the overall assignment verdict on an orange-red scale.
 </p>
@@ -328,12 +332,12 @@ the overall assignment verdict on an orange-red scale.
 </h2>
 <p><code><a href="../reference/plot_ppc.html">plot_ppc()</a></code> shows the posterior distribution of the RMSE
 between <code>cor(Y_rep)</code> and <code>cor(Y_obs)</code>. A
-well-specified model puts most mass at small RMSE.</p>
+well-specified model puts most posterior mass at small RMSE.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_ppc.html">plot_ppc</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="bayesqm-intro_files/figure-html/ppc-1.png" class="r-plt" alt="PPC on the correlation matrix." width="770"><p class="caption">
-PPC on the correlation matrix.
+<img src="bayesqm-intro_files/figure-html/ppc-1.png" class="r-plt" alt="PPC on the by-person correlation matrix." width="770"><p class="caption">
+PPC on the by-person correlation matrix.
 </p>
 </div>
 </div>
@@ -351,8 +355,8 @@ Posterior densities of nu, sigma, and tau.
 <div class="section level2">
 <h2 id="reporting-and-exporting">Reporting and exporting<a class="anchor" aria-label="anchor" href="#reporting-and-exporting"></a>
 </h2>
-<p><code><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot()</a></code> writes any plot to PDF / SVG / PNG /
-TIFF / JPEG at journal-appropriate dimensions:</p>
+<p><code><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot()</a></code> writes any plot to PDF, SVG, PNG,
+TIFF, or JPEG at journal-appropriate dimensions:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot</a></span><span class="op">(</span><span class="st">"fig_loadings.pdf"</span>, <span class="fu"><a href="../reference/plot_loading_posterior.html">plot_loading_posterior</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot</a></span><span class="op">(</span><span class="st">"fig_elpd.pdf"</span>,      <span class="fu"><a href="../reference/plot_elpd.html">plot_elpd</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span>,</span>
@@ -398,6 +402,36 @@ substantive factor names</li>
 view above, when <code>ggplot2</code> and <code>ggdist</code> are
 installed</li>
 </ul>
+</div>
+<div class="section level2 unnumbered">
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-Brown1980" class="csl-entry">
+Brown, Steven R. 1980. <em>Political Subjectivity: Applications of q
+Methodology in Political Science</em>. New Haven, CT: Yale University
+Press.
+</div>
+<div id="ref-PoworoznekEtAl2025" class="csl-entry">
+Poworoznek, Evan, Niccolo Anceschi, Federico Ferrari, and David Dunson.
+2025. <span>“Efficiently Resolving Rotational Ambiguity in Bayesian
+Matrix Sampling with Matching.”</span> <em>Bayesian Analysis</em>, 1–22.
+<a href="https://doi.org/10.1214/25-BA1544" class="external-link">https://doi.org/10.1214/25-BA1544</a>.
+</div>
+<div id="ref-SivulaEtAl2025" class="csl-entry">
+Sivula, Tuomas, Måns Magnusson, Asael Alonzo Matamoros, and Aki Vehtari.
+2025. <span>“Uncertainty in Bayesian Leave-One-Out Cross-Validation
+Based Model Comparison.”</span> <em>Bayesian Analysis</em>, 1–31. <a href="https://doi.org/10.1214/25-BA1569" class="external-link">https://doi.org/10.1214/25-BA1569</a>.
+</div>
+<div id="ref-VehtariEtAl2021" class="csl-entry">
+Vehtari, Aki, Andrew Gelman, Daniel Simpson, Bob Carpenter, and
+Paul-Christian Bürkner. 2021. <span>“Rank-Normalization, Folding, and
+Localization: An Improved
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>R</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\widehat{R}</annotation></semantics></math>
+for Assessing Convergence of MCMC (with Discussion).”</span>
+<em>Bayesian Analysis</em> 16 (2): 667–718. <a href="https://doi.org/10.1214/20-BA1221" class="external-link">https://doi.org/10.1214/20-BA1221</a>.
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
