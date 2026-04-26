@@ -16,6 +16,8 @@ Description: A Bayesian factor-analytic framework for Q methodology. Fits a
 License: MIT + file LICENSE
 URL: https://github.com/rdazadda/bayesqm, https://rdazadda.github.io/bayesqm/
 BugReports: https://github.com/rdazadda/bayesqm/issues
+Additional_repositories:
+    https://stan-dev.r-universe.dev
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
