@@ -71,9 +71,8 @@
     
 <p>This vignette walks through one Q study end to end in
 <strong>bayesqm</strong>: import, fit, diagnose, interpret, select K,
-and export. The running example is a 33-participant, 42-statement Q-sort
-generated with the package’s data simulator so the vignette is
-reproducible without network access or extra data files.</p>
+and export. The running example is a synthetic 33-participant,
+42-statement Q-sort.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rdazadda/bayesqm" class="external-link">bayesqm</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
@@ -89,8 +88,7 @@ columns) plus a vector of forced-distribution counts.
 <code class="sourceCode R"><span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_qsort.html">read_qsort</a></span><span class="op">(</span><span class="st">"mystudy.csv"</span><span class="op">)</span>   <span class="co"># CSV / Excel / HTMLQ / FlashQ</span></span>
 <span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_qsort.html">read_qsort</a></span><span class="op">(</span><span class="st">"mystudy.DAT"</span><span class="op">)</span>   <span class="co"># PQMethod</span></span>
 <span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_qsort.html">read_qsort</a></span><span class="op">(</span><span class="st">"mystudy.zip"</span><span class="op">)</span>   <span class="co"># KADE project</span></span></code></pre></div>
-<p>For this vignette we generate a Q-sort dataset of 33 participants
-ranking 42 statements:</p>
+<p>The example dataset:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim</span>   <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_data.html">generate_data</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">33</span>, J <span class="op">=</span> <span class="fl">42</span>, K <span class="op">=</span> <span class="fl">3</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/qsort_data.html">qsort_data</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">Y</span>, distribution <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">distribution</span><span class="op">)</span></span>
@@ -122,7 +120,7 @@ al. (<a href="#ref-PoworoznekEtAl2025">2025</a>)</span>:</p>
 <span><span class="co">#&gt;   Data:      N = 33 persons, J = 42 statements</span></span>
 <span><span class="co">#&gt;   Draws:     4 chains x 1000 post-warmup = 4000 total</span></span>
 <span><span class="co">#&gt;   Backend:   demo</span></span>
-<span><span class="co">#&gt;   Fitted:    2026-04-26 10:12:30</span></span>
+<span><span class="co">#&gt;   Fitted:    2026-04-26 10:32:51</span></span>
 <span><span class="co">#&gt;   Max Rhat:  1.010</span></span>
 <span><span class="co">#&gt;   Min ESS:   bulk 820 / tail 950</span></span>
 <span><span class="co">#&gt;   Divergent: 0</span></span>
@@ -155,8 +153,8 @@ MatchAlign diagnostic.</p>
 <div class="section level2">
 <h2 id="diagnostics">Diagnostics<a class="anchor" aria-label="anchor" href="#diagnostics"></a>
 </h2>
-<p>Convergence statistics live in <code>fit$diagnostics</code>. The
-recommended thresholds are R-hat below 1.01, bulk and tail effective
+<p>Convergence statistics are stored on <code>fit$diagnostics</code>.
+The recommended thresholds are R-hat below 1.01, bulk and tail effective
 sample sizes above 400, and zero divergent transitions <span class="citation">(<a href="#ref-VehtariEtAl2021">Vehtari et al.
 2021</a>)</span>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -221,10 +219,9 @@ Loadings with nested 50% and 95% credible intervals.
 <div class="section level2">
 <h2 id="factor-z-scores">Factor z-scores<a class="anchor" aria-label="anchor" href="#factor-z-scores"></a>
 </h2>
-<p><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> gives a cross-panel z-score dotchart; rows share
-an order (by factor 1’s posterior mean, configurable via
-<code>sort_by</code>) so the reader can scan horizontally to compare
-factors.</p>
+<p><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> produces a cross-panel z-score dotchart; rows
+share an order (by factor 1’s posterior mean, configurable via
+<code>sort_by</code>) so factors can be compared horizontally.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -233,7 +230,7 @@ Posterior z-scores across factors with 50% and 95% credible intervals.
 </p>
 </div>
 <p>For a single statement across factors,
-<code><a href="../reference/plot_zscore_posterior.html">plot_zscore_posterior()</a></code> gives the drill-down:</p>
+<code><a href="../reference/plot_zscore_posterior.html">plot_zscore_posterior()</a></code> shows the per-factor view:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_zscore_posterior.html">plot_zscore_posterior</a></span><span class="op">(</span><span class="va">fit</span>, statement <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -249,7 +246,7 @@ Posterior z-score for a single statement across factors.
 applies the <strong>peak-plus-Sivula</strong> protocol: the ELPD peak is
 the automated choice and the Sivula parsimony rule <span class="citation">(<a href="#ref-SivulaEtAl2025">Sivula et al.
 2025</a>)</span> is reported alongside as a diagnostic.</p>
-<p>On real data you would call:</p>
+<p>On real data:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_bayes.html">run_bayes</a></span><span class="op">(</span><span class="va">qdata</span>, K_max <span class="op">=</span> <span class="fl">4</span>, seed <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                 chains <span class="op">=</span> <span class="fl">2</span>, iter <span class="op">=</span> <span class="fl">1500</span>, warmup <span class="op">=</span> <span class="fl">800</span><span class="op">)</span></span></code></pre></div>
@@ -280,14 +277,12 @@ Triangle marks the Sivula K, square marks the ELPD peak (the adopted K).
 </p>
 </div>
 <p>The ELPD peak is always the adopted K. The Sivula diagnostic is
-reported alongside the peak so readers can see how confidently the data
-discriminate between adjacent models. The <code>run$case</code> field
+reported alongside as a parsimony check. The <code>run$case</code> field
 labels the relationship between the two: when Sivula lands on the same K
 as the peak, the case is <code>agree</code>; when Sivula points to a
 smaller K than the peak, the case is <code>gap</code>; when Sivula
-exceeds the peak, the case is <code>reversed</code> and usually
-indicates numerical instability in the comparison itself. In every case
-the adopted K is the ELPD peak.</p>
+exceeds the peak, the case is <code>reversed</code> (rare in
+practice).</p>
 </div>
 <div class="section level2">
 <h2 id="distinguishing-consensus-and-membership">Distinguishing, consensus, and membership<a class="anchor" aria-label="anchor" href="#distinguishing-consensus-and-membership"></a>
@@ -305,7 +300,7 @@ Distinguishing-statement probability. Rows sorted so the most
 discriminating statements are at the top.
 </p>
 </div>
-<p>Participant-level membership is probabilistic too.
+<p>Participant-level membership is also probabilistic.
 <code><a href="../reference/bayesqm-membership.html">classify_membership()</a></code> turns posterior dominance into a
 <code>Strong / Moderate / Weak</code> tier:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -356,14 +351,14 @@ Posterior densities of nu, sigma, and tau.
 <h2 id="reporting-and-exporting">Reporting and exporting<a class="anchor" aria-label="anchor" href="#reporting-and-exporting"></a>
 </h2>
 <p><code><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot()</a></code> writes any plot to PDF, SVG, PNG,
-TIFF, or JPEG at journal-appropriate dimensions:</p>
+TIFF, or JPEG at the chosen dimensions:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot</a></span><span class="op">(</span><span class="st">"fig_loadings.pdf"</span>, <span class="fu"><a href="../reference/plot_loading_posterior.html">plot_loading_posterior</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot</a></span><span class="op">(</span><span class="st">"fig_elpd.pdf"</span>,      <span class="fu"><a href="../reference/plot_elpd.html">plot_elpd</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span>,</span>
 <span>                  width <span class="op">=</span> <span class="fl">3.5</span>, height <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="../reference/caption_bayesqm.html">caption_bayesqm()</a></code> returns a ready-to-paste figure
-caption with model configuration, sample sizes, interval probability,
-and convergence diagnostics:</p>
+<p><code><a href="../reference/caption_bayesqm.html">caption_bayesqm()</a></code> returns a figure caption with model
+configuration, sample sizes, interval probability, and convergence
+diagnostics:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/caption_bayesqm.html">caption_bayesqm</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Bayesian Q-methodology factor model (K = 3, N = 33, J = 42); fitted with a Student-t likelihood via demo (4 chains, 4,000 post-warmup draws); intervals shown at 95% posterior coverage; max Rhat = 1.010, min bulk ESS = 820, 0 divergent transitions. Fitted with the bayesqm R package."</span></span></code></pre></div>

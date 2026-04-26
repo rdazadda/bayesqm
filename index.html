@@ -114,18 +114,17 @@
 <li>The <strong>ELPD peak</strong>: argmax of the expected log pointwise predictive density via element-wise PSIS-LOO (Vehtari, Gelman, &amp; Gabry, 2017).</li>
 <li>The <strong>Sivula parsimony diagnostic</strong> (Sivula et al., 2025): a sequential rule that accepts a more complex K only when ΔELPD &gt; 4 and |ΔELPD| / SE(Δ) &gt; 2.</li>
 </ul>
-<p>The <code>$case</code> field labels their relationship as <code>agree</code>, <code>gap</code>, or <code>reversed</code>. The ELPD peak is always the adopted K; the case label tells the reader how confidently the data discriminate between adjacent models, and the gap, when present, is itself a reportable finding rather than something to paper over.</p>
+<p>The <code>$case</code> field labels their relationship as <code>agree</code>, <code>gap</code>, or <code>reversed</code>. The ELPD peak is always the adopted K; the case label indicates how confidently the data discriminate between adjacent models, and a gap between the two is itself diagnostic information.</p>
 </div>
 <div class="section level2">
 <h2 id="probabilistic-factor-membership">Probabilistic factor membership<a class="anchor" aria-label="anchor" href="#probabilistic-factor-membership"></a>
 </h2>
-<p>Membership is summarized at three levels of resolution:</p>
+<p>Rather than dichotomizing each loading into flagged or unflagged, <code>bayesqm</code> reports the posterior probability that factor k is participant i’s dominant factor, P(dominant_i = k | Y). <code><a href="reference/bayesqm-membership.html">classify_membership()</a></code> turns these probabilities into a per-participant Strong / Moderate / Weak tier:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/bayesqm-membership.html">compute_threshold_prob</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span>, threshold <span class="op">=</span> <span class="fl">1.96</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">brief</span><span class="op">$</span><span class="va">J</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/bayesqm-membership.html">compute_dominant_prob</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/bayesqm-membership.html">classify_membership</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span>   <span class="co"># Strong / Moderate / Weak tiers</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/bayesqm-membership.html">compute_dominant_prob</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/bayesqm-membership.html">classify_membership</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/plot_membership.html">plot_membership</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
-<p>Distinguishing and consensus statements use posterior probabilities of pairwise factor-score separations rather than thresholded standard errors:</p>
+<p>Distinguishing and consensus statements use posterior probabilities of pairwise factor-score separations:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/bayesqm-membership.html">compute_distinguishing_prob</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">F_draws</span>, delta <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/bayesqm-membership.html">compute_consensus_prob</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">F_draws</span>, delta <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span>
@@ -144,13 +143,13 @@
 <span><span class="fu"><a href="reference/plot_tucker.html">plot_tucker</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                <span class="co"># MatchAlign alignment quality</span></span>
 <span><span class="fu"><a href="reference/plot_hyper.html">plot_hyper</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                 <span class="co"># hyperparameter posteriors</span></span>
 <span><span class="fu"><a href="reference/plot_elpd.html">plot_elpd</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span>                  <span class="co"># ELPD across K with peak / Sivula annotations</span></span></code></pre></div>
-<p>For figure export, <code><a href="reference/save_bayesqm_plot.html">save_bayesqm_plot()</a></code> opens the appropriate device from the file extension and <code><a href="reference/caption_bayesqm.html">caption_bayesqm()</a></code> returns a ready-to-paste figure caption that reports K, N, J, chains, coverage probability, and convergence diagnostics.</p>
+<p>For figure export, <code><a href="reference/save_bayesqm_plot.html">save_bayesqm_plot()</a></code> opens the appropriate device from the file extension and <code><a href="reference/caption_bayesqm.html">caption_bayesqm()</a></code> returns a figure caption that reports K, N, J, chains, coverage probability, and convergence diagnostics.</p>
 </div>
 <div class="section level2">
 <h2 id="compatibility-with-qmethod">Compatibility with <code>qmethod</code>
 <a class="anchor" aria-label="anchor" href="#compatibility-with-qmethod"></a>
 </h2>
-<p><code>bayesqm_fit</code> deliberately mirrors the slot names from the <code>qmethod</code> package (Zabala, 2014): <code>$dataset</code>, <code>$loa</code>, <code>$zsc</code>, <code>$zsc_n</code>, <code>$f_char</code>, <code>$qdc</code>, <code>$flagged</code>. It uses the same distinguishing-statement vocabulary (<code>"Distinguishes all"</code>, <code>"Consensus"</code>, <code>"Distinguishes f1, f3"</code>, <code>""</code>). Scripts written against <code>qmethod</code> largely keep working. Intentional Bayesian divergences are documented in <code>?bayesqm-package</code>:</p>
+<p><code>bayesqm_fit</code> deliberately mirrors the slot names from the <code>qmethod</code> package (Zabala, 2015): <code>$dataset</code>, <code>$loa</code>, <code>$zsc</code>, <code>$zsc_n</code>, <code>$f_char</code>, <code>$qdc</code>, <code>$flagged</code>. It uses the same distinguishing-statement vocabulary (<code>"Distinguishes all"</code>, <code>"Consensus"</code>, <code>"Distinguishes f1, f3"</code>, <code>""</code>). Intentional Bayesian divergences are documented in <code>?bayesqm-package</code>:</p>
 <ul>
 <li>
 <code>$flagged</code> is defined probabilistically as P(argmax_k |λ_ik| = k) &gt; 0.5, replacing Brown’s (1980) significance-based rule.</li>
@@ -176,7 +175,7 @@
 </h2>
 <ul>
 <li>
-<code><a href="articles/bayesqm-intro.html">vignette("bayesqm-intro")</a></code> walks the full workflow end to end on a reproducible synthetic Q-sort.</li>
+<code><a href="articles/bayesqm-intro.html">vignette("bayesqm-intro")</a></code> walks the full workflow end to end on a synthetic Q-sort.</li>
 <li>
 <code><a href="reference/fit_bayesian.html">?fit_bayesian</a></code> documents every prior and sampler option.</li>
 <li>

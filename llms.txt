@@ -86,25 +86,27 @@ fits the model for K = 1..K_max and reports two summaries:
   \|ΔELPD\| / SE(Δ) \> 2.
 
 The `$case` field labels their relationship as `agree`, `gap`, or
-`reversed`. The ELPD peak is always the adopted K; the case label tells
-the reader how confidently the data discriminate between adjacent
-models, and the gap, when present, is itself a reportable finding rather
-than something to paper over.
+`reversed`. The ELPD peak is always the adopted K; the case label
+indicates how confidently the data discriminate between adjacent models,
+and a gap between the two is itself diagnostic information.
 
 ## Probabilistic factor membership
 
-Membership is summarized at three levels of resolution:
+Rather than dichotomizing each loading into flagged or unflagged,
+`bayesqm` reports the posterior probability that factor k is participant
+i’s dominant factor, P(dominant_i = k \| Y).
+[`classify_membership()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)
+turns these probabilities into a per-participant Strong / Moderate /
+Weak tier:
 
 ``` r
-compute_threshold_prob(fit$Lambda_draws, threshold = 1.96 / sqrt(fit$brief$J))
 compute_dominant_prob(fit$Lambda_draws)
-classify_membership(fit$Lambda_draws)   # Strong / Moderate / Weak tiers
+classify_membership(fit$Lambda_draws)
 plot_membership(fit)
 ```
 
 Distinguishing and consensus statements use posterior probabilities of
-pairwise factor-score separations rather than thresholded standard
-errors:
+pairwise factor-score separations:
 
 ``` r
 compute_distinguishing_prob(fit$F_draws, delta = 1.0)
@@ -136,17 +138,16 @@ For figure export,
 [`save_bayesqm_plot()`](https://rdazadda.github.io/bayesqm/reference/save_bayesqm_plot.md)
 opens the appropriate device from the file extension and
 [`caption_bayesqm()`](https://rdazadda.github.io/bayesqm/reference/caption_bayesqm.md)
-returns a ready-to-paste figure caption that reports K, N, J, chains,
-coverage probability, and convergence diagnostics.
+returns a figure caption that reports K, N, J, chains, coverage
+probability, and convergence diagnostics.
 
 ## Compatibility with `qmethod`
 
 `bayesqm_fit` deliberately mirrors the slot names from the `qmethod`
-package (Zabala, 2014): `$dataset`, `$loa`, `$zsc`, `$zsc_n`, `$f_char`,
+package (Zabala, 2015): `$dataset`, `$loa`, `$zsc`, `$zsc_n`, `$f_char`,
 `$qdc`, `$flagged`. It uses the same distinguishing-statement vocabulary
 (`"Distinguishes all"`, `"Consensus"`, `"Distinguishes f1, f3"`, `""`).
-Scripts written against `qmethod` largely keep working. Intentional
-Bayesian divergences are documented in `?bayesqm-package`:
+Intentional Bayesian divergences are documented in `?bayesqm-package`:
 
 - `$flagged` is defined probabilistically as P(argmax_k \|λ_ik\| = k) \>
   0.5, replacing Brown’s (1980) significance-based rule.
@@ -175,7 +176,7 @@ citation("bayesqm")
 ## Where to look next
 
 - [`vignette("bayesqm-intro")`](https://rdazadda.github.io/bayesqm/articles/bayesqm-intro.md)
-  walks the full workflow end to end on a reproducible synthetic Q-sort.
+  walks the full workflow end to end on a synthetic Q-sort.
 - [`?fit_bayesian`](https://rdazadda.github.io/bayesqm/reference/fit_bayesian.md)
   documents every prior and sampler option.
 - [`?run_bayes`](https://rdazadda.github.io/bayesqm/reference/run_bayes.md)

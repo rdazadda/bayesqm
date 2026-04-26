@@ -2,9 +2,7 @@
 
 This vignette walks through one Q study end to end in **bayesqm**:
 import, fit, diagnose, interpret, select K, and export. The running
-example is a 33-participant, 42-statement Q-sort generated with the
-package’s data simulator so the vignette is reproducible without network
-access or extra data files.
+example is a synthetic 33-participant, 42-statement Q-sort.
 
 ``` r
 library(bayesqm)
@@ -26,8 +24,7 @@ qdata <- read_qsort("mystudy.DAT")   # PQMethod
 qdata <- read_qsort("mystudy.zip")   # KADE project
 ```
 
-For this vignette we generate a Q-sort dataset of 33 participants
-ranking 42 statements:
+The example dataset:
 
 ``` r
 sim   <- generate_data(N = 33, J = 42, K = 3, seed = 1)
@@ -63,7 +60,7 @@ fit
 #>   Data:      N = 33 persons, J = 42 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-04-26 10:12:30
+#>   Fitted:    2026-04-26 10:32:51
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
@@ -97,7 +94,7 @@ diagnostic.
 
 ## Diagnostics
 
-Convergence statistics live in `fit$diagnostics`. The recommended
+Convergence statistics are stored on `fit$diagnostics`. The recommended
 thresholds are R-hat below 1.01, bulk and tail effective sample sizes
 above 400, and zero divergent transitions ([Vehtari et al.
 2021](#ref-VehtariEtAl2021)):
@@ -172,10 +169,10 @@ head(compute_loadings(fit$Lambda_draws, prob = 0.95))
 
 ## Factor z-scores
 
-[`plot()`](https://rdrr.io/r/graphics/plot.default.html) gives a
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) produces a
 cross-panel z-score dotchart; rows share an order (by factor 1’s
-posterior mean, configurable via `sort_by`) so the reader can scan
-horizontally to compare factors.
+posterior mean, configurable via `sort_by`) so factors can be compared
+horizontally.
 
 ``` r
 plot(fit)
@@ -188,7 +185,7 @@ Posterior z-scores across factors with 50% and 95% credible intervals.
 
 For a single statement across factors,
 [`plot_zscore_posterior()`](https://rdazadda.github.io/bayesqm/reference/plot_zscore_posterior.md)
-gives the drill-down:
+shows the per-factor view:
 
 ``` r
 plot_zscore_posterior(fit, statement = 1)
@@ -207,7 +204,7 @@ fits the model for each K in a range and applies the
 the Sivula parsimony rule ([Sivula et al. 2025](#ref-SivulaEtAl2025)) is
 reported alongside as a diagnostic.
 
-On real data you would call:
+On real data:
 
 ``` r
 run <- run_bayes(qdata, K_max = 4, seed = 1,
@@ -246,13 +243,11 @@ K).](bayesqm-intro_files/figure-html/elpd-1.png)
 Triangle marks the Sivula K, square marks the ELPD peak (the adopted K).
 
 The ELPD peak is always the adopted K. The Sivula diagnostic is reported
-alongside the peak so readers can see how confidently the data
-discriminate between adjacent models. The `run$case` field labels the
+alongside as a parsimony check. The `run$case` field labels the
 relationship between the two: when Sivula lands on the same K as the
 peak, the case is `agree`; when Sivula points to a smaller K than the
 peak, the case is `gap`; when Sivula exceeds the peak, the case is
-`reversed` and usually indicates numerical instability in the comparison
-itself. In every case the adopted K is the ELPD peak.
+`reversed` (rare in practice).
 
 ## Distinguishing, consensus, and membership
 
@@ -273,7 +268,7 @@ top.](bayesqm-intro_files/figure-html/dist-cons-1.png)
 Distinguishing-statement probability. Rows sorted so the most
 discriminating statements are at the top.
 
-Participant-level membership is probabilistic too.
+Participant-level membership is also probabilistic.
 [`classify_membership()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)
 turns posterior dominance into a `Strong / Moderate / Weak` tier:
 
@@ -331,7 +326,7 @@ Posterior densities of nu, sigma, and tau.
 ## Reporting and exporting
 
 [`save_bayesqm_plot()`](https://rdazadda.github.io/bayesqm/reference/save_bayesqm_plot.md)
-writes any plot to PDF, SVG, PNG, TIFF, or JPEG at journal-appropriate
+writes any plot to PDF, SVG, PNG, TIFF, or JPEG at the chosen
 dimensions:
 
 ``` r
@@ -341,8 +336,8 @@ save_bayesqm_plot("fig_elpd.pdf",      plot_elpd(run),
 ```
 
 [`caption_bayesqm()`](https://rdazadda.github.io/bayesqm/reference/caption_bayesqm.md)
-returns a ready-to-paste figure caption with model configuration, sample
-sizes, interval probability, and convergence diagnostics:
+returns a figure caption with model configuration, sample sizes,
+interval probability, and convergence diagnostics:
 
 ``` r
 caption_bayesqm(fit)
