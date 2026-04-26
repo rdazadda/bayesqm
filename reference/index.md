@@ -53,7 +53,7 @@ required.
 - [`plot_membership()`](https://rdazadda.github.io/bayesqm/reference/plot_membership.md)
   : Dominant-factor posterior-probability heatmap
 - [`plot_elpd()`](https://rdazadda.github.io/bayesqm/reference/plot_elpd.md)
-  : ELPD across K with peak and Sivula markers
+  : ELPD across K with peak and Sivula annotations
 - [`plot_ppc()`](https://rdazadda.github.io/bayesqm/reference/plot_ppc.md)
   : Posterior predictive check on the correlation-matrix RMSE
 - [`plot_tucker()`](https://rdazadda.github.io/bayesqm/reference/plot_tucker.md)
@@ -63,9 +63,9 @@ required.
 - [`plot_hyper()`](https://rdazadda.github.io/bayesqm/reference/plot_hyper.md)
   : Hyperparameter posterior densities
 
-## Paper figure renderers (ggplot2)
+## ggplot2 figure renderers
 
-Direct ports of the three main-text figures in the accompanying paper:
+Publication-grade ggplot2 figures for `bayesqm_run` and `bayesqm_fit`:
 the ELPD curve, the dominant-factor panel, and the PPC ridgeline. Also
 reachable through
 [`ggplot2::autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html).
@@ -76,10 +76,10 @@ reachable through
   : Probabilistic dominant-factor panel
 - [`make_ppc_ridge()`](https://rdazadda.github.io/bayesqm/reference/make_ppc_ridge.md)
   : Posterior predictive RMSE ridgeline across K
-- [`autoplot(`*`<bayesqm_fit>`*`)`](https://rdazadda.github.io/bayesqm/reference/autoplot.bayesqm_fit.md)
+- [`autoplot.bayesqm_fit()`](https://rdazadda.github.io/bayesqm/reference/autoplot.bayesqm_fit.md)
   : ggplot2 renderings of a bayesqm_fit
-- [`autoplot(`*`<bayesqm_run>`*`)`](https://rdazadda.github.io/bayesqm/reference/autoplot.bayesqm_run.md)
-  : ggplot2 rendering of the ELPD curve for a bayesqm_run
+- [`autoplot.bayesqm_run()`](https://rdazadda.github.io/bayesqm/reference/autoplot.bayesqm_run.md)
+  : ggplot2 renderings of a bayesqm_run
 
 ## Theming and export
 
@@ -158,7 +158,7 @@ object.
 
 ## Simulation helpers
 
-Data-generating functions and assessment utilities used in the paper.
+Data-generating functions and assessment utilities.
 
 - [`demo_fit()`](https://rdazadda.github.io/bayesqm/reference/demo_fit.md)
   : A synthetic bayesqm_fit for examples and tutorials

@@ -2,19 +2,16 @@
 
 Generic
 [`ggplot2::autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
-method for `bayesqm_fit`. Unlike the base-R
-[`plot.bayesqm_fit()`](https://rdazadda.github.io/bayesqm/reference/plot.bayesqm_fit.md),
-these renderings use
+method for `bayesqm_fit`. Dispatches to
+[`make_dominant_panel()`](https://rdazadda.github.io/bayesqm/reference/make_dominant_panel.md)
+when `type = "membership"`; uses
 [`ggdist::stat_pointinterval`](https://mjskay.github.io/ggdist/reference/stat_pointinterval.html)
-and
-[`ggdist::stat_halfeye`](https://mjskay.github.io/ggdist/reference/stat_halfeye.html)
-for publication-grade posterior summaries.
+/ `stat_halfeye` for the remaining views.
 
 ## Usage
 
 ``` r
-# S3 method for class 'bayesqm_fit'
-autoplot(
+autoplot.bayesqm_fit(
   object,
   type = c("loadings", "zscores", "membership", "hyper", "zscore_posterior"),
   statement = NULL,
@@ -39,7 +36,8 @@ autoplot(
 
 - ...:
 
-  Ignored.
+  Passed to the underlying figure function (e.g. `title`, `anonymize`
+  for membership).
 
 ## Value
 

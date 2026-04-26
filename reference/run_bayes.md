@@ -47,7 +47,7 @@ select_k_sivula(
 
 - elpd_diff_threshold, se_ratio_threshold:
 
-  Sivula rule thresholds (paper defaults 4 and 2).
+  Sivula rule thresholds (defaults 4 and 2).
 
 - ...:
 

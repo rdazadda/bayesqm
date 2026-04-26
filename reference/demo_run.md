@@ -66,7 +66,7 @@ run
 #>  3 -165.42 6.00      -5.49     3.00  1.83
 #>  4 -170.20 5.00       4.78     3.00  1.59
 #> 
-#> Case 'gap': adopt k_peak if corroborated by external evidence, else fall back to k_sivula for parsimony.
+#> Case 'gap': k_peak is adopted; Sivula is reported as a parsimony diagnostic only.
 plot_elpd(run)
 
 ```

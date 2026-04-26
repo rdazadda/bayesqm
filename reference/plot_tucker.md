@@ -1,9 +1,11 @@
 # MatchAlign Tucker's phi distribution by factor
 
 Boxplot of the per-draw Tucker's phi between each aligned loading column
-and its pivot, stored in `fit$align_info$congruence`. A dashed reference
-line is drawn at 0.95 (a common near-identity threshold for rotational
-agreement).
+and the MatchAlign pivot, stored on `fit$align_info$congruence`. A
+semi-transparent strip of the individual draws is overlaid so bimodality
+– the visible signature of residual label-switching – is not hidden by
+the box. A dashed rule at 0.95 marks the conventional near-identity
+threshold.
 
 ## Usage
 
@@ -19,7 +21,8 @@ plot_tucker(fit, ...)
 
 - ...:
 
-  Passed to [`boxplot()`](https://rdrr.io/r/graphics/boxplot.html).
+  Additional arguments forwarded to
+  [`boxplot()`](https://rdrr.io/r/graphics/boxplot.html).
 
 ## Value
 

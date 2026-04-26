@@ -1,9 +1,9 @@
 # Per-statement factor-score posterior across factors
 
-For a single statement, draws the posterior median z-score with 50
-percent (thick) and 95 percent (thin) credible-interval bars for each
-factor, stacked vertically. Reveals, per statement, which factors place
-it above zero and whether the factors actually distinguish it.
+For a single statement, draws the posterior median z-score per factor
+with nested 50 percent (thick) and 95 percent (thin) credible-interval
+whiskers, stacked vertically. The x-axis is symmetric around zero so the
+zero reference is centred.
 
 ## Usage
 
@@ -23,7 +23,8 @@ plot_zscore_posterior(fit, statement, ...)
 
 - ...:
 
-  Unused.
+  Additional arguments forwarded to
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
 
 ## Value
 

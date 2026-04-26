@@ -1,10 +1,12 @@
 # Dominant-factor posterior-probability heatmap
 
 Tiled heatmap of `P(argmax_k |Lambda[i, k]| = k)` with one row per
-participant and one column per factor, annotated by a right-side tier
-strip (Strong / Moderate / Weak following
+participant, one column per factor, rendered on a sequential blue ramp.
+A right-side tier strip encodes Strong / Moderate / Weak membership (per
 [`classify_membership()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)).
-Rows are sorted by tier and then by dominant factor.
+A horizontal colourbar under the plot gives the probability scale. Rows
+are sorted by dominant factor first, then tier, then probability – so
+the block structure a reader wants to see is preserved.
 
 ## Usage
 
@@ -20,11 +22,12 @@ plot_membership(fit, sort = TRUE, ...)
 
 - sort:
 
-  Logical; reorder participants by tier and dominant factor.
+  Logical; apply the default ordering.
 
 - ...:
 
-  Passed to [`image()`](https://rdrr.io/r/graphics/image.html).
+  Additional arguments forwarded to
+  [`image()`](https://rdrr.io/r/graphics/image.html).
 
 ## Value
 

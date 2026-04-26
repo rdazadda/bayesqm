@@ -3,8 +3,7 @@
 Returns a human-readable caption string summarising the model
 configuration (`K`, `N`, `J`, family), the sampler (backend, chains,
 post-warmup draws), the interval probability, and convergence
-diagnostics (max Rhat, divergent transitions). Optionally appends a
-citation to the accompanying Psychometrika paper.
+diagnostics (max Rhat, divergent transitions).
 
 ## Usage
 
@@ -20,7 +19,7 @@ caption_bayesqm(fit, include_ref = TRUE, include_diag = TRUE)
 
 - include_ref:
 
-  Logical; append the paper citation.
+  Logical; append a brief package-attribution line.
 
 - include_diag:
 

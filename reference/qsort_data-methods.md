@@ -1,5 +1,7 @@
 # Print, summary, and matrix conversion for qsort_data
 
+Print, summary, and matrix conversion for qsort_data
+
 ## Usage
 
 ``` r

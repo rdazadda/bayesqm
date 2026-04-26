@@ -1,9 +1,8 @@
 # Probabilistic dominant-factor panel
 
-Direct port of the paper's Figure E2 renderer. Draws a blue-gradient
-heatmap of `P(dominant factor = k)` per participant, with a right- hand
-"Assignment" strip (orange-red gradient) showing the verdict "Strong /
-Mod. / Weak F-k" for each participant.
+Draws a blue-gradient heatmap of `P(dominant factor = k)` per
+participant, with a right-hand "Assignment" strip (orange-red gradient)
+showing the verdict "Strong / Mod. / Weak F-k" for each participant.
 
 ## Usage
 

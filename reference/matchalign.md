@@ -29,4 +29,6 @@ per-draw Tucker-phi per factor, and the `pivot` index used.
 
 ## References
 
-Poworoznek et al. (2025). *Bayesian Analysis*.
+Poworoznek, E., Anceschi, N., Ferrari, F., & Dunson, D. (2025).
+Efficiently Resolving Rotational Ambiguity in Bayesian Matrix Sampling
+with Matching. *Bayesian Analysis*.

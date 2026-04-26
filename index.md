@@ -5,9 +5,8 @@ factor model is sampled with Stan, rotational and sign ambiguity is
 resolved by MatchAlign post-processing, and every quantity the analysis
 produces (loadings, factor z-scores, distinguishing statements, factor
 membership) is reported with posterior credible intervals. The number of
-factors is chosen by PSIS-LOO, under a peak-plus-Sivula protocol that
-reports both the ELPD-optimal K and the more conservative parsimony
-choice.
+factors is chosen by PSIS-LOO: the ELPD peak is adopted, and the Sivula
+parsimony rule is reported alongside as a diagnostic.
 
 ## Installation
 
@@ -78,8 +77,8 @@ coverage probability, and convergence diagnostics.
 
 ## How it works
 
-`bayesqm` samples a low-rank Bayesian factor model with Stan - a
-Student-t likelihood by default, Normal optional and resolves
+`bayesqm` samples a low-rank Bayesian factor model with Stan (a
+Student-t likelihood by default, Normal optional), then resolves
 rotational, sign, and label-permutation ambiguity with MatchAlign
 post-processing. Every factor-analytic quantity is returned as posterior
 draws: loadings, z-scores, and hyperparameters all carry credible
@@ -102,7 +101,7 @@ natively.
 ## Where to look next
 
 - [`vignette("bayesqm-intro")`](https://rdazadda.github.io/bayesqm/articles/bayesqm-intro.md)
-  walks the full workflow on a simulated dataset.
+  walks the full workflow end to end on a reproducible synthetic Q-sort.
 - [`?fit_bayesian`](https://rdazadda.github.io/bayesqm/reference/fit_bayesian.md)
   documents every prior and sampler option.
 - [`?run_bayes`](https://rdazadda.github.io/bayesqm/reference/run_bayes.md)

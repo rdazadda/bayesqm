@@ -1,7 +1,7 @@
 # Probabilistic factor-membership summaries
 
-The paper's Section 6 summaries, each computed entirely from posterior
-draws:
+Probabilistic summaries of factor membership and statement
+interpretation, each computed entirely from posterior draws:
 
 - `compute_threshold_prob()` returns the `N x K` posterior probability
   that `|lambda_ik| > threshold`, i.e. the Bayesian version of the
@@ -55,8 +55,7 @@ classify_membership(Lambda_draws, strong = 0.8, moderate = 0.6)
 
 - strong, moderate:
 
-  Tier cutoffs on `max P(dominant)` (defaults 0.80 and 0.60 following
-  the paper).
+  Tier cutoffs on `max P(dominant)` (defaults 0.80 and 0.60).
 
 ## Value
 

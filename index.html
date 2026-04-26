@@ -59,7 +59,7 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="bayesqm">bayesqm<a class="anchor" aria-label="anchor" href="#bayesqm"></a>
 </h1></div>
-<p>A Bayesian implementation of Q-methodology factor analysis for R. The factor model is sampled with Stan, rotational and sign ambiguity is resolved by MatchAlign post-processing, and every quantity the analysis produces (loadings, factor z-scores, distinguishing statements, factor membership) is reported with posterior credible intervals. The number of factors is chosen by PSIS-LOO, under a peak-plus-Sivula protocol that reports both the ELPD-optimal K and the more conservative parsimony choice.</p>
+<p>A Bayesian implementation of Q-methodology factor analysis for R. The factor model is sampled with Stan, rotational and sign ambiguity is resolved by MatchAlign post-processing, and every quantity the analysis produces (loadings, factor z-scores, distinguishing statements, factor membership) is reported with posterior credible intervals. The number of factors is chosen by PSIS-LOO: the ELPD peak is adopted, and the Sivula parsimony rule is reported alongside as a diagnostic.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -97,7 +97,7 @@
 <div class="section level2">
 <h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
 </h2>
-<p><code>bayesqm</code> samples a low-rank Bayesian factor model with Stan - a Student-t likelihood by default, Normal optional and resolves rotational, sign, and label-permutation ambiguity with MatchAlign post-processing. Every factor-analytic quantity is returned as posterior draws: loadings, z-scores, and hyperparameters all carry credible intervals rather than point estimates. Participant flagging is the posterior probability that a factor is dominant for a given participant; distinguishing statements are scored by <code>P(|f_jk - f_jl| &gt; δ)</code>; and the number of factors is chosen by the ELPD peak under a peak-plus-Sivula protocol built on PSIS-LOO.</p>
+<p><code>bayesqm</code> samples a low-rank Bayesian factor model with Stan (a Student-t likelihood by default, Normal optional), then resolves rotational, sign, and label-permutation ambiguity with MatchAlign post-processing. Every factor-analytic quantity is returned as posterior draws: loadings, z-scores, and hyperparameters all carry credible intervals rather than point estimates. Participant flagging is the posterior probability that a factor is dominant for a given participant; distinguishing statements are scored by <code>P(|f_jk - f_jl| &gt; δ)</code>; and the number of factors is chosen by the ELPD peak under a peak-plus-Sivula protocol built on PSIS-LOO.</p>
 <p>The fit stores everything on a small set of named slots: <code>$loa</code> for posterior-mean loadings, <code>$ci_lower</code> / <code>$ci_upper</code> for credible intervals, <code>$zsc</code> and <code>$zsc_n</code> for continuous and forced-distribution factor scores, <code>$f_char</code> for factor characteristics, <code>$flagged</code> for the dominance logical, and <code>$qdc</code> for the distinguishing-statement table. Standard R accessors (<code>coef</code>, <code>fitted</code>, <code>residuals</code>, <code>sigma</code>, <code>as.matrix</code>, <code>plot</code>) dispatch on the object, and the draws are also exposed in a Stan-style matrix that <code>posterior</code> and <code>bayesplot</code> consume natively.</p>
 </div>
 <div class="section level2">
@@ -105,7 +105,7 @@
 </h2>
 <ul>
 <li>
-<code><a href="articles/bayesqm-intro.html">vignette("bayesqm-intro")</a></code> walks the full workflow on a simulated dataset.</li>
+<code><a href="articles/bayesqm-intro.html">vignette("bayesqm-intro")</a></code> walks the full workflow end to end on a reproducible synthetic Q-sort.</li>
 <li>
 <code><a href="reference/fit_bayesian.html">?fit_bayesian</a></code> documents every prior and sampler option.</li>
 <li>

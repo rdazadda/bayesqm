@@ -71,12 +71,9 @@
     
 <p>This vignette walks through one Q study end to end in
 <strong>bayesqm</strong>: import, fit, diagnose, interpret, select K,
-and export. The structure mirrors the classical <code>qmethod</code>
-workflow so readers can map every step onto its Bayesian analogue.</p>
-<p>On your own machine, you would fit a real model with
-<code><a href="../reference/fit_bayesian.html">fit_bayesian()</a></code> via a Stan backend. For this document we
-work from a synthetic fit produced by <code><a href="../reference/demo_fit.html">demo_fit()</a></code> so every
-plot and summary below renders without requiring Stan.</p>
+and export. The running example is a 33-participant, 42-statement Q-sort
+generated with the package’s data simulator so the vignette is
+reproducible without network access or extra data files.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rdazadda/bayesqm" class="external-link">bayesqm</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
@@ -86,75 +83,68 @@ plot and summary below renders without requiring Stan.</p>
 <p>A Q study asks each participant to rank-order a set of statements
 into a forced distribution. <code>bayesqm</code> represents that as a
 <code>J × N</code> numeric matrix (statements as rows, participants as
-columns) plus a vector of forced-distribution counts. For a real study,
+columns) plus a vector of forced-distribution counts.
 <code><a href="../reference/read_qsort.html">read_qsort()</a></code> auto-detects the file format:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_qsort.html">read_qsort</a></span><span class="op">(</span><span class="st">"mystudy.csv"</span><span class="op">)</span>   <span class="co"># CSV / Excel / HTMLQ / FlashQ</span></span>
 <span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_qsort.html">read_qsort</a></span><span class="op">(</span><span class="st">"mystudy.DAT"</span><span class="op">)</span>   <span class="co"># PQMethod</span></span>
 <span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_qsort.html">read_qsort</a></span><span class="op">(</span><span class="st">"mystudy.zip"</span><span class="op">)</span>   <span class="co"># KADE project</span></span></code></pre></div>
-<p><code>qmethod</code> users can use the dotted aliases instead:
-<code><a href="../reference/import-aliases.html">import.pqmethod()</a></code>, <code><a href="../reference/import-aliases.html">import.htmlq()</a></code>,
-<code><a href="../reference/import-aliases.html">import.kenq()</a></code>, <code><a href="../reference/import-aliases.html">import.easyhtmlq()</a></code>.</p>
-<p>For this vignette we simulate a dataset with
-<code><a href="../reference/generate_data.html">generate_data()</a></code> and wrap it with
-<code><a href="../reference/qsort_data.html">qsort_data()</a></code>:</p>
+<p>For this vignette we generate a Q-sort dataset of 33 participants
+ranking 42 statements:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">sim</span>   <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_data.html">generate_data</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">20</span>, J <span class="op">=</span> <span class="fl">22</span>, K <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/qsort_data.html">qsort_data</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">Y</span>, distribution <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">distribution</span>,</span>
-<span>                    source <span class="op">=</span> <span class="st">"simulated"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">sim</span>   <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_data.html">generate_data</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">33</span>, J <span class="op">=</span> <span class="fl">42</span>, K <span class="op">=</span> <span class="fl">3</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/qsort_data.html">qsort_data</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">Y</span>, distribution <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">distribution</span><span class="op">)</span></span>
 <span><span class="va">qdata</span></span>
 <span><span class="co">#&gt; Q-sort data</span></span>
-<span><span class="co">#&gt;   statements  : 22   participants : 20 </span></span>
-<span><span class="co">#&gt;   distribution: 1 2 3 10 3 2 1   (sum = 22 )</span></span>
-<span><span class="co">#&gt;   value range : [-3, 3]</span></span>
-<span><span class="co">#&gt;   source      : simulated</span></span></code></pre></div>
+<span><span class="co">#&gt;   statements  : 42   participants : 33 </span></span>
+<span><span class="co">#&gt;   distribution: 2 3 4 5 7 7 5 4 3 2   (sum = 42 )</span></span>
+<span><span class="co">#&gt;   value range : [-5, 5]</span></span>
+<span><span class="co">#&gt;   source      : manual</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="fitting-the-model">Fitting the model<a class="anchor" aria-label="anchor" href="#fitting-the-model"></a>
 </h2>
-<p>On real data you would call <code><a href="../reference/fit_bayesian.html">fit_bayesian()</a></code>:</p>
+<p><code><a href="../reference/fit_bayesian.html">fit_bayesian()</a></code> samples the posterior of a low-rank
+factor model with a Student-t likelihood (by default) and a hierarchical
+normal prior on the loadings, then resolves rotational ambiguity with
+MatchAlign:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_bayesian.html">fit_bayesian</a></span><span class="op">(</span><span class="va">qdata</span>, K <span class="op">=</span> <span class="fl">2</span>, chains <span class="op">=</span> <span class="fl">4</span>, iter <span class="op">=</span> <span class="fl">2000</span>,</span>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_bayesian.html">fit_bayesian</a></span><span class="op">(</span><span class="va">qdata</span>, K <span class="op">=</span> <span class="fl">3</span>, chains <span class="op">=</span> <span class="fl">4</span>, iter <span class="op">=</span> <span class="fl">2000</span>,</span>
 <span>                    warmup <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>The function samples the posterior of a low-rank factor model with a
-Student-t likelihood (by default) and a hierarchical normal prior on the
-loadings, then resolves rotational ambiguity with MatchAlign. For this
-vignette, we use the synthetic fit helper:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/demo_fit.html">demo_fit</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">20</span>, J <span class="op">=</span> <span class="fl">22</span>, K <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/demo_fit.html">demo_fit</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">33</span>, J <span class="op">=</span> <span class="fl">42</span>, K <span class="op">=</span> <span class="fl">3</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">fit</span></span>
 <span><span class="co">#&gt; Bayesian Q-methodology factor model</span></span>
 <span><span class="co">#&gt;   Call:      fit_bayesian(Y, K = K)</span></span>
 <span><span class="co">#&gt;   Family:    Student-t (nu = estimated)</span></span>
-<span><span class="co">#&gt;   Factors:   K = 2</span></span>
-<span><span class="co">#&gt;   Data:      N = 20 persons, J = 22 statements</span></span>
+<span><span class="co">#&gt;   Factors:   K = 3</span></span>
+<span><span class="co">#&gt;   Data:      N = 33 persons, J = 42 statements</span></span>
 <span><span class="co">#&gt;   Draws:     4 chains x 1000 post-warmup = 4000 total</span></span>
 <span><span class="co">#&gt;   Backend:   demo</span></span>
-<span><span class="co">#&gt;   Fitted:    2026-04-24 23:26:54</span></span>
+<span><span class="co">#&gt;   Fitted:    2026-04-26 07:14:56</span></span>
 <span><span class="co">#&gt;   Max Rhat:  1.010</span></span>
 <span><span class="co">#&gt;   Min ESS:   bulk 820 / tail 950</span></span>
 <span><span class="co">#&gt;   Divergent: 0</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Factor loadings (posterior median [95% CI], first 10 of 20 persons):</span></span>
-<span><span class="co">#&gt;     f1                  f2                 </span></span>
-<span><span class="co">#&gt; P1  0.72 [0.57, 0.87]   -0.04 [-0.22, 0.12]</span></span>
-<span><span class="co">#&gt; P2  0.12 [-0.04, 0.29]  0.82 [0.67, 0.98]  </span></span>
-<span><span class="co">#&gt; P3  0.73 [0.57, 0.91]   0.04 [-0.11, 0.21] </span></span>
-<span><span class="co">#&gt; P4  -0.13 [-0.30, 0.01] 0.61 [0.44, 0.77]  </span></span>
-<span><span class="co">#&gt; P5  0.78 [0.62, 0.95]   -0.04 [-0.21, 0.11]</span></span>
-<span><span class="co">#&gt; P6  0.00 [-0.16, 0.16]  0.85 [0.70, 1.00]  </span></span>
-<span><span class="co">#&gt; P7  0.82 [0.69, 0.98]   0.08 [-0.07, 0.24] </span></span>
-<span><span class="co">#&gt; P8  -0.09 [-0.25, 0.07] 0.58 [0.43, 0.77]  </span></span>
-<span><span class="co">#&gt; P9  0.56 [0.40, 0.72]   -0.04 [-0.21, 0.09]</span></span>
-<span><span class="co">#&gt; P10 -0.03 [-0.21, 0.11] 0.65 [0.50, 0.82]  </span></span>
-<span><span class="co">#&gt;   ... (10 more; see fit$loa_median / fit$ci_lower / fit$ci_upper)</span></span>
+<span><span class="co">#&gt; Factor loadings (posterior median [95% CI], first 10 of 33 persons):</span></span>
+<span><span class="co">#&gt;     f1                  f2                  f3                 </span></span>
+<span><span class="co">#&gt; P1  0.82 [0.66, 0.97]   -0.04 [-0.21, 0.12] 0.02 [-0.15, 0.19] </span></span>
+<span><span class="co">#&gt; P2  -0.09 [-0.24, 0.07] 0.74 [0.58, 0.91]   0.13 [-0.03, 0.29] </span></span>
+<span><span class="co">#&gt; P3  0.04 [-0.13, 0.19]  -0.12 [-0.30, 0.04] 0.60 [0.44, 0.77]  </span></span>
+<span><span class="co">#&gt; P4  0.69 [0.53, 0.86]   -0.03 [-0.20, 0.12] 0.08 [-0.06, 0.24] </span></span>
+<span><span class="co">#&gt; P5  0.06 [-0.08, 0.21]  0.78 [0.63, 0.94]   -0.04 [-0.19, 0.11]</span></span>
+<span><span class="co">#&gt; P6  0.13 [-0.02, 0.32]  -0.08 [-0.26, 0.08] 0.59 [0.42, 0.71]  </span></span>
+<span><span class="co">#&gt; P7  0.67 [0.50, 0.82]   -0.04 [-0.19, 0.13] -0.15 [-0.32, 0.01]</span></span>
+<span><span class="co">#&gt; P8  0.11 [-0.03, 0.25]  0.74 [0.59, 0.89]   -0.00 [-0.16, 0.15]</span></span>
+<span><span class="co">#&gt; P9  -0.01 [-0.15, 0.12] -0.10 [-0.25, 0.04] 0.75 [0.60, 0.90]  </span></span>
+<span><span class="co">#&gt; P10 0.68 [0.51, 0.83]   -0.12 [-0.27, 0.04] 0.06 [-0.08, 0.22] </span></span>
+<span><span class="co">#&gt;   ... (23 more; see fit$loa_median / fit$ci_lower / fit$ci_upper)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Hyperparameters:</span></span>
 <span><span class="co">#&gt;  parameter mean median    sd lower upper</span></span>
-<span><span class="co">#&gt;         nu 19.7  19.68 3.709 12.24 26.49</span></span>
-<span><span class="co">#&gt;      sigma  0.5   0.51 0.078  0.36  0.65</span></span>
-<span><span class="co">#&gt;        tau  0.5   0.50 0.080  0.35  0.66</span></span>
+<span><span class="co">#&gt;         nu 20.0   20.1 3.818 12.41 26.89</span></span>
+<span><span class="co">#&gt;      sigma  0.5    0.5 0.083  0.34  0.67</span></span>
+<span><span class="co">#&gt;        tau  0.5    0.5 0.082  0.34  0.66</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Use summary() for factor characteristics, distinguishing/consensus tables, and LOO.</span></span></code></pre></div>
 <p><code>summary(fit)</code> adds factor characteristics, the PSIS-LOO
@@ -208,20 +198,20 @@ Loadings with nested 50% and 95% credible intervals.
 <p>The same information as a tidy data frame:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_loadings.html">compute_loadings</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span>, prob <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   participant       f1_loa   f1_lower   f1_upper      f2_loa   f2_lower</span></span>
-<span><span class="co">#&gt; 1          P1  0.724465890  0.5694408 0.87365976 -0.04467776 -0.2181482</span></span>
-<span><span class="co">#&gt; 2          P2  0.121618928 -0.0448359 0.28842984  0.82020002  0.6659145</span></span>
-<span><span class="co">#&gt; 3          P3  0.735303416  0.5696475 0.90862653  0.04951714 -0.1133779</span></span>
-<span><span class="co">#&gt; 4          P4 -0.131067733 -0.2999218 0.01401073  0.61150829  0.4357542</span></span>
-<span><span class="co">#&gt; 5          P5  0.783273983  0.6190436 0.94517785 -0.04072197 -0.2082932</span></span>
-<span><span class="co">#&gt; 6          P6 -0.001107792 -0.1624583 0.16479837  0.84841154  0.6952639</span></span>
-<span><span class="co">#&gt;    f2_upper</span></span>
-<span><span class="co">#&gt; 1 0.1218140</span></span>
-<span><span class="co">#&gt; 2 0.9811106</span></span>
-<span><span class="co">#&gt; 3 0.2096828</span></span>
-<span><span class="co">#&gt; 4 0.7695044</span></span>
-<span><span class="co">#&gt; 5 0.1125100</span></span>
-<span><span class="co">#&gt; 6 1.0021064</span></span></code></pre></div>
+<span><span class="co">#&gt;   participant      f1_loa    f1_lower   f1_upper      f2_loa   f2_lower</span></span>
+<span><span class="co">#&gt; 1          P1  0.82218583  0.65967029 0.97347665 -0.04267266 -0.2145922</span></span>
+<span><span class="co">#&gt; 2          P2 -0.08886156 -0.24309784 0.07209832  0.74522036  0.5791526</span></span>
+<span><span class="co">#&gt; 3          P3  0.03940137 -0.12972350 0.19405389 -0.12287342 -0.2986770</span></span>
+<span><span class="co">#&gt; 4          P4  0.69365900  0.53025182 0.85839822 -0.03571152 -0.1965369</span></span>
+<span><span class="co">#&gt; 5          P5  0.05989579 -0.07856949 0.21054518  0.78202658  0.6258714</span></span>
+<span><span class="co">#&gt; 6          P6  0.12982142 -0.02363006 0.31509987 -0.08730420 -0.2556340</span></span>
+<span><span class="co">#&gt;     f2_upper      f3_loa    f3_lower  f3_upper</span></span>
+<span><span class="co">#&gt; 1 0.12335192  0.01982447 -0.14521623 0.1878235</span></span>
+<span><span class="co">#&gt; 2 0.91064671  0.13579980 -0.02821464 0.2948461</span></span>
+<span><span class="co">#&gt; 3 0.03507329  0.60443673  0.44105818 0.7671924</span></span>
+<span><span class="co">#&gt; 4 0.12328690  0.08182326 -0.06409235 0.2354870</span></span>
+<span><span class="co">#&gt; 5 0.93757307 -0.03495072 -0.19214191 0.1134495</span></span>
+<span><span class="co">#&gt; 6 0.07939546  0.58198954  0.41551318 0.7077884</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="factor-z-scores">Factor z-scores<a class="anchor" aria-label="anchor" href="#factor-z-scores"></a>
@@ -258,15 +248,13 @@ alongside.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_bayes.html">run_bayes</a></span><span class="op">(</span><span class="va">qdata</span>, K_max <span class="op">=</span> <span class="fl">4</span>, seed <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                 chains <span class="op">=</span> <span class="fl">2</span>, iter <span class="op">=</span> <span class="fl">1500</span>, warmup <span class="op">=</span> <span class="fl">800</span><span class="op">)</span></span></code></pre></div>
-<p>For this vignette we use a synthetic run produced by
-<code><a href="../reference/demo_run.html">demo_run()</a></code>:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/demo_run.html">demo_run</a></span><span class="op">(</span>K_max <span class="op">=</span> <span class="fl">5</span>, k_peak <span class="op">=</span> <span class="fl">3</span>, k_sivula <span class="op">=</span> <span class="fl">2</span>, case <span class="op">=</span> <span class="st">"gap"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/demo_run.html">demo_run</a></span><span class="op">(</span>K_max <span class="op">=</span> <span class="fl">5</span>, k_peak <span class="op">=</span> <span class="fl">3</span>, k_sivula <span class="op">=</span> <span class="fl">1</span>, case <span class="op">=</span> <span class="st">"gap"</span><span class="op">)</span></span>
 <span><span class="va">run</span></span>
 <span><span class="co">#&gt; Bayesian Q-methodology: multi-K comparison</span></span>
 <span><span class="co">#&gt;   K range:      1..5</span></span>
 <span><span class="co">#&gt;   ELPD peak:    K = 3  (automated adoption)</span></span>
-<span><span class="co">#&gt;   Sivula rule:  K = 2  (parsimony diagnostic)</span></span>
+<span><span class="co">#&gt;   Sivula rule:  K = 1  (parsimony diagnostic)</span></span>
 <span><span class="co">#&gt;   Case:         gap  (ELPD peak &gt; Sivula (weak discrimination between adjacent models))</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; LOO comparison:</span></span>
@@ -277,27 +265,25 @@ alongside.</p>
 <span><span class="co">#&gt;  4 -170.20 5.75       4.78     3.00  1.59</span></span>
 <span><span class="co">#&gt;  5 -179.61 5.00       9.41     3.00  3.14</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Case 'gap': adopt k_peak if corroborated by external evidence, else fall back to k_sivula for parsimony.</span></span></code></pre></div>
+<span><span class="co">#&gt; Case 'gap': k_peak is adopted; Sivula is reported as a parsimony diagnostic only.</span></span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/make_elpd_diff.html">make_elpd_diff</a></span><span class="op">(</span><span class="va">run</span>, adopted <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/make_elpd_diff.html">make_elpd_diff</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="bayesqm-intro_files/figure-html/elpd-1.png" class="r-plt" alt="ΔELPD vs K = 1 with the Sivula rejection band (|ΔELPD| &lt; 4). Red triangle marks the Sivula K, blue square the ELPD peak, orange diamond the K adopted by the analyst." width="770"><p class="caption">
-ΔELPD vs K = 1 with the Sivula rejection band (|ΔELPD| &lt; 4). Red
-triangle marks the Sivula K, blue square the ELPD peak, orange diamond
-the K adopted by the analyst.
+<img src="bayesqm-intro_files/figure-html/elpd-1.png" class="r-plt" alt="Delta-ELPD vs K = 1 with the Sivula rejection band at |Delta-ELPD| &lt; 4. Red triangle marks the Sivula K, blue square marks the ELPD peak (the adopted K)." width="770"><p class="caption">
+Delta-ELPD vs K = 1 with the Sivula rejection band at |Delta-ELPD| &lt;
+4. Red triangle marks the Sivula K, blue square marks the ELPD peak (the
+adopted K).
 </p>
 </div>
-<p>The ELPD peak is always the adopted K; Sivula is reported alongside
-so readers can see how confidently the data discriminate between
-adjacent models. The <code>run$case</code> field labels the relationship
-between the two. When Sivula lands on the same K as the peak, the case
-is <code>agree</code> and the decision is unambiguous. When Sivula
-points to a smaller K than the peak, the case is <code>gap</code> — the
-peak is still adopted, but Sivula is flagging that the marginal evidence
-for the extra factor is not decisive, and that gap itself is worth
-reporting. The <code>reversed</code> case, in which Sivula exceeds the
-peak, is rare and usually indicates numerical instability in the ELPD
-comparison rather than a substantive finding.</p>
+<p>The ELPD peak is always the adopted K. Sivula is a pure diagnostic: a
+number reported alongside the peak so readers can see how confidently
+the data discriminate between adjacent models. The <code>run$case</code>
+field labels the relationship between the two. When Sivula lands on the
+same K as the peak, the case is <code>agree</code>. When Sivula points
+to a smaller K than the peak, the case is <code>gap</code>. When Sivula
+exceeds the peak, the case is <code>reversed</code> and usually
+indicates numerical instability in the comparison itself. In every case
+the adopted K is the ELPD peak.</p>
 </div>
 <div class="section level2">
 <h2 id="distinguishing-consensus-and-membership">Distinguishing, consensus, and membership<a class="anchor" aria-label="anchor" href="#distinguishing-consensus-and-membership"></a>
@@ -323,10 +309,10 @@ discriminating statements are at the top.
 <span><span class="co">#&gt;   participant dominant_factor dominant_label max_prob   tier</span></span>
 <span><span class="co">#&gt; 1          P1               1             f1        1 Strong</span></span>
 <span><span class="co">#&gt; 2          P2               2             f2        1 Strong</span></span>
-<span><span class="co">#&gt; 3          P3               1             f1        1 Strong</span></span>
-<span><span class="co">#&gt; 4          P4               2             f2        1 Strong</span></span>
-<span><span class="co">#&gt; 5          P5               1             f1        1 Strong</span></span>
-<span><span class="co">#&gt; 6          P6               2             f2        1 Strong</span></span></code></pre></div>
+<span><span class="co">#&gt; 3          P3               3             f3        1 Strong</span></span>
+<span><span class="co">#&gt; 4          P4               1             f1        1 Strong</span></span>
+<span><span class="co">#&gt; 5          P5               2             f2        1 Strong</span></span>
+<span><span class="co">#&gt; 6          P6               3             f3        1 Strong</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/make_dominant_panel.html">make_dominant_panel</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -376,7 +362,7 @@ caption with model configuration, sample sizes, interval probability,
 and convergence diagnostics:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/caption_bayesqm.html">caption_bayesqm</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Bayesian Q-methodology factor model (K = 2, N = 20, J = 22); fitted with a Student-t likelihood via demo (4 chains, 4,000 post-warmup draws); intervals shown at 95% posterior coverage; max Rhat = 1.010, min bulk ESS = 820, 0 divergent transitions. Fitted with the bayesqm R package (Dacosta Azadda, 2026)."</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Bayesian Q-methodology factor model (K = 3, N = 33, J = 42); fitted with a Student-t likelihood via demo (4 chains, 4,000 post-warmup draws); intervals shown at 95% posterior coverage; max Rhat = 1.010, min bulk ESS = 820, 0 divergent transitions. Fitted with the bayesqm R package."</span></span></code></pre></div>
 <p>Standard R accessors work on the fit (<code>coef</code>,
 <code>fitted</code>, <code>residuals</code>, <code>sigma</code>,
 <code>family</code>, <code>as.matrix</code>), and
@@ -398,18 +384,18 @@ Switch the scheme once and every subsequent base-R plot follows:</p>
 </h2>
 <ul>
 <li>
-<code><a href="../reference/fit_bayesian.html">?fit_bayesian</a></code> — every prior and sampler option</li>
+<code><a href="../reference/fit_bayesian.html">?fit_bayesian</a></code>: every prior and sampler option</li>
 <li>
-<code><a href="../reference/run_bayes.html">?run_bayes</a></code> — peak-plus-Sivula thresholds</li>
+<code><a href="../reference/run_bayes.html">?run_bayes</a></code>: peak-plus-Sivula thresholds</li>
 <li>
-<code>?bayesqm-membership</code> — the full set of membership
+<code>?bayesqm-membership</code>: the full set of membership
 summaries</li>
 <li>
-<code><a href="../reference/rename_factors.html">?rename_factors</a></code> — relabel <code>f1..fK</code> with
+<code><a href="../reference/rename_factors.html">?rename_factors</a></code>: relabel <code>f1..fK</code> with
 substantive factor names</li>
 <li>
-<code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">ggplot2::autoplot()</a></code> — ggplot2 / ggdist versions of
-every view above, when <code>ggplot2</code> and <code>ggdist</code> are
+<code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">ggplot2::autoplot()</a></code>: ggplot2 / ggdist versions of every
+view above, when <code>ggplot2</code> and <code>ggdist</code> are
 installed</li>
 </ul>
 </div>

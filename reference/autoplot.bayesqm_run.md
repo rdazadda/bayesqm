@@ -1,14 +1,17 @@
-# ggplot2 rendering of the ELPD curve for a bayesqm_run
+# ggplot2 renderings of a bayesqm_run
 
+Generic
 [`ggplot2::autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
-method for a `bayesqm_run`. Draws ELPD against K with +/- 1.96 SE
-whiskers and peak / Sivula markers.
+method for `bayesqm_run`. Dispatches to
+[`make_elpd_diff()`](https://rdazadda.github.io/bayesqm/reference/make_elpd_diff.md)
+when `type = "elpd"` (default) and
+[`make_ppc_ridge()`](https://rdazadda.github.io/bayesqm/reference/make_ppc_ridge.md)
+when `type = "ppc"`.
 
 ## Usage
 
 ``` r
-# S3 method for class 'bayesqm_run'
-autoplot(object, ...)
+autoplot.bayesqm_run(object, type = c("elpd", "ppc"), ...)
 ```
 
 ## Arguments
@@ -17,9 +20,13 @@ autoplot(object, ...)
 
   A `bayesqm_run`.
 
+- type:
+
+  One of `"elpd"` or `"ppc"`.
+
 - ...:
 
-  Ignored.
+  Passed to the underlying figure function (e.g. `adopted`, `title`).
 
 ## Value
 

@@ -1,8 +1,8 @@
 # Simulate Q-sort data
 
 `generate_data()` is the top-level data-generating function used by the
-paper's simulation studies and by package tests. It builds a loading
-matrix (`generate_loadings()`), factor scores, noise of the chosen type
+package's simulation studies and tests. It builds a loading matrix
+(`generate_loadings()`), factor scores, noise of the chosen type
 (`generate_noise()`), and discretises the continuous signal onto a
 forced Q-sort grid (`discretize_to_grid()`). See also
 `get_distribution()` for the standard forced-distribution lookup.
@@ -74,9 +74,9 @@ get_distribution(J)
 
   `"simple"` or `"complex"`.
 
-- primary_range, cross_range, type:
+- primary_range, cross_range:
 
-  For `generate_loadings()`.
+  Uniform ranges for primary and cross-loadings.
 
 - seed:
 
@@ -93,6 +93,10 @@ get_distribution(J)
 - distr:
 
   Integer forced-distribution counts.
+
+- primary_range, cross_range, type:
+
+  For `generate_loadings()`.
 
 ## Value
 

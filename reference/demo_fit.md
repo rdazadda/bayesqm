@@ -1,9 +1,10 @@
 # A synthetic bayesqm_fit for examples and tutorials
 
-Returns a `bayesqm_fit` object built from pre-generated posterior draws,
-so every summary and plot function can run without a Stan backend. Use
-it for demonstrations, teaching materials, and the package vignette. It
-is not a substitute for
+Returns a `bayesqm_fit` with realistic Q-methodology structure: every
+participant has a dominant factor, roughly 40 percent of the statements
+polarise the factor pair, 10 percent are consensus, and the remainder
+are weakly partial. Use it for documentation, teaching materials, and
+the package vignette; it is not a substitute for
 [`fit_bayesian()`](https://rdazadda.github.io/bayesqm/reference/fit_bayesian.md)
 on real data.
 
@@ -53,7 +54,7 @@ summary(fit)
 #>   Data:      N = 12 persons, J = 15 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-04-24 23:26:49
+#>   Fitted:    2026-04-26 07:14:51
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0

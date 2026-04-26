@@ -1,11 +1,12 @@
 # Loading forest with 50 and 95 percent credible intervals
 
-One panel per factor, horizontal dotchart of posterior-median loadings
-with nested 50 percent (thick) and 95 percent (thin) credible intervals,
-ranked by posterior mean. A dashed vertical rule marks the classical
-Brown cut-off `1.96 / sqrt(J)`; when `highlight_flagged = TRUE`,
-participants in `fit$flagged` for that factor are drawn as filled
-points.
+Horizontal dotchart of every participant's loading, one panel per
+factor, ranked by posterior mean. Each loading is drawn as a median
+point with nested 50 percent (thick) and 95 percent (thin)
+credible-interval whiskers. A faint grey vertical rule marks Brown's
+descriptive cut-off `+/- 1.96 / sqrt(J)`. When
+`highlight_flagged = TRUE`, participants in `fit$flagged[, k]` are drawn
+as filled points in the accent colour.
 
 ## Usage
 
@@ -29,7 +30,8 @@ plot_loading_posterior(fit, factors = NULL, highlight_flagged = TRUE, ...)
 
 - ...:
 
-  Unused.
+  Additional arguments forwarded to
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
 
 ## Value
 

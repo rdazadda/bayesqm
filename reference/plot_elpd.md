@@ -1,9 +1,9 @@
-# ELPD across K with peak and Sivula markers
+# ELPD across K with peak and Sivula annotations
 
-Plots the ELPD across the K values enumerated by
-[`run_bayes()`](https://rdazadda.github.io/bayesqm/reference/run_bayes.md),
-with +/- 1.96 SE bars, a dashed vertical rule at the Sivula K and a
-solid vertical rule at the ELPD-peak K. The plot title reports the
+ELPD against K with +/- 1.96 SE whiskers, a solid vertical rule at the
+ELPD peak, and a dashed rule at the Sivula (parsimony) K. Both rules are
+drawn in the primary blue, distinguished by line type and by text
+annotations at the top of the axis. The title reports the
 peak-plus-Sivula case (`agree`, `gap`, `reversed`).
 
 ## Usage
@@ -16,11 +16,12 @@ plot_elpd(run, ...)
 
 - run:
 
-  A `bayesqm_run` object.
+  A `bayesqm_run`.
 
 - ...:
 
-  Passed to [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
+  Additional arguments forwarded to
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
 
 ## Value
 

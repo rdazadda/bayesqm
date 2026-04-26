@@ -1,8 +1,7 @@
 # Posterior predictive RMSE ridgeline across K
 
-Direct port of the paper's Figure E4 renderer. Draws a ridgeline density
-of the posterior predictive correlation-matrix RMSE (\\RMSE_R\\) at
-every K in `run`, with a median tick per ridge.
+Draws a ridgeline density of the posterior predictive correlation-matrix
+RMSE (\\RMSE_R\\) at every K in `run`, with a median tick per ridge.
 
 ## Usage
 

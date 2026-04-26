@@ -9,6 +9,15 @@ and factor scores, probabilistic dominant-factor membership,
 distinguishing and consensus statements, and PSIS-LOO-based factor
 enumeration.
 
+A Bayesian factor-analytic framework for Q methodology. Fits a low-rank
+factor model to Q-sort data with a Student-t likelihood and a
+hierarchical normal prior on loadings, samples the posterior with Stan,
+resolves rotational ambiguity via MatchAlign post-processing, and
+returns posterior summaries including credible intervals for loadings
+and factor scores, probabilistic dominant-factor membership,
+distinguishing and consensus statements, and PSIS-LOO-based factor
+enumeration.
+
 ## Details
 
 The typical workflow is:
@@ -100,9 +109,6 @@ Intentional Bayesian divergences:
 
 ## References
 
-Dacosta Azadda, R. (2026). Bayesian Q Methodology: Probabilistic Factor
-Analysis for the Study of Subjectivity. *Psychometrika* (in press).
-
 Poworoznek, E., Anceschi, N., Ferrari, F., & Dunson, D. (2025).
 Efficiently Resolving Rotational Ambiguity in Bayesian Matrix Sampling
 with Matching. *Bayesian Analysis*.
@@ -114,6 +120,16 @@ Comparison. *Bayesian Analysis*.
 Vehtari, A., Gelman, A., & Gabry, J. (2017). Practical Bayesian model
 evaluation using leave-one-out cross-validation and WAIC. *Statistics
 and Computing*, 27(5), 1413-1432.
+
+## See also
+
+Useful links:
+
+- <https://github.com/rdazadda/bayesqm>
+
+- <https://rdazadda.github.io/bayesqm/>
+
+- Report bugs at <https://github.com/rdazadda/bayesqm/issues>
 
 ## Author
 
