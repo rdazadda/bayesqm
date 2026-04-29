@@ -4,7 +4,7 @@ template:
   bootstrap: 5
   light-switch: true
   bslib:
-    primary:   "#236192"
+    primary:   "#1E3A5F"
     secondary: "#DF6A2E"
     success:   "#71984A"
     info:      "#87D1E6"
