@@ -60,7 +60,7 @@ fit
 #>   Data:      N = 33 persons, J = 42 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-04-29 19:52:41
+#>   Fitted:    2026-04-29 19:54:41
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
