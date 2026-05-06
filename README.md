@@ -5,7 +5,7 @@
 <!-- badges: end -->
 
 **Bayesian Q methodology: probabilistic factor analysis for the study
-of subjectivity.**
+of subjective opinions.**
 
 `bayesqm` is the first fully Bayesian framework for Q-methodology
 factor analysis. Since Stephenson (1935), Q analysis has relied on
