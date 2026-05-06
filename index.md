@@ -195,5 +195,6 @@ citation("bayesqm")
 
 ## License
 
-Released under the MIT license; see
-[LICENSE](https://rdazadda.github.io/bayesqm/LICENSE) for the full text.
+Released under the GNU General Public License version 3 (GPL-3); see
+[LICENSE.md](https://rdazadda.github.io/bayesqm/LICENSE.md) for the full
+text.
