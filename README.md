@@ -1,7 +1,7 @@
 # bayesqm
 
 <!-- badges: start -->
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- badges: end -->
 
 **Bayesian Q methodology: probabilistic factor analysis for the study
@@ -181,5 +181,5 @@ citation("bayesqm")
 
 ## License
 
-Released under the MIT license; see [LICENSE](LICENSE) for the full
-text.
+Released under the GNU General Public License version 3 (GPL-3);
+see [LICENSE.md](LICENSE.md) for the full text.
