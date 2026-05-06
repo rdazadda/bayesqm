@@ -5,6 +5,7 @@ import, fit, diagnose, interpret, select K, and export. The running
 example is a synthetic 33-participant, 42-statement Q-sort.
 
 ``` r
+
 library(bayesqm)
 library(ggplot2)
 ```
@@ -19,6 +20,7 @@ forced-distribution counts.
 auto-detects the file format:
 
 ``` r
+
 qdata <- read_qsort("mystudy.csv")   # CSV / Excel / HTMLQ / FlashQ
 qdata <- read_qsort("mystudy.DAT")   # PQMethod
 qdata <- read_qsort("mystudy.zip")   # KADE project
@@ -27,6 +29,7 @@ qdata <- read_qsort("mystudy.zip")   # KADE project
 The example dataset:
 
 ``` r
+
 sim   <- generate_data(N = 33, J = 42, K = 3, seed = 1)
 qdata <- qsort_data(sim$Y, distribution = sim$distribution)
 qdata
@@ -46,11 +49,13 @@ then resolves rotational ambiguity with the MatchAlign post-processing
 of Poworoznek et al. ([2025](#ref-PoworoznekEtAl2025)):
 
 ``` r
+
 fit <- fit_bayesian(qdata, K = 3, chains = 4, iter = 2000,
                     warmup = 1000, seed = 1)
 ```
 
 ``` r
+
 fit <- demo_fit(N = 33, J = 42, K = 3, seed = 1)
 fit
 #> Bayesian Q-methodology factor model
@@ -60,7 +65,7 @@ fit
 #>   Data:      N = 33 persons, J = 42 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-04-29 20:20:33
+#>   Fitted:    2026-05-06 06:53:53
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
@@ -100,6 +105,7 @@ above 400, and zero divergent transitions ([Vehtari et al.
 2021](#ref-VehtariEtAl2021)):
 
 ``` r
+
 fit$diagnostics
 #> $rhat_max
 #> [1] 1.01
@@ -120,6 +126,7 @@ and the MatchAlign pivot. Values near 1 indicate a stable alignment;
 bimodality signals residual label-switching.
 
 ``` r
+
 plot_tucker(fit)
 ```
 
@@ -139,6 +146,7 @@ faint reference. Filled points are participants with
 `P(factor k dominant) > 0.5`.
 
 ``` r
+
 plot_loading_posterior(fit)
 ```
 
@@ -150,6 +158,7 @@ Loadings with nested 50% and 95% credible intervals.
 The same information as a tidy data frame:
 
 ``` r
+
 head(compute_loadings(fit$Lambda_draws, prob = 0.95))
 #>   participant      f1_loa    f1_lower   f1_upper      f2_loa   f2_lower
 #> 1          P1  0.82218583  0.65967029 0.97347665 -0.04267266 -0.2145922
@@ -175,6 +184,7 @@ posterior mean, configurable via `sort_by`) so factors can be compared
 horizontally.
 
 ``` r
+
 plot(fit)
 ```
 
@@ -188,6 +198,7 @@ For a single statement across factors,
 shows the per-factor view:
 
 ``` r
+
 plot_zscore_posterior(fit, statement = 1)
 ```
 
@@ -207,11 +218,13 @@ reported alongside as a diagnostic.
 On real data:
 
 ``` r
+
 run <- run_bayes(qdata, K_max = 4, seed = 1,
                  chains = 2, iter = 1500, warmup = 800)
 ```
 
 ``` r
+
 run <- demo_run(K_max = 5, k_peak = 3, k_sivula = 1, case = "gap")
 run
 #> Bayesian Q-methodology: multi-K comparison
@@ -232,6 +245,7 @@ run
 ```
 
 ``` r
+
 make_elpd_diff(run)
 ```
 
@@ -258,6 +272,7 @@ statement by at least δ. The default δ = 1 is on the standardised
 factor-score scale.
 
 ``` r
+
 plot_dist_cons(fit, delta = 1.0)
 ```
 
@@ -273,6 +288,7 @@ Participant-level membership is also probabilistic.
 turns posterior dominance into a `Strong / Moderate / Weak` tier:
 
 ``` r
+
 head(classify_membership(fit$Lambda_draws))
 #>   participant dominant_factor dominant_label max_prob   tier
 #> 1          P1               1             f1        1 Strong
@@ -284,6 +300,7 @@ head(classify_membership(fit$Lambda_draws))
 ```
 
 ``` r
+
 make_dominant_panel(fit)
 ```
 
@@ -304,6 +321,7 @@ shows the posterior distribution of the RMSE between `cor(Y_rep)` and
 RMSE.
 
 ``` r
+
 plot_ppc(fit)
 ```
 
@@ -315,6 +333,7 @@ PPC on the by-person correlation matrix.
 ## Hyperparameters
 
 ``` r
+
 plot_hyper(fit)
 ```
 
@@ -330,6 +349,7 @@ writes any plot to PDF, SVG, PNG, TIFF, or JPEG at the chosen
 dimensions:
 
 ``` r
+
 save_bayesqm_plot("fig_loadings.pdf", plot_loading_posterior(fit))
 save_bayesqm_plot("fig_elpd.pdf",      plot_elpd(run),
                   width = 3.5, height = 3)
@@ -340,6 +360,7 @@ returns a figure caption with model configuration, sample sizes,
 interval probability, and convergence diagnostics:
 
 ``` r
+
 caption_bayesqm(fit)
 #> [1] "Bayesian Q-methodology factor model (K = 3, N = 33, J = 42); fitted with a Student-t likelihood via demo (4 chains, 4,000 post-warmup draws); intervals shown at 95% posterior coverage; max Rhat = 1.010, min bulk ESS = 820, 0 divergent transitions. Fitted with the bayesqm R package."
 ```
@@ -356,6 +377,7 @@ Every plot reads its palette through
 Switch the scheme once and every subsequent base-R plot follows:
 
 ``` r
+
 bayesqm_set_colors("teal")   # "blue" (default), "red", "purple", "grey"
 plot(fit)
 bayesqm_set_colors("blue")
@@ -377,7 +399,7 @@ bayesqm_set_colors("blue")
 ## References
 
 Brown, Steven R. 1980. *Political Subjectivity: Applications of q
-Methodology in Political Science*. New Haven, CT: Yale University Press.
+Methodology in Political Science*. Yale University Press.
 
 Poworoznek, Evan, Niccolo Anceschi, Federico Ferrari, and David Dunson.
 2025. “Efficiently Resolving Rotational Ambiguity in Bayesian Matrix
@@ -391,6 +413,6 @@ Model Comparison.” *Bayesian Analysis*, 1–31.
 
 Vehtari, Aki, Andrew Gelman, Daniel Simpson, Bob Carpenter, and
 Paul-Christian Bürkner. 2021. “Rank-Normalization, Folding, and
-Localization: An Improved $\widehat{R}$ for Assessing Convergence of
+Localization: An Improved $`\widehat{R}`$ for Assessing Convergence of
 MCMC (with Discussion).” *Bayesian Analysis* 16 (2): 667–718.
 <https://doi.org/10.1214/20-BA1221>.

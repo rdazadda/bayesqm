@@ -1,7 +1,7 @@
 # bayesqm
 
 **Bayesian Q methodology: probabilistic factor analysis for the study of
-subjectivity.**
+subjective opinions.**
 
 `bayesqm` is the first fully Bayesian framework for Q-methodology factor
 analysis. Since Stephenson (1935), Q analysis has relied on frequentist
@@ -38,6 +38,7 @@ analysis cannot:
 A Stan backend is required. Install `cmdstanr` or `rstan`, then:
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("rdazadda/bayesqm")
 ```
@@ -45,6 +46,7 @@ remotes::install_github("rdazadda/bayesqm")
 ## Minimal workflow
 
 ``` r
+
 library(bayesqm)
 qdata <- read_qsort("mystudy.csv")
 fit   <- fit_bayesian(qdata, K = 3)
@@ -72,6 +74,7 @@ expected: [`coef()`](https://rdrr.io/r/stats/coef.html),
 ## Choosing K
 
 ``` r
+
 run <- run_bayes(qdata, K_max = 5)
 plot_elpd(run)
 ```
@@ -100,6 +103,7 @@ turns these probabilities into a per-participant Strong / Moderate /
 Weak tier:
 
 ``` r
+
 compute_dominant_prob(fit$Lambda_draws)
 classify_membership(fit$Lambda_draws)
 plot_membership(fit)
@@ -109,6 +113,7 @@ Distinguishing and consensus statements use posterior probabilities of
 pairwise factor-score separations:
 
 ``` r
+
 compute_distinguishing_prob(fit$F_draws, delta = 1.0)
 compute_consensus_prob(fit$F_draws, delta = 1.0)
 plot_dist_cons(fit, delta = 1.0)
@@ -124,6 +129,7 @@ their palette through
 and restore [`par()`](https://rdrr.io/r/graphics/par.html) on exit:
 
 ``` r
+
 plot(fit)                       # cross-panel z-score dotchart
 plot_loading_posterior(fit)     # loadings with 50% / 95% intervals
 plot_membership(fit)            # dominant-factor probability heatmap
@@ -170,6 +176,7 @@ registered for `posterior::as_draws_*` when `posterior` is installed, so
 ## Citing the package
 
 ``` r
+
 citation("bayesqm")
 ```
 
