@@ -1,0 +1,39 @@
+# Renders paper/paper.md to a PDF with openjournals/inara, the same Pandoc
+# + Lua filter pipeline JOSS uses at submission and review. The PDF is
+# uploaded as a build artifact so it can be downloaded and reviewed before
+# submitting at https://joss.theoj.org/papers/new.
+
+name: JOSS draft
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'paper/**'
+      - '.github/workflows/joss-paper.yaml'
+  pull_request:
+    paths:
+      - 'paper/**'
+      - '.github/workflows/joss-paper.yaml'
+
+permissions: read-all
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    name: Render JOSS paper
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build draft PDF
+        uses: openjournals/openjournals-draft-action@master
+        with:
+          journal: joss
+          paper-path: paper/paper.md
+
+      - name: Upload draft PDF as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper
+          path: paper/paper.pdf
