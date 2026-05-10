@@ -47,4 +47,5 @@ Suggests:
     testthat (>= 3.0.0),
     vdiffr (>= 1.0.0)
 VignetteBuilder: knitr
-LazyData: true
+Additional_repositories:
+    https://stan-dev.r-universe.dev
