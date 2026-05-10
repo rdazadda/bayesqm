@@ -11,7 +11,7 @@ This is the first CRAN submission of bayesqm.
 
 0 errors | 0 warnings | 1 note
 
-The note has two parts. The first is the standard "New submission" message. The second reports that cmdstanr is suggested but not on a mainstream repository: cmdstanr is published on the Stan project's r-universe, the package declares this in Additional_repositories, and the check confirms cmdstanr is reachable from the declared location.
+The note has three parts. The first is the standard "New submission" message. The second flags six words in the DESCRIPTION as possibly misspelled: MatchAlign (a post-processing method), Poworoznek, Sivula, and Vehtari (author surnames), and et and al (components of the Latin abbreviation "et al."). All six appear inside the inline DOI citations. The third reports that cmdstanr is suggested but not on a mainstream repository: cmdstanr is published on the Stan project's r-universe, the package declares this in Additional_repositories, and the check confirms cmdstanr is reachable from the declared location.
 
 ## Stan and the test suite
 

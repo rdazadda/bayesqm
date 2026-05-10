@@ -181,5 +181,5 @@ citation("bayesqm")
 
 ## License
 
-Released under the GNU General Public License version 3 (GPL-3);
-see [LICENSE.md](LICENSE.md) for the full text.
+Released under the GNU General Public License version 3 (GPL-3); see
+<https://www.gnu.org/licenses/gpl-3.0.html> for the full text.
