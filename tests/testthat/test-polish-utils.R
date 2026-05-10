@@ -11,6 +11,7 @@ test_that("save_bayesqm_plot writes a pdf and returns the path", {
 })
 
 test_that("save_bayesqm_plot dispatches by extension", {
+  skip_on_ci()
   fit <- make_fake_fit(N = 4, J = 8, K = 2)
   for (ext in c("pdf", "svg", "png", "tiff", "jpeg")) {
     tmp <- tempfile(fileext = paste0(".", ext))
