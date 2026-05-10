@@ -49,6 +49,8 @@ jobs:
           extra-packages: |
             any::rcmdcheck
             any::cmdstanr
+            any::BH
+            any::StanHeaders
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
