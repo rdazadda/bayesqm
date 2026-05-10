@@ -9,10 +9,13 @@ Authors@R: person(
 Description: A Bayesian factor-analytic framework for Q methodology. Fits a
     low-rank factor model to Q-sort data with a Student-t likelihood and a
     hierarchical normal prior on loadings, samples the posterior with Stan,
-    resolves rotational ambiguity via MatchAlign post-processing, and returns
-    posterior summaries including credible intervals for loadings and factor
-    scores, probabilistic dominant-factor membership, distinguishing and
-    consensus statements, and PSIS-LOO-based factor enumeration.
+    resolves rotational ambiguity via MatchAlign post-processing (Poworoznek
+    et al. 2025) <doi:10.1214/25-BA1544>, and returns posterior summaries
+    including credible intervals for loadings and factor scores, probabilistic
+    dominant-factor membership, distinguishing and consensus statements, and
+    PSIS-LOO-based factor enumeration (Vehtari et al. 2017
+    <doi:10.1007/s11222-016-9696-4>) with the Sivula et al. (2025)
+    <doi:10.1214/25-BA1569> parsimony rule.
 License: GPL (>= 3)
 URL: https://github.com/rdazadda/bayesqm, https://rdazadda.github.io/bayesqm/
 BugReports: https://github.com/rdazadda/bayesqm/issues
