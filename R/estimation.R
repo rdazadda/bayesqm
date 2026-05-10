@@ -269,7 +269,7 @@ get_diagnostics <- function(fit, be) {
   smax <- function(x) if (!length(x) || all(is.na(x))) NA_real_ else max(x, na.rm = TRUE)
 
   # only identified params; Lambda/F have rotational ambiguity
-  idp <- c("log_tau", "log_sigma", "tau", "sigma",
+  idp <- c("log_sigma", "tau", "sigma",
            "nu_raw", "nu", "lp__", "log_lik", "log_lik_person")
 
   if (be == "cmdstanr") {

@@ -89,4 +89,4 @@ importFrom(stats, aggregate, coef, cor, density, family, fitted,
            residuals, sd, setNames, sigma, update)
 importFrom(utils, combn, head, read.csv, unzip)
 importFrom(graphics, abline, axis, box, boxplot, hist, image, layout, legend, lines, mtext, par, points, polygon, rect, segments, text, title)
-importFrom(grDevices, adjustcolor, colorRampPalette, grey.colors)
+importFrom(grDevices, adjustcolor, colorRampPalette)

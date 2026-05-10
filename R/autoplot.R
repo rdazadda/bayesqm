@@ -536,6 +536,3 @@ autoplot.bayesqm_run <- function(object, type = c("elpd", "ppc"), ...) {
     ggplot2::theme_minimal(base_size = 11) +
     ggplot2::theme(panel.grid.minor = ggplot2::element_blank())
 }
-
-
-`%||%` <- function(a, b) if (is.null(a)) b else a
