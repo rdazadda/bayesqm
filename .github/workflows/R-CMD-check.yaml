@@ -30,6 +30,11 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      # Force skip_on_cran() to fire so Stan-sampling tests skip in this
+      # matrix. r-lib/actions/check-r-package@v2 sets NOT_CRAN=true by
+      # default; the dedicated R-CMD-check-stan.yaml workflow handles
+      # Stan execution with a real CmdStan install.
+      NOT_CRAN: "false"
 
     steps:
       - uses: actions/checkout@v6
@@ -49,8 +54,6 @@ jobs:
           extra-packages: |
             any::rcmdcheck
             any::cmdstanr
-            any::BH
-            any::StanHeaders
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
