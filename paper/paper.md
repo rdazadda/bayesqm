@@ -1,5 +1,5 @@
 ---
-title: 'Bayesian Q methodology: probabilistic factor analysis for the study of subjective opinions'
+title: 'bayesqm: Probabilistic factor analysis for Q methodology in R'
 tags:
   - R
   - Stan
@@ -51,6 +51,6 @@ Five simulation studies validate the framework: credible-interval coverage is ne
 
 # Acknowledgements
 
-This work was conducted at the Center for Alaska Native Health Research at the University of Alaska Fairbanks. The author thanks the Q-methodology research community for the publicly available datasets used in package development, and the development teams of Stan, `cmdstanr`, `rstan`, `loo`, `posterior`, and `ggplot2` for the foundational tooling on which this package is built.
+`bayesqm` grew out of work at the Center for Alaska Native Health Research at the University of Alaska Fairbanks, and would not exist without the people there. I am grateful to the CANHR research team for their discussions and encouragement, and especially to the Numbers Team, particularly Andrew Grogan-Kaylor and KyungSook Lee, for their methodological discussions, feedback on early designs, and patience with the questions that shaped this package over many conversations. I also thank the broader Q-methodology research community for the publicly available datasets used in package development, and the development teams of Stan, `cmdstanr`, `rstan`, `loo`, `posterior`, and `ggplot2` for the foundational tooling on which `bayesqm` is built.
 
 # References
