@@ -1,4 +1,7 @@
 # Render the Q-sort grid figure used in the JOSS paper.
+# The two real-data figures (dominant-membership.pdf and elpd-k-selection.pdf)
+# are reproduced from the companion methodology paper and checked into
+# paper/figures/ directly; they are not regenerated here.
 # Run from the package root: Rscript paper/generate_figures.R
 
 suppressPackageStartupMessages(library(ggplot2))
