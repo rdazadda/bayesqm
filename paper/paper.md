@@ -21,9 +21,9 @@ bibliography: paper.bib
 
 # Summary
 
-`bayesqm` brings fully Bayesian inference to Q methodology, an approach that identifies shared viewpoints from how participants rank-order a set of statements [@Stephenson1935; @Brown1980]. Each participant places statements onto a forced distribution (Figure \ref{fig:qsort}), so the analytic input is a $J \times N$ matrix of integer scores where every participant uses the same fixed count of statements at each rank position.
+`bayesqm` introduces fully Bayesian inference to Q methodology, an approach that identifies shared viewpoints from how participants rank-order a set of statements [@Stephenson1935; @Brown1980]. Each participant places statements onto a forced distribution (Figure \ref{fig:qsort}), so the analytic input is a $J \times N$ matrix of integer scores where every participant uses the same fixed count of statements at each rank position.
 
-![A common Q-sort grid: 36 statements arranged on a nine-category forced distribution from "most disagree" to "most agree." Each column placement is constrained to a fixed count, producing the structural constraint that distinguishes Q-sort data from conventional rating scales.\label{fig:qsort}](figures/qsort-grid.pdf){width=70%}
+![A common Q-sort grid: participants arrange 36 statements on a nine-category forced distribution from "most disagree" to "most agree." Each column placement is constrained to a fixed count, producing the structural constraint that distinguishes Q-sort data from conventional rating scales.\label{fig:qsort}](figures/qsort-grid.pdf){width=70%}
 
 The package fits a low-rank factor model to Q-sort data with a Student-$t$ likelihood and a hierarchical prior on loadings, samples the joint posterior with Stan [@CarpenterEtAl2017], resolves rotational ambiguity through MatchAlign post-processing [@PoworoznekEtAl2025], and returns posterior credible intervals for participant loadings, probabilistic factor membership summaries, distinguishing and consensus statement probabilities, and PSIS-LOO-based factor enumeration [@VehtariEtAl2017; @SivulaEtAl2025]. It supports both `cmdstanr` and `rstan` as Stan backends, imports Q-sort datasets from PQMethod and KADE, and integrates with the broader R Bayesian ecosystem via `posterior`, `loo`, and `ggplot2` autoplot methods.
 
