@@ -40,9 +40,10 @@ run_bayes <- function(Y, K_max = 5, stan_dir = NULL,
   fits <- vector("list", K_max)
   loo_list <- vector("list", K_max)
   for (k in seq_len(K_max)) {
-    fits[[k]] <- tryCatch(
+    res <- tryCatch(
       fit_bayesian(Y, K = k, stan_dir = stan_dir, ...),
       error = function(e) NULL)
+    if (!is.null(res)) fits[[k]] <- res
     if (!is.null(fits[[k]]$loo)) loo_list[[k]] <- fits[[k]]$loo
   }
 
