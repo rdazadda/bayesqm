@@ -35,13 +35,31 @@ analysis cannot:
 
 ## Installation
 
-A Stan backend is required. Install `cmdstanr` or `rstan`, then:
-
 ``` r
 
 # install.packages("remotes")
 remotes::install_github("rdazadda/bayesqm")
 ```
+
+### Stan backend
+
+`bayesqm` fits models with Stan and needs a working backend: `cmdstanr`
+(recommended) or `rstan`.
+
+`cmdstanr` is not on CRAN and is installed from the Stan R-universe.
+CmdStan itself must then be installed separately:
+
+``` r
+
+install.packages("cmdstanr", repos = c("https://stan-dev.r-universe.dev", getOption("repos")))
+cmdstanr::check_cmdstan_toolchain(fix = TRUE)
+cmdstanr::install_cmdstan()
+cmdstanr::cmdstan_version()   # verify
+```
+
+On Windows you also need Rtools; on macOS, the Xcode command-line tools
+(`xcode-select --install`). See the Getting Started vignette for the
+full setup walkthrough and the `rstan` alternative.
 
 ## Minimal workflow
 

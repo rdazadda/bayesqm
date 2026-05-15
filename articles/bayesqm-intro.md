@@ -10,6 +10,36 @@ library(bayesqm)
 library(ggplot2)
 ```
 
+## Setup
+
+bayesqm performs inference with Stan, so you need a working Stan backend
+before the modelling functions will run. The package supports cmdstanr
+(recommended) and rstan.
+
+cmdstanr is distributed through the Stan R-universe rather than CRAN,
+and installing the R package does not install CmdStan itself; that is a
+separate step. Run the following once (not evaluated here):
+
+``` r
+
+install.packages("cmdstanr", repos = c("https://stan-dev.r-universe.dev", getOption("repos")))
+cmdstanr::check_cmdstan_toolchain(fix = TRUE)
+cmdstanr::install_cmdstan()
+cmdstanr::cmdstan_version()   # should print a version
+```
+
+On Windows you additionally need Rtools matching your R version; on
+macOS, run `xcode-select --install`. If you prefer rstan, install it
+from CRAN with a C++ toolchain; bayesqm uses whichever backend is
+available.
+
+The remainder of this vignette uses small precomputed demonstration
+objects
+([`demo_fit()`](https://rdazadda.github.io/bayesqm/reference/demo_fit.md),
+[`demo_run()`](https://rdazadda.github.io/bayesqm/reference/demo_run.md))
+so it renders without a Stan backend. To reproduce the examples on real
+data you will need the backend installed as above.
+
 ## The Q-sort data
 
 A Q study asks each participant to rank-order a set of statements into a
@@ -65,7 +95,7 @@ fit
 #>   Data:      N = 33 persons, J = 42 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-05-15 20:09:30
+#>   Fitted:    2026-05-15 23:44:22
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0

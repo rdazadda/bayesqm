@@ -77,6 +77,29 @@ and export. The running example is a synthetic 33-participant,
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rdazadda/bayesqm" class="external-link">bayesqm</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
+<h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a>
+</h2>
+<p>bayesqm performs inference with Stan, so you need a working Stan
+backend before the modelling functions will run. The package supports
+cmdstanr (recommended) and rstan.</p>
+<p>cmdstanr is distributed through the Stan R-universe rather than CRAN,
+and installing the R package does not install CmdStan itself; that is a
+separate step. Run the following once (not evaluated here):</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cmdstanr"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://stan-dev.r-universe.dev"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">check_cmdstan_toolchain</a></span><span class="op">(</span>fix <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/set_cmdstan_path.html" class="external-link">cmdstan_version</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># should print a version</span></span></code></pre></div>
+<p>On Windows you additionally need Rtools matching your R version; on
+macOS, run <code>xcode-select --install</code>. If you prefer rstan,
+install it from CRAN with a C++ toolchain; bayesqm uses whichever
+backend is available.</p>
+<p>The remainder of this vignette uses small precomputed demonstration
+objects (<code><a href="../reference/demo_fit.html">demo_fit()</a></code>, <code><a href="../reference/demo_run.html">demo_run()</a></code>) so it renders
+without a Stan backend. To reproduce the examples on real data you will
+need the backend installed as above.</p>
+</div>
+<div class="section level2">
 <h2 id="the-q-sort-data">The Q-sort data<a class="anchor" aria-label="anchor" href="#the-q-sort-data"></a>
 </h2>
 <p>A Q study asks each participant to rank-order a set of statements
@@ -84,12 +107,12 @@ into a forced distribution. <code>bayesqm</code> represents that as a
 <code>J × N</code> numeric matrix (statements as rows, participants as
 columns) plus a vector of forced-distribution counts.
 <code><a href="../reference/read_qsort.html">read_qsort()</a></code> auto-detects the file format:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_qsort.html">read_qsort</a></span><span class="op">(</span><span class="st">"mystudy.csv"</span><span class="op">)</span>   <span class="co"># CSV / Excel / HTMLQ / FlashQ</span></span>
 <span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_qsort.html">read_qsort</a></span><span class="op">(</span><span class="st">"mystudy.DAT"</span><span class="op">)</span>   <span class="co"># PQMethod</span></span>
 <span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_qsort.html">read_qsort</a></span><span class="op">(</span><span class="st">"mystudy.zip"</span><span class="op">)</span>   <span class="co"># KADE project</span></span></code></pre></div>
 <p>The example dataset:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim</span>   <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_data.html">generate_data</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">33</span>, J <span class="op">=</span> <span class="fl">42</span>, K <span class="op">=</span> <span class="fl">3</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/qsort_data.html">qsort_data</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">Y</span>, distribution <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">distribution</span><span class="op">)</span></span>
 <span><span class="va">qdata</span></span>
@@ -107,10 +130,10 @@ factor model with a Student-t likelihood (by default) and a hierarchical
 normal prior on the loadings, then resolves rotational ambiguity with
 the MatchAlign post-processing of <span class="citation">Poworoznek et
 al. (<a href="#ref-PoworoznekEtAl2025">2025</a>)</span>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_bayesian.html">fit_bayesian</a></span><span class="op">(</span><span class="va">qdata</span>, K <span class="op">=</span> <span class="fl">3</span>, chains <span class="op">=</span> <span class="fl">4</span>, iter <span class="op">=</span> <span class="fl">2000</span>,</span>
 <span>                    warmup <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/demo_fit.html">demo_fit</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">33</span>, J <span class="op">=</span> <span class="fl">42</span>, K <span class="op">=</span> <span class="fl">3</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">fit</span></span>
 <span><span class="co">#&gt; Bayesian Q-methodology factor model</span></span>
@@ -120,7 +143,7 @@ al. (<a href="#ref-PoworoznekEtAl2025">2025</a>)</span>:</p>
 <span><span class="co">#&gt;   Data:      N = 33 persons, J = 42 statements</span></span>
 <span><span class="co">#&gt;   Draws:     4 chains x 1000 post-warmup = 4000 total</span></span>
 <span><span class="co">#&gt;   Backend:   demo</span></span>
-<span><span class="co">#&gt;   Fitted:    2026-05-15 20:09:30</span></span>
+<span><span class="co">#&gt;   Fitted:    2026-05-15 23:44:22</span></span>
 <span><span class="co">#&gt;   Max Rhat:  1.010</span></span>
 <span><span class="co">#&gt;   Min ESS:   bulk 820 / tail 950</span></span>
 <span><span class="co">#&gt;   Divergent: 0</span></span>
@@ -157,7 +180,7 @@ MatchAlign diagnostic.</p>
 The recommended thresholds are R-hat below 1.01, bulk and tail effective
 sample sizes above 400, and zero divergent transitions <span class="citation">(<a href="#ref-VehtariEtAl2021">Vehtari et al.
 2021</a>)</span>:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span><span class="op">$</span><span class="va">diagnostics</span></span>
 <span><span class="co">#&gt; $rhat_max</span></span>
 <span><span class="co">#&gt; [1] 1.01</span></span>
@@ -174,7 +197,7 @@ sample sizes above 400, and zero divergent transitions <span class="citation">(<
 each aligned factor column and the MatchAlign pivot. Values near 1
 indicate a stable alignment; bimodality signals residual
 label-switching.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_tucker.html">plot_tucker</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/tucker-1.png" class="r-plt" alt="MatchAlign alignment quality by factor." width="770"><p class="caption">
@@ -191,7 +214,7 @@ forest, with nested 50% and 95% credible-interval whiskers and the
 classical <span class="citation">Brown (<a href="#ref-Brown1980">1980</a>)</span> cut-off as a faint reference.
 Filled points are participants with
 <code>P(factor k dominant) &gt; 0.5</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_loading_posterior.html">plot_loading_posterior</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/loadings-1.png" class="r-plt" alt="Loadings with nested 50% and 95% credible intervals." width="770"><p class="caption">
@@ -199,7 +222,7 @@ Loadings with nested 50% and 95% credible intervals.
 </p>
 </div>
 <p>The same information as a tidy data frame:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/compute_loadings.html">compute_loadings</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span>, prob <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   participant      f1_loa    f1_lower   f1_upper      f2_loa   f2_lower</span></span>
 <span><span class="co">#&gt; 1          P1  0.82218583  0.65967029 0.97347665 -0.04267266 -0.2145922</span></span>
@@ -222,7 +245,7 @@ Loadings with nested 50% and 95% credible intervals.
 <p><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> produces a cross-panel z-score dotchart; rows
 share an order (by factor 1’s posterior mean, configurable via
 <code>sort_by</code>) so factors can be compared horizontally.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/zscores-1.png" class="r-plt" alt="Posterior z-scores across factors with 50% and 95% credible intervals." width="770"><p class="caption">
@@ -231,7 +254,7 @@ Posterior z-scores across factors with 50% and 95% credible intervals.
 </div>
 <p>For a single statement across factors,
 <code><a href="../reference/plot_zscore_posterior.html">plot_zscore_posterior()</a></code> shows the per-factor view:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_zscore_posterior.html">plot_zscore_posterior</a></span><span class="op">(</span><span class="va">fit</span>, statement <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/zscore-one-1.png" class="r-plt" alt="Posterior z-score for a single statement across factors." width="770"><p class="caption">
@@ -247,10 +270,10 @@ applies the <strong>peak-plus-Sivula</strong> protocol: the ELPD peak is
 the automated choice and the Sivula parsimony rule <span class="citation">(<a href="#ref-SivulaEtAl2025">Sivula et al.
 2025</a>)</span> is reported alongside as a diagnostic.</p>
 <p>On real data:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_bayes.html">run_bayes</a></span><span class="op">(</span><span class="va">qdata</span>, K_max <span class="op">=</span> <span class="fl">4</span>, seed <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                 chains <span class="op">=</span> <span class="fl">2</span>, iter <span class="op">=</span> <span class="fl">1500</span>, warmup <span class="op">=</span> <span class="fl">800</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/demo_run.html">demo_run</a></span><span class="op">(</span>K_max <span class="op">=</span> <span class="fl">5</span>, k_peak <span class="op">=</span> <span class="fl">3</span>, k_sivula <span class="op">=</span> <span class="fl">1</span>, case <span class="op">=</span> <span class="st">"gap"</span><span class="op">)</span></span>
 <span><span class="va">run</span></span>
 <span><span class="co">#&gt; Bayesian Q-methodology: multi-K comparison</span></span>
@@ -268,7 +291,7 @@ the automated choice and the Sivula parsimony rule <span class="citation">(<a hr
 <span><span class="co">#&gt;  5 -179.61 5.00       9.41     3.00  3.14</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Case 'gap': k_peak is adopted; Sivula is reported as a parsimony diagnostic only.</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/make_elpd_diff.html">make_elpd_diff</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/elpd-1.png" class="r-plt" alt="ΔELPD across K with the Sivula non-promotion band at |ΔELPD| &lt; 4. Triangle marks the Sivula K, square marks the ELPD peak (the adopted K)." width="770"><p class="caption">
@@ -292,7 +315,7 @@ direct posterior probability. For every statement and every factor pair,
 P(|f_jk − f_jl| &gt; δ) gives the probability that the two factors
 separate that statement by at least δ. The default δ = 1 is on the
 standardised factor-score scale.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_dist_cons.html">plot_dist_cons</a></span><span class="op">(</span><span class="va">fit</span>, delta <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/dist-cons-1.png" class="r-plt" alt="Distinguishing-statement probability. Rows sorted so the most discriminating statements are at the top." width="770"><p class="caption">
@@ -303,7 +326,7 @@ discriminating statements are at the top.
 <p>Participant-level membership is also probabilistic.
 <code><a href="../reference/bayesqm-membership.html">classify_membership()</a></code> turns posterior dominance into a
 <code>Strong / Moderate / Weak</code> tier:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/bayesqm-membership.html">classify_membership</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   participant dominant_factor dominant_label max_prob   tier</span></span>
 <span><span class="co">#&gt; 1          P1               1             f1        1 Strong</span></span>
@@ -312,7 +335,7 @@ discriminating statements are at the top.
 <span><span class="co">#&gt; 4          P4               1             f1        1 Strong</span></span>
 <span><span class="co">#&gt; 5          P5               2             f2        1 Strong</span></span>
 <span><span class="co">#&gt; 6          P6               3             f3        1 Strong</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/make_dominant_panel.html">make_dominant_panel</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/membership-1.png" class="r-plt" alt="Blue tiles: posterior probability that each factor is dominant for a given participant (values printed in each cell). The right column shows the overall assignment verdict on an orange-red scale." width="715"><p class="caption">
@@ -328,7 +351,7 @@ the overall assignment verdict on an orange-red scale.
 <p><code><a href="../reference/plot_ppc.html">plot_ppc()</a></code> shows the posterior distribution of the RMSE
 between <code>cor(Y_rep)</code> and <code>cor(Y_obs)</code>. A
 well-specified model puts most posterior mass at small RMSE.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_ppc.html">plot_ppc</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/ppc-1.png" class="r-plt" alt="PPC on the by-person correlation matrix." width="770"><p class="caption">
@@ -339,7 +362,7 @@ PPC on the by-person correlation matrix.
 <div class="section level2">
 <h2 id="hyperparameters">Hyperparameters<a class="anchor" aria-label="anchor" href="#hyperparameters"></a>
 </h2>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_hyper.html">plot_hyper</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/hyper-1.png" class="r-plt" alt="Posterior densities of nu, sigma, and tau." width="770"><p class="caption">
@@ -352,14 +375,14 @@ Posterior densities of nu, sigma, and tau.
 </h2>
 <p><code><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot()</a></code> writes any plot to PDF, SVG, PNG,
 TIFF, or JPEG at the chosen dimensions:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot</a></span><span class="op">(</span><span class="st">"fig_loadings.pdf"</span>, <span class="fu"><a href="../reference/plot_loading_posterior.html">plot_loading_posterior</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot</a></span><span class="op">(</span><span class="st">"fig_elpd.pdf"</span>,      <span class="fu"><a href="../reference/plot_elpd.html">plot_elpd</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span>,</span>
 <span>                  width <span class="op">=</span> <span class="fl">3.5</span>, height <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/caption_bayesqm.html">caption_bayesqm()</a></code> returns a figure caption with model
 configuration, sample sizes, interval probability, and convergence
 diagnostics:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/caption_bayesqm.html">caption_bayesqm</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Bayesian Q-methodology factor model (K = 3, N = 33, J = 42); fitted with a Student-t likelihood via demo (4 chains, 4,000 post-warmup draws); intervals shown at 95% posterior coverage; max Rhat = 1.010, min bulk ESS = 820, 0 divergent transitions. Fitted with the bayesqm R package."</span></span></code></pre></div>
 <p>Standard R accessors work on the fit (<code>coef</code>,
@@ -373,7 +396,7 @@ diagnostics:</p>
 </h2>
 <p>Every plot reads its palette through <code><a href="../reference/bayesqm-colors.html">bayesqm_colors()</a></code>.
 Switch the scheme once and every subsequent base-R plot follows:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bayesqm-colors.html">bayesqm_set_colors</a></span><span class="op">(</span><span class="st">"teal"</span><span class="op">)</span>   <span class="co"># "blue" (default), "red", "purple", "grey"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bayesqm-colors.html">bayesqm_set_colors</a></span><span class="op">(</span><span class="st">"blue"</span><span class="op">)</span></span></code></pre></div>
