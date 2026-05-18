@@ -1,14 +1,18 @@
-# Distinguishing-statement posterior-probability heatmap
+# Distinguishing/consensus divergence forest
 
-Heatmap of `P(|F[j, k] - F[j, l]| > delta)` for every statement and
-every factor pair, rendered on a sequential blue ramp. Rows are ordered
-so the most discriminating statements are at the top. A vertical colour
-bar in the right margin gives the probability scale.
+Horizontal dot-and-whisker plot of the posterior viewpoint divergence
+`D_j` for every statement: posterior median with a 95% credible-interval
+whisker, statements ordered by the distinguishing probability
+`P(D_j > delta | Y)`. A dashed rule marks the substantive separation
+`delta` and each point is shaded by `P(D_j > delta | Y)`. By default the
+divergence summary stored on the fit is used (computed at the fit's
+`delta`); pass `delta` to recompute at a different separation without
+refitting.
 
 ## Usage
 
 ``` r
-plot_dist_cons(fit, delta = 1, ...)
+plot_dist_cons(fit, delta = NULL, ...)
 ```
 
 ## Arguments
@@ -19,12 +23,17 @@ plot_dist_cons(fit, delta = 1, ...)
 
 - delta:
 
-  Minimum z-score separation (default 1.0).
+  Optional separation override. If `NULL` (default) the fit's stored
+  summary (`fit$qdc`, at `fit$brief$delta`) is used; that default is the
+  Bayesian reliability-adjusted critical difference
+  ([`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md)).
+  Pass a numeric value to recompute the divergence summary at a
+  different separation.
 
 - ...:
 
   Additional arguments forwarded to
-  [`image()`](https://rdrr.io/r/graphics/image.html).
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
 
 ## Value
 

@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Getting started with bayesqm • bayesqm</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bayesqm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -143,7 +143,7 @@ al. (<a href="#ref-PoworoznekEtAl2025">2025</a>)</span>:</p>
 <span><span class="co">#&gt;   Data:      N = 33 persons, J = 42 statements</span></span>
 <span><span class="co">#&gt;   Draws:     4 chains x 1000 post-warmup = 4000 total</span></span>
 <span><span class="co">#&gt;   Backend:   demo</span></span>
-<span><span class="co">#&gt;   Fitted:    2026-05-15 23:44:22</span></span>
+<span><span class="co">#&gt;   Fitted:    2026-05-18 21:48:10</span></span>
 <span><span class="co">#&gt;   Max Rhat:  1.010</span></span>
 <span><span class="co">#&gt;   Min ESS:   bulk 820 / tail 950</span></span>
 <span><span class="co">#&gt;   Divergent: 0</span></span>
@@ -168,10 +168,10 @@ al. (<a href="#ref-PoworoznekEtAl2025">2025</a>)</span>:</p>
 <span><span class="co">#&gt;      sigma  0.5    0.5 0.083  0.34  0.67</span></span>
 <span><span class="co">#&gt;        tau  0.5    0.5 0.082  0.34  0.66</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Use summary() for factor characteristics, distinguishing/consensus tables, and LOO.</span></span></code></pre></div>
+<span><span class="co">#&gt; Use summary() for factor characteristics, the divergence summary, and LOO.</span></span></code></pre></div>
 <p><code>summary(fit)</code> adds factor characteristics, the PSIS-LOO
-ELPD (when available), distinguishing-statement counts, and the
-MatchAlign diagnostic.</p>
+ELPD (when available), a divergence summary, and the MatchAlign
+diagnostic.</p>
 </div>
 <div class="section level2">
 <h2 id="diagnostics">Diagnostics<a class="anchor" aria-label="anchor" href="#diagnostics"></a>
@@ -310,23 +310,42 @@ practice).</p>
 <div class="section level2">
 <h2 id="distinguishing-consensus-and-membership">Distinguishing, consensus, and membership<a class="anchor" aria-label="anchor" href="#distinguishing-consensus-and-membership"></a>
 </h2>
-<p><code>bayesqm</code> replaces the classical z-score test with a
-direct posterior probability. For every statement and every factor pair,
-P(|f_jk − f_jl| &gt; δ) gives the probability that the two factors
-separate that statement by at least δ. The default δ = 1 is on the
-standardised factor-score scale.</p>
+<p><code>bayesqm</code> replaces the classical z-score test with the
+posterior of an explicit viewpoint-divergence measure. For each
+statement, D_j is the mean absolute pairwise difference of the K
+viewpoint scores; the package reports P(D_j &gt; delta | Y) and P(D_j
+&lt; delta | Y), the probabilities that the viewpoints diverge
+meaningfully or practically agree. The separation delta is computed by
+default as the Bayesian reliability-adjusted critical difference
+(<code><a href="../reference/critical_delta.html">critical_delta()</a></code>); <code><a href="../reference/suggest_delta.html">suggest_delta()</a></code> (one
+forced-distribution category on the standardised scale) is an
+alternative, and results are reported with sensitivity across the choice
+of delta. No fixed probability cutoff defines a statement.</p>
+<p>The divergence summary is stored on <code>fit$qdc</code>, and
+<code><a href="../reference/critical_delta.html">critical_delta()</a></code> returns the separation the fit used:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_dist_cons.html">plot_dist_cons</a></span><span class="op">(</span><span class="va">fit</span>, delta <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/critical_delta.html">critical_delta</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.4131967</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">qdc</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   statement  D_median    D_lower   D_upper   pi_D   pi_C kstar gsign p_gstar</span></span>
+<span><span class="co">#&gt; 1        S1 0.3381550 0.06190555 0.7146339 0.3725 0.6275     2    -1  0.3950</span></span>
+<span><span class="co">#&gt; 2        S2 0.4427912 0.13551050 0.8479464 0.5825 0.4175     2    -1  0.6925</span></span>
+<span><span class="co">#&gt; 3        S3 1.9525495 1.58449898 2.2832984 1.0000 0.0000     1     1  1.0000</span></span>
+<span><span class="co">#&gt; 4        S4 1.9386399 1.55679839 2.3175306 1.0000 0.0000     2     1  1.0000</span></span>
+<span><span class="co">#&gt; 5        S5 1.9742330 1.54433252 2.3631369 1.0000 0.0000     1     1  1.0000</span></span>
+<span><span class="co">#&gt; 6        S6 0.2651122 0.04975712 0.6005598 0.1900 0.8100     3     1  0.2050</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_dist_cons.html">plot_dist_cons</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="bayesqm-intro_files/figure-html/dist-cons-1.png" class="r-plt" alt="Distinguishing-statement probability. Rows sorted so the most discriminating statements are at the top." width="770"><p class="caption">
-Distinguishing-statement probability. Rows sorted so the most
-discriminating statements are at the top.
+<img src="bayesqm-intro_files/figure-html/dist-cons-1.png" class="r-plt" alt="Posterior viewpoint divergence D_j with 95% credible intervals; statements ordered by P(D_j &gt; delta | Y)." width="770"><p class="caption">
+Posterior viewpoint divergence D_j with 95% credible intervals;
+statements ordered by P(D_j &gt; delta | Y).
 </p>
 </div>
 <p>Participant-level membership is also probabilistic.
 <code><a href="../reference/bayesqm-membership.html">classify_membership()</a></code> turns posterior dominance into a
 <code>Strong / Moderate / Weak</code> tier:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/bayesqm-membership.html">classify_membership</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   participant dominant_factor dominant_label max_prob   tier</span></span>
 <span><span class="co">#&gt; 1          P1               1             f1        1 Strong</span></span>
@@ -335,7 +354,7 @@ discriminating statements are at the top.
 <span><span class="co">#&gt; 4          P4               1             f1        1 Strong</span></span>
 <span><span class="co">#&gt; 5          P5               2             f2        1 Strong</span></span>
 <span><span class="co">#&gt; 6          P6               3             f3        1 Strong</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/make_dominant_panel.html">make_dominant_panel</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/membership-1.png" class="r-plt" alt="Blue tiles: posterior probability that each factor is dominant for a given participant (values printed in each cell). The right column shows the overall assignment verdict on an orange-red scale." width="715"><p class="caption">
@@ -351,7 +370,7 @@ the overall assignment verdict on an orange-red scale.
 <p><code><a href="../reference/plot_ppc.html">plot_ppc()</a></code> shows the posterior distribution of the RMSE
 between <code>cor(Y_rep)</code> and <code>cor(Y_obs)</code>. A
 well-specified model puts most posterior mass at small RMSE.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_ppc.html">plot_ppc</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/ppc-1.png" class="r-plt" alt="PPC on the by-person correlation matrix." width="770"><p class="caption">
@@ -362,7 +381,7 @@ PPC on the by-person correlation matrix.
 <div class="section level2">
 <h2 id="hyperparameters">Hyperparameters<a class="anchor" aria-label="anchor" href="#hyperparameters"></a>
 </h2>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_hyper.html">plot_hyper</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="bayesqm-intro_files/figure-html/hyper-1.png" class="r-plt" alt="Posterior densities of nu, sigma, and tau." width="770"><p class="caption">
@@ -375,14 +394,14 @@ Posterior densities of nu, sigma, and tau.
 </h2>
 <p><code><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot()</a></code> writes any plot to PDF, SVG, PNG,
 TIFF, or JPEG at the chosen dimensions:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot</a></span><span class="op">(</span><span class="st">"fig_loadings.pdf"</span>, <span class="fu"><a href="../reference/plot_loading_posterior.html">plot_loading_posterior</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/save_bayesqm_plot.html">save_bayesqm_plot</a></span><span class="op">(</span><span class="st">"fig_elpd.pdf"</span>,      <span class="fu"><a href="../reference/plot_elpd.html">plot_elpd</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span>,</span>
 <span>                  width <span class="op">=</span> <span class="fl">3.5</span>, height <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/caption_bayesqm.html">caption_bayesqm()</a></code> returns a figure caption with model
 configuration, sample sizes, interval probability, and convergence
 diagnostics:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/caption_bayesqm.html">caption_bayesqm</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Bayesian Q-methodology factor model (K = 3, N = 33, J = 42); fitted with a Student-t likelihood via demo (4 chains, 4,000 post-warmup draws); intervals shown at 95% posterior coverage; max Rhat = 1.010, min bulk ESS = 820, 0 divergent transitions. Fitted with the bayesqm R package."</span></span></code></pre></div>
 <p>Standard R accessors work on the fit (<code>coef</code>,
@@ -396,7 +415,7 @@ diagnostics:</p>
 </h2>
 <p>Every plot reads its palette through <code><a href="../reference/bayesqm-colors.html">bayesqm_colors()</a></code>.
 Switch the scheme once and every subsequent base-R plot follows:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bayesqm-colors.html">bayesqm_set_colors</a></span><span class="op">(</span><span class="st">"teal"</span><span class="op">)</span>   <span class="co"># "blue" (default), "red", "purple", "grey"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/bayesqm-colors.html">bayesqm_set_colors</a></span><span class="op">(</span><span class="st">"blue"</span><span class="op">)</span></span></code></pre></div>

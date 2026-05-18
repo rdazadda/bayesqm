@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Bayesian Q Methodology: Probabilistic Factor Analysis • bayesqm</title>
 <script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/Inter-0.4.10/font.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/Inter-0.4.10/font.css" rel="stylesheet">
 <link href="deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="index.html">bayesqm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -130,16 +130,17 @@
 <div class="section level2">
 <h2 id="probabilistic-factor-membership">Probabilistic factor membership<a class="anchor" aria-label="anchor" href="#probabilistic-factor-membership"></a>
 </h2>
-<p>Rather than dichotomizing each loading into flagged or unflagged, <code>bayesqm</code> reports the posterior probability that factor k is participant i’s dominant factor, P(dominant_i = k | Y). <code><a href="reference/bayesqm-membership.html">classify_membership()</a></code> turns these probabilities into a per-participant Strong / Moderate / Weak tier:</p>
+<p>Rather than dichotomizing each loading into flagged or unflagged, <code>bayesqm</code> reports the posterior probability that factor k is participant i’s dominant factor, P(dominant_i = k | Y). <code><a href="reference/bayesqm-membership.html">compute_dominant_sign()</a></code> adds the posterior probability that the dominant loading is positive, so negative exemplars (a viewpoint held by opposition) stay distinct. <code><a href="reference/bayesqm-membership.html">classify_membership()</a></code> turns the probabilities into a descriptive Strong / Moderate / Weak tier:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/bayesqm-membership.html">compute_dominant_prob</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/bayesqm-membership.html">compute_dominant_sign</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/bayesqm-membership.html">classify_membership</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/plot_membership.html">plot_membership</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
-<p>Distinguishing and consensus statements use posterior probabilities of pairwise factor-score separations:</p>
+<p>Distinguishing and consensus statements come from the posterior of an explicit viewpoint-divergence measure <code>D_j</code>, with the probabilities <code>P(D_j &gt; delta | Y)</code> and <code>P(D_j &lt; delta | Y)</code> it implies. <code>delta</code> is computed by default as the Bayesian reliability-adjusted critical difference (<code><a href="reference/critical_delta.html">critical_delta()</a></code>); <code><a href="reference/suggest_delta.html">suggest_delta()</a></code> (one forced-distribution category) is an alternative:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/bayesqm-membership.html">compute_distinguishing_prob</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">F_draws</span>, delta <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/bayesqm-membership.html">compute_consensus_prob</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">F_draws</span>, delta <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/plot_dist_cons.html">plot_dist_cons</a></span><span class="op">(</span><span class="va">fit</span>, delta <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/critical_delta.html">critical_delta</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span>   <span class="co"># default separation (computed)</span></span>
+<span><span class="fu"><a href="reference/bayesqm-membership.html">compute_divergence</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">F_draws</span>, delta <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/plot_dist_cons.html">plot_dist_cons</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                 <span class="co"># uses the fit's stored divergence summary</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
@@ -149,7 +150,7 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                       <span class="co"># cross-panel z-score dotchart</span></span>
 <span><span class="fu"><a href="reference/plot_loading_posterior.html">plot_loading_posterior</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>     <span class="co"># loadings with 50% / 95% intervals</span></span>
 <span><span class="fu"><a href="reference/plot_membership.html">plot_membership</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>            <span class="co"># dominant-factor probability heatmap</span></span>
-<span><span class="fu"><a href="reference/plot_dist_cons.html">plot_dist_cons</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>             <span class="co"># distinguishing-statement probability</span></span>
+<span><span class="fu"><a href="reference/plot_dist_cons.html">plot_dist_cons</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>             <span class="co"># distinguishing/consensus divergence forest</span></span>
 <span><span class="fu"><a href="reference/plot_ppc.html">plot_ppc</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                   <span class="co"># posterior predictive check on by-person correlations</span></span>
 <span><span class="fu"><a href="reference/plot_tucker.html">plot_tucker</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                <span class="co"># MatchAlign alignment quality</span></span>
 <span><span class="fu"><a href="reference/plot_hyper.html">plot_hyper</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                 <span class="co"># hyperparameter posteriors</span></span>
@@ -160,7 +161,7 @@
 <h2 id="compatibility-with-qmethod">Compatibility with <code>qmethod</code>
 <a class="anchor" aria-label="anchor" href="#compatibility-with-qmethod"></a>
 </h2>
-<p><code>bayesqm_fit</code> deliberately mirrors the slot names from the <code>qmethod</code> package (Zabala, 2015): <code>$dataset</code>, <code>$loa</code>, <code>$zsc</code>, <code>$zsc_n</code>, <code>$f_char</code>, <code>$qdc</code>, <code>$flagged</code>. It uses the same distinguishing-statement vocabulary (<code>"Distinguishes all"</code>, <code>"Consensus"</code>, <code>"Distinguishes f1, f3"</code>, <code>""</code>). Intentional Bayesian divergences are documented in <code>?bayesqm-package</code>:</p>
+<p><code>bayesqm_fit</code> deliberately mirrors the slot names from the <code>qmethod</code> package (Zabala, 2015): <code>$dataset</code>, <code>$loa</code>, <code>$zsc</code>, <code>$zsc_n</code>, <code>$f_char</code>, <code>$qdc</code>, <code>$flagged</code>. <code>$qdc</code> is a Bayesian divergence summary (posterior median and 95% CrI of <code>D_j</code>, with <code>pi_D</code> and <code>pi_C</code>), not the classical significance-label vocabulary. Intentional Bayesian divergences are documented in <code>?bayesqm-package</code>:</p>
 <ul>
 <li>
 <code>$flagged</code> is defined probabilistically as P(argmax_k |λ_ik| = k) &gt; 0.5, replacing Brown’s (1980) significance-based rule.</li>

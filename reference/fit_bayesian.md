@@ -26,7 +26,8 @@ fit_bayesian(
   prior_nu_alpha = 2,
   prior_nu_beta = 0.1,
   use_half_cauchy = FALSE,
-  prob = 0.95
+  prob = 0.95,
+  delta = NULL
 )
 ```
 
@@ -80,6 +81,16 @@ fit_bayesian(
 - prob:
 
   Credible-interval probability stored on the fit (default 0.95).
+
+- delta:
+
+  Substantive viewpoint separation for the distinguishing/consensus
+  probabilities. If `NULL` (default) it is computed as the
+  reliability-adjusted critical difference
+  ([`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md));
+  pass a numeric value to override, or use
+  [`suggest_delta()`](https://rdazadda.github.io/bayesqm/reference/suggest_delta.md)
+  as an alternative.
 
 ## Value
 

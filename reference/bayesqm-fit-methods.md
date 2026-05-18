@@ -3,9 +3,9 @@
 [`print()`](https://rdrr.io/r/base/print.html) shows a compact,
 brms-style header with convergence and the first few loadings.
 [`summary()`](https://rdrr.io/r/base/summary.html) expands with factor
-characteristics, the PSIS-LOO estimate, the distinguishing/consensus
-count, and the MatchAlign Tucker-phi diagnostic. Both methods exist for
-`bayesqm_fit` (returned by
+characteristics, the PSIS-LOO estimate, the divergence summary, and the
+MatchAlign Tucker-phi diagnostic. Both methods exist for `bayesqm_fit`
+(returned by
 [`fit_bayesian()`](https://rdazadda.github.io/bayesqm/reference/fit_bayesian.md))
 and `bayesqm_run` (returned by
 [`run_bayes()`](https://rdazadda.github.io/bayesqm/reference/run_bayes.md)).

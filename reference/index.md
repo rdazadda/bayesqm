@@ -34,10 +34,20 @@ Brown-threshold flags.
 
 - [`compute_threshold_prob()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)
   [`compute_dominant_prob()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)
-  [`compute_distinguishing_prob()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)
-  [`compute_consensus_prob()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)
+  [`compute_dominant_sign()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)
+  [`compute_divergence()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)
   [`classify_membership()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)
-  : Probabilistic factor-membership summaries
+  : Probabilistic factor-membership and divergence summaries
+
+- [`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md)
+  :
+
+  Bayesian reliability-adjusted critical difference (default `delta`)
+
+- [`suggest_delta()`](https://rdazadda.github.io/bayesqm/reference/suggest_delta.md)
+  :
+
+  Suggested separation `delta` from the forced distribution
 
 ## Plots (base R)
 
@@ -59,7 +69,7 @@ required.
 - [`plot_tucker()`](https://rdazadda.github.io/bayesqm/reference/plot_tucker.md)
   : MatchAlign Tucker's phi distribution by factor
 - [`plot_dist_cons()`](https://rdazadda.github.io/bayesqm/reference/plot_dist_cons.md)
-  : Distinguishing-statement posterior-probability heatmap
+  : Distinguishing/consensus divergence forest
 - [`plot_hyper()`](https://rdazadda.github.io/bayesqm/reference/plot_hyper.md)
   : Hyperparameter posterior densities
 

@@ -1,13 +1,19 @@
-# bayesqm: Bayesian Q-Methodology Factor Analysis
+# bayesqm: Bayesian Q Methodology: Probabilistic Factor Analysis
 
 A Bayesian factor-analytic framework for Q methodology. Fits a low-rank
 factor model to Q-sort data with a Student-t likelihood and a
 hierarchical normal prior on loadings, samples the posterior with Stan,
-resolves rotational ambiguity via MatchAlign post-processing, and
-returns posterior summaries including credible intervals for loadings
-and factor scores, probabilistic dominant-factor membership,
-distinguishing and consensus statements, and PSIS-LOO-based factor
-enumeration.
+resolves rotational ambiguity via the MatchAlign post-processing of
+Poworoznek et al. (2025)
+[doi:10.1214/25-BA1544](https://doi.org/10.1214/25-BA1544) , and returns
+posterior summaries including credible intervals for loadings and factor
+scores, probabilistic dominant-factor membership, distinguishing and
+consensus statements, and PSIS-LOO-based factor enumeration following
+Vehtari et al. (2017)
+[doi:10.1007/s11222-016-9696-4](https://doi.org/10.1007/s11222-016-9696-4)
+with the Sivula et al. (2025)
+[doi:10.1214/25-BA1569](https://doi.org/10.1214/25-BA1569) parsimony
+rule.
 
 A Bayesian factor-analytic framework for Q methodology. Fits a low-rank
 factor model to Q-sort data with a Student-t likelihood and a
@@ -43,8 +49,7 @@ The typical workflow is:
     [`compute_factor_array()`](https://rdazadda.github.io/bayesqm/reference/compute_factor_array.md),
     [`compute_dominant_prob()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md),
     [`compute_threshold_prob()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md),
-    [`compute_distinguishing_prob()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md),
-    [`compute_consensus_prob()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md),
+    [`compute_divergence()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md),
     [`classify_membership()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md),
     and
     [`compute_posterior_scalars()`](https://rdazadda.github.io/bayesqm/reference/compute_posterior_scalars.md).
@@ -133,4 +138,8 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Raymond Dacosta Azadda <dacostazadda@gmail.com>
+**Maintainer**: Raymond Dacosta Azadda <rdazadda@alaska.edu>
+
+Authors:
+
+- Raymond Dacosta Azadda <rdazadda@alaska.edu>

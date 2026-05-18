@@ -95,7 +95,7 @@ fit
 #>   Data:      N = 33 persons, J = 42 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-05-15 23:44:22
+#>   Fitted:    2026-05-18 21:48:10
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
@@ -120,12 +120,11 @@ fit
 #>      sigma  0.5    0.5 0.083  0.34  0.67
 #>        tau  0.5    0.5 0.082  0.34  0.66
 #> 
-#> Use summary() for factor characteristics, distinguishing/consensus tables, and LOO.
+#> Use summary() for factor characteristics, the divergence summary, and LOO.
 ```
 
 `summary(fit)` adds factor characteristics, the PSIS-LOO ELPD (when
-available), distinguishing-statement counts, and the MatchAlign
-diagnostic.
+available), a divergence summary, and the MatchAlign diagnostic.
 
 ## Diagnostics
 
@@ -295,23 +294,48 @@ peak, the case is `gap`; when Sivula exceeds the peak, the case is
 
 ## Distinguishing, consensus, and membership
 
-`bayesqm` replaces the classical z-score test with a direct posterior
-probability. For every statement and every factor pair, P(\|f_jk −
-f_jl\| \> δ) gives the probability that the two factors separate that
-statement by at least δ. The default δ = 1 is on the standardised
-factor-score scale.
+`bayesqm` replaces the classical z-score test with the posterior of an
+explicit viewpoint-divergence measure. For each statement, D_j is the
+mean absolute pairwise difference of the K viewpoint scores; the package
+reports P(D_j \> delta \| Y) and P(D_j \< delta \| Y), the probabilities
+that the viewpoints diverge meaningfully or practically agree. The
+separation delta is computed by default as the Bayesian
+reliability-adjusted critical difference
+([`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md));
+[`suggest_delta()`](https://rdazadda.github.io/bayesqm/reference/suggest_delta.md)
+(one forced-distribution category on the standardised scale) is an
+alternative, and results are reported with sensitivity across the choice
+of delta. No fixed probability cutoff defines a statement.
+
+The divergence summary is stored on `fit$qdc`, and
+[`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md)
+returns the separation the fit used:
 
 ``` r
 
-plot_dist_cons(fit, delta = 1.0)
+critical_delta(fit$Lambda_draws)
+#> [1] 0.4131967
+head(fit$qdc)
+#>   statement  D_median    D_lower   D_upper   pi_D   pi_C kstar gsign p_gstar
+#> 1        S1 0.3381550 0.06190555 0.7146339 0.3725 0.6275     2    -1  0.3950
+#> 2        S2 0.4427912 0.13551050 0.8479464 0.5825 0.4175     2    -1  0.6925
+#> 3        S3 1.9525495 1.58449898 2.2832984 1.0000 0.0000     1     1  1.0000
+#> 4        S4 1.9386399 1.55679839 2.3175306 1.0000 0.0000     2     1  1.0000
+#> 5        S5 1.9742330 1.54433252 2.3631369 1.0000 0.0000     1     1  1.0000
+#> 6        S6 0.2651122 0.04975712 0.6005598 0.1900 0.8100     3     1  0.2050
 ```
 
-![Distinguishing-statement probability. Rows sorted so the most
-discriminating statements are at the
-top.](bayesqm-intro_files/figure-html/dist-cons-1.png)
+``` r
 
-Distinguishing-statement probability. Rows sorted so the most
-discriminating statements are at the top.
+plot_dist_cons(fit)
+```
+
+![Posterior viewpoint divergence D_j with 95% credible intervals;
+statements ordered by P(D_j \> delta \|
+Y).](bayesqm-intro_files/figure-html/dist-cons-1.png)
+
+Posterior viewpoint divergence D_j with 95% credible intervals;
+statements ordered by P(D_j \> delta \| Y).
 
 Participant-level membership is also probabilistic.
 [`classify_membership()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)

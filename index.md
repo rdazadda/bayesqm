@@ -116,25 +116,35 @@ and a gap between the two is itself diagnostic information.
 Rather than dichotomizing each loading into flagged or unflagged,
 `bayesqm` reports the posterior probability that factor k is participant
 i’s dominant factor, P(dominant_i = k \| Y).
+[`compute_dominant_sign()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)
+adds the posterior probability that the dominant loading is positive, so
+negative exemplars (a viewpoint held by opposition) stay distinct.
 [`classify_membership()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-membership.md)
-turns these probabilities into a per-participant Strong / Moderate /
-Weak tier:
+turns the probabilities into a descriptive Strong / Moderate / Weak
+tier:
 
 ``` r
 
 compute_dominant_prob(fit$Lambda_draws)
+compute_dominant_sign(fit$Lambda_draws)
 classify_membership(fit$Lambda_draws)
 plot_membership(fit)
 ```
 
-Distinguishing and consensus statements use posterior probabilities of
-pairwise factor-score separations:
+Distinguishing and consensus statements come from the posterior of an
+explicit viewpoint-divergence measure `D_j`, with the probabilities
+`P(D_j > delta | Y)` and `P(D_j < delta | Y)` it implies. `delta` is
+computed by default as the Bayesian reliability-adjusted critical
+difference
+([`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md));
+[`suggest_delta()`](https://rdazadda.github.io/bayesqm/reference/suggest_delta.md)
+(one forced-distribution category) is an alternative:
 
 ``` r
 
-compute_distinguishing_prob(fit$F_draws, delta = 1.0)
-compute_consensus_prob(fit$F_draws, delta = 1.0)
-plot_dist_cons(fit, delta = 1.0)
+d <- critical_delta(fit$Lambda_draws)   # default separation (computed)
+compute_divergence(fit$F_draws, delta = d)
+plot_dist_cons(fit)                 # uses the fit's stored divergence summary
 ```
 
 ## Plotting
@@ -151,7 +161,7 @@ and restore [`par()`](https://rdrr.io/r/graphics/par.html) on exit:
 plot(fit)                       # cross-panel z-score dotchart
 plot_loading_posterior(fit)     # loadings with 50% / 95% intervals
 plot_membership(fit)            # dominant-factor probability heatmap
-plot_dist_cons(fit)             # distinguishing-statement probability
+plot_dist_cons(fit)             # distinguishing/consensus divergence forest
 plot_ppc(fit)                   # posterior predictive check on by-person correlations
 plot_tucker(fit)                # MatchAlign alignment quality
 plot_hyper(fit)                 # hyperparameter posteriors
@@ -169,9 +179,10 @@ probability, and convergence diagnostics.
 
 `bayesqm_fit` deliberately mirrors the slot names from the `qmethod`
 package (Zabala, 2015): `$dataset`, `$loa`, `$zsc`, `$zsc_n`, `$f_char`,
-`$qdc`, `$flagged`. It uses the same distinguishing-statement vocabulary
-(`"Distinguishes all"`, `"Consensus"`, `"Distinguishes f1, f3"`, `""`).
-Intentional Bayesian divergences are documented in `?bayesqm-package`:
+`$qdc`, `$flagged`. `$qdc` is a Bayesian divergence summary (posterior
+median and 95% CrI of `D_j`, with `pi_D` and `pi_C`), not the classical
+significance-label vocabulary. Intentional Bayesian divergences are
+documented in `?bayesqm-package`:
 
 - `$flagged` is defined probabilistically as P(argmax_k \|λ_ik\| = k) \>
   0.5, replacing Brown’s (1980) significance-based rule.

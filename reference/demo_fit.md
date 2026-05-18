@@ -54,7 +54,7 @@ summary(fit)
 #>   Data:      N = 12 persons, J = 15 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-05-15 23:44:16
+#>   Fitted:    2026-05-18 21:48:04
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
@@ -70,9 +70,12 @@ summary(fit)
 #>      sigma  0.498  0.500 0.0786  0.345  0.646
 #>        tau  0.507  0.511 0.0820  0.358  0.660
 #> 
-#> Distinguishing / consensus statements (delta = 1.0, p > 0.95):
-#>   Consensus                6
-#>   Distinguishes all        6
+#> Divergence summary:
+#>   posterior median D_j ranges 0.20 to 2.81
+#>   delta = 0.55 (reliability-adjusted critical difference)
+#>   statements with P(D_j > delta | Y) >= 0.95: 7 of 15
+#>   strongest consensus, max P(D_j < delta | Y): 0.94
+#>   negative exemplars, P(dominant loading > 0 | Y) < 0.5: 0 of 12
 #> 
 #> MatchAlign diagnostics (mean Tucker phi per factor):
 #>   f1 = 0.943  f2 = 0.945  

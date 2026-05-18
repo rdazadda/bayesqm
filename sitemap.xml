@@ -18,6 +18,7 @@
 <url><loc>https://rdazadda.github.io/bayesqm/reference/compute_loadings.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/compute_posterior_scalars.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/compute_zscores.html</loc></url>
+<url><loc>https://rdazadda.github.io/bayesqm/reference/critical_delta.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/demo_fit.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/demo_run.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/fit_bayesian.html</loc></url>
@@ -45,6 +46,7 @@
 <url><loc>https://rdazadda.github.io/bayesqm/reference/rename_factors.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/run_bayes.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/save_bayesqm_plot.html</loc></url>
+<url><loc>https://rdazadda.github.io/bayesqm/reference/suggest_delta.html</loc></url>
 <url><loc>https://rdazadda.github.io/bayesqm/reference/tucker_congruence.html</loc></url>
 </urlset>
 
