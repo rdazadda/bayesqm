@@ -201,8 +201,10 @@ scale) is an alternative, and results are reported with sensitivity
 across the choice of delta. No fixed probability cutoff defines a
 statement.
 
-The divergence summary is stored on `fit$qdc`, and `critical_delta()`
-returns the separation the fit used:
+The full distinguishing/consensus table is stored on `fit$qdc` (per
+viewpoint: grid position and z-score with 95% CrI, then `D_j` with
+95% CrI, `pi_D`, `pi_C`). `critical_delta()` returns the separation
+the fit used:
 
 ```{r}
 critical_delta(fit$Lambda_draws)

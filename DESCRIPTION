@@ -1,7 +1,7 @@
 Package: bayesqm
 Type: Package
 Title: Bayesian Q Methodology: Probabilistic Factor Analysis
-Version: 0.2.0
+Version: 0.1.0
 Date: 2026-05-18
 Authors@R: person(
     "Raymond", "Dacosta Azadda",

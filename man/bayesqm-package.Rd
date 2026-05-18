@@ -53,9 +53,9 @@ working:
 \itemize{
 \item Slot names match: \verb{$dataset}, \verb{$loa}, \verb{$zsc}, \verb{$zsc_n}, \verb{$f_char},
 \verb{$qdc}, \verb{$flagged}.
-\item The \verb{$qdc$dist.and.cons} vocabulary matches exactly
-(\code{"Distinguishes all"}, \code{"Consensus"}, \code{"Distinguishes f1, f3"},
-\code{""}).
+\item \verb{$qdc} is the Bayesian divergence table (per-viewpoint grid and
+z-score with 95\% CrI, then \code{D_j} with 95\% CrI, \code{pi_D}, \code{pi_C}),
+not the classical significance-label vocabulary.
 \item Dotted reader aliases (\code{\link[=import.pqmethod]{import.pqmethod()}}, \code{\link[=import.htmlq]{import.htmlq()}},
 \code{\link[=import.kenq]{import.kenq()}}, \code{\link[=import.easyhtmlq]{import.easyhtmlq()}}) forward to the \verb{read_*}
 readers.

@@ -61,7 +61,7 @@ new_bayesqm_fit <- function(call, Y, K, distribution, prob, robust, nu,
   # Default delta: Bayesian reliability-adjusted critical difference.
   if (is.null(delta) && K >= 2)
     delta <- critical_delta(Lambda_draws, level = 0.05, r0 = 0.80)
-  qdc <- compute_qdc(F_draws, delta = delta)
+  qdc <- compute_qdc(F_draws, distribution, delta = delta)
 
   brief <- list(
     call         = call,
@@ -158,41 +158,53 @@ rank_to_grid <- function(F_hat, distribution) {
 }
 
 
-# Distinguishing / consensus summary. Reports the posterior of the
-# viewpoint divergence D_j (mean absolute pairwise difference of the K
-# standardized viewpoint scores) per statement: posterior median and
-# 95% credible interval, pi_D = P(D_j > delta | Y), pi_C = P(D_j < delta
-# | Y), and the dominant viewpoint, sign, and P(|g| > delta | Y) of the
-# per-viewpoint departure. No fixed probability cutoff defines a
+# Distinguishing / consensus table. One row per statement, in the
+# layout of the manuscript supplement: for each viewpoint the
+# forced-distribution grid position and the posterior factor score
+# (mean) with its 95% credible interval, then the viewpoint divergence
+# D_j (median and 95% CrI), pi_D = P(D_j > delta | Y), and
+# pi_C = P(D_j < delta | Y). No fixed probability cutoff defines a
 # distinguishing or consensus statement; the probabilities are the
 # reported quantities.
 #' @keywords internal
 #' @noRd
-compute_qdc <- function(F_draws, delta, delta_grid = NULL) {
+compute_qdc <- function(F_draws, distribution, delta, delta_grid = NULL) {
   J <- dim(F_draws)[2]
   K <- dim(F_draws)[3]
   stmt_ids <- dimnames(F_draws)[[2]]
   if (is.null(stmt_ids)) stmt_ids <- paste0("S", seq_len(J))
-  if (K < 2)
-    return(data.frame(statement = stmt_ids,
-                      D_median = NA_real_, D_lower = NA_real_,
-                      D_upper = NA_real_, pi_D = NA_real_, pi_C = NA_real_,
-                      kstar = NA_integer_, gsign = NA_real_,
-                      p_gstar = NA_real_, stringsAsFactors = FALSE))
+
+  zm <- .summarize_draws(F_draws, mean)
+  dimnames(zm) <- list(stmt_ids, paste0("f", seq_len(K)))
+  grid <- rank_to_grid(zm, distribution)
+  zsc  <- compute_zscores(F_draws, prob = 0.95)
+
+  out <- data.frame(statement = stmt_ids, stringsAsFactors = FALSE)
+  for (k in seq_len(K)) {
+    fk <- paste0("f", k)
+    out[[paste0(fk, "_grid")]]  <- unname(grid[, k])
+    out[[paste0(fk, "_zsc")]]   <- zsc[[paste0(fk, "_zsc")]]
+    out[[paste0(fk, "_lower")]] <- zsc[[paste0(fk, "_lower")]]
+    out[[paste0(fk, "_upper")]] <- zsc[[paste0(fk, "_upper")]]
+  }
+
+  if (K < 2) {
+    out$D_median <- NA_real_
+    out$D_lower  <- NA_real_
+    out$D_upper  <- NA_real_
+    out$pi_D     <- NA_real_
+    out$pi_C     <- NA_real_
+    rownames(out) <- NULL
+    attr(out, "delta") <- delta
+    return(out)
+  }
 
   dv <- compute_divergence(F_draws, delta = delta, delta_grid = delta_grid)
-  out <- data.frame(
-    statement = stmt_ids,
-    D_median  = unname(dv$D_median),
-    D_lower   = unname(dv$D_lower),
-    D_upper   = unname(dv$D_upper),
-    pi_D      = unname(dv$pi_D),
-    pi_C      = unname(dv$pi_C),
-    kstar     = unname(dv$kstar),
-    gsign     = unname(dv$gsign),
-    p_gstar   = unname(dv$p_gstar),
-    stringsAsFactors = FALSE
-  )
+  out$D_median <- unname(dv$D_median)
+  out$D_lower  <- unname(dv$D_lower)
+  out$D_upper  <- unname(dv$D_upper)
+  out$pi_D     <- unname(dv$pi_D)
+  out$pi_C     <- unname(dv$pi_C)
   rownames(out) <- NULL
   attr(out, "delta") <- delta
   attr(out, "sensitivity") <- dv$sensitivity

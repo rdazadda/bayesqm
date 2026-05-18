@@ -62,19 +62,22 @@ test_that("f_char has characteristics and cor_zsc with correct shape", {
   expect_equal(unname(diag(fit$f_char$cor_zsc)), c(1, 1, 1))
 })
 
-test_that("qdc reports the divergence summary schema", {
+test_that("qdc is the full per-viewpoint divergence table", {
   fit <- make_fake_fit(N = 6, J = 10, K = 3)
-  expect_true(all(c("statement", "D_median", "D_lower", "D_upper",
-                     "pi_D", "pi_C", "kstar", "gsign", "p_gstar")
-                   %in% names(fit$qdc)))
-  expect_false("dist.and.cons" %in% names(fit$qdc))
-  expect_equal(nrow(fit$qdc), 10)
-  # delta is the computed reliability-adjusted critical difference,
-  # so the probabilities are numeric (not NA) and well formed.
-  expect_true(all(fit$qdc$pi_D >= 0 & fit$qdc$pi_D <= 1))
-  expect_equal(fit$qdc$pi_C, 1 - fit$qdc$pi_D)
-  expect_true(all(fit$qdc$kstar %in% seq_len(3)))
-  expect_true(all(fit$qdc$gsign %in% c(-1, 0, 1)))
+  q <- fit$qdc
+  expect_equal(nrow(q), 10)
+  expect_true("statement" %in% names(q))
+  for (k in 1:3)
+    expect_true(all(c(paste0("f", k, "_grid"), paste0("f", k, "_zsc"),
+                      paste0("f", k, "_lower"), paste0("f", k, "_upper"))
+                    %in% names(q)))
+  expect_true(all(c("D_median", "D_lower", "D_upper", "pi_D", "pi_C")
+                  %in% names(q)))
+  expect_false("dist.and.cons" %in% names(q))
+  # default delta is computed (not NULL), so pi_D is numeric
+  expect_true(all(q$pi_D >= 0 & q$pi_D <= 1))
+  expect_equal(q$pi_C, 1 - q$pi_D)
+  expect_true(all(q$D_lower <= q$D_median & q$D_median <= q$D_upper))
 })
 
 test_that("K = 1 fit preserves matrix dimensions across all slots", {

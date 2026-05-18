@@ -49,9 +49,9 @@
 #'
 #' - Slot names match: `$dataset`, `$loa`, `$zsc`, `$zsc_n`, `$f_char`,
 #'   `$qdc`, `$flagged`.
-#' - The `$qdc$dist.and.cons` vocabulary matches exactly
-#'   (`"Distinguishes all"`, `"Consensus"`, `"Distinguishes f1, f3"`,
-#'   `""`).
+#' - `$qdc` is the Bayesian divergence table (per-viewpoint grid and
+#'   z-score with 95% CrI, then `D_j` with 95% CrI, `pi_D`, `pi_C`),
+#'   not the classical significance-label vocabulary.
 #' - Dotted reader aliases ([import.pqmethod()], [import.htmlq()],
 #'   [import.kenq()], [import.easyhtmlq()]) forward to the `read_*`
 #'   readers.

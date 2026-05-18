@@ -38,17 +38,16 @@ test_that("rename_factors rewrites every factor-indexed slot", {
   expect_equal(dimnames(fit2$F_draws)[[3]],      nm)
 })
 
-test_that("rename_factors leaves the divergence qdc schema intact", {
-  fit <- make_fake_fit(N = 6, J = 10, K = 2)
+test_that("rename_factors rewrites the per-viewpoint qdc columns", {
+  fit  <- make_fake_fit(N = 6, J = 10, K = 2)
   fit2 <- rename_factors(fit, c("low", "high"))
 
-  # The divergence qdc carries no per-factor columns, so renaming is a
-  # no-op there; the schema must survive unchanged and stay clean.
-  expect_identical(names(fit2$qdc), names(fit$qdc))
-  expect_true(all(c("statement", "D_median", "D_lower", "D_upper",
-                     "pi_D", "pi_C", "kstar", "gsign", "p_gstar")
-                   %in% names(fit2$qdc)))
-  expect_false(any(grepl("\\bf1\\b|\\bf2\\b", names(fit2$qdc))))
+  qcols <- names(fit2$qdc)
+  expect_true(all(c("low_grid", "low_zsc", "high_grid", "high_zsc")
+                  %in% qcols))
+  expect_false(any(grepl("^f[0-9]", qcols)))
+  # divergence columns are not factor-indexed and survive unchanged
+  expect_true(all(c("D_median", "pi_D", "pi_C") %in% qcols))
 })
 
 test_that("rename_factors is idempotent when the names already match", {

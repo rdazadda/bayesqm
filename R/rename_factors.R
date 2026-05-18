@@ -51,9 +51,10 @@ rename_factors <- function(fit, new_names) {
       dimnames(fit$f_char$cor_zsc) <- list(new_names, new_names)
   }
 
-  # qdc columns have the form "f{k}_f{l}_diff" and "f{k}_f{l}_prob".
-  # Underscore is a regex word character so \b doesn't fence it; match
-  # the factor name explicitly between start/underscore and underscore/end.
+  # qdc has per-viewpoint columns "f{k}_grid", "f{k}_zsc", "f{k}_lower",
+  # "f{k}_upper". Underscore is a regex word character so \b doesn't
+  # fence it; match the factor name between start/underscore and
+  # underscore/end.
   if (!is.null(fit$qdc) && ncol(fit$qdc) > 2) {
     nm <- names(fit$qdc)
     for (k in seq_len(K))
