@@ -58,7 +58,7 @@ new_bayesqm_fit <- function(call, Y, K, distribution, prob, robust, nu,
   names(dom_sign) <- part_ids
   neg_exemplar <- stats::setNames(dom_sign < 0.5, part_ids)
 
-  # Default delta: Bayesian reliability-adjusted critical difference.
+  # Default delta: reliability-adjusted critical difference (see critical_delta()).
   if (is.null(delta) && K >= 2)
     delta <- critical_delta(Lambda_draws, level = 0.05, r0 = 0.80)
   qdc <- compute_qdc(F_draws, distribution, delta = delta)

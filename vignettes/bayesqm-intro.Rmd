@@ -194,8 +194,9 @@ explicit viewpoint-divergence measure. For each statement, D_j is the
 mean absolute pairwise difference of the K viewpoint scores; the
 package reports P(D_j > delta | Y) and P(D_j < delta | Y), the
 probabilities that the viewpoints diverge meaningfully or practically
-agree. The separation delta is computed by default as the Bayesian
-reliability-adjusted critical difference (`critical_delta()`);
+agree. By default the separation delta is the reliability-adjusted
+critical difference from classical Q analysis [@Brown1980], computed
+from the posterior dominant-factor counts (`critical_delta()`);
 `suggest_delta()` (one forced-distribution category on the standardised
 scale) is an alternative, and results are reported with sensitivity
 across the choice of delta. No fixed probability cutoff defines a

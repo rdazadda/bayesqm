@@ -126,10 +126,12 @@ plot_membership(fit)
 
 Distinguishing and consensus statements come from the posterior of an
 explicit viewpoint-divergence measure `D_j`, with the probabilities
-`P(D_j > delta | Y)` and `P(D_j < delta | Y)` it implies. `delta` is computed
-by default as the Bayesian reliability-adjusted critical difference
-(`critical_delta()`); `suggest_delta()` (one forced-distribution
-category) is an alternative:
+`P(D_j > delta | Y)` and `P(D_j < delta | Y)` it implies. By default
+`delta` is the reliability-adjusted critical difference from classical
+Q analysis (Brown, 1980; Zabala & Pascual, 2016), computed from the
+posterior dominant-factor counts (`critical_delta()`);
+`suggest_delta()` (one forced-distribution category) is an
+alternative:
 
 ```r
 d <- critical_delta(fit$Lambda_draws)   # default separation (computed)
