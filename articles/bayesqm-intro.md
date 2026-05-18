@@ -95,7 +95,7 @@ fit
 #>   Data:      N = 33 persons, J = 42 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-05-18 21:48:10
+#>   Fitted:    2026-05-18 22:28:07
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
@@ -307,7 +307,9 @@ reliability-adjusted critical difference
 alternative, and results are reported with sensitivity across the choice
 of delta. No fixed probability cutoff defines a statement.
 
-The divergence summary is stored on `fit$qdc`, and
+The full distinguishing/consensus table is stored on `fit$qdc` (per
+viewpoint: grid position and z-score with 95% CrI, then `D_j` with 95%
+CrI, `pi_D`, `pi_C`).
 [`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md)
 returns the separation the fit used:
 
@@ -316,13 +318,27 @@ returns the separation the fit used:
 critical_delta(fit$Lambda_draws)
 #> [1] 0.4131967
 head(fit$qdc)
-#>   statement  D_median    D_lower   D_upper   pi_D   pi_C kstar gsign p_gstar
-#> 1        S1 0.3381550 0.06190555 0.7146339 0.3725 0.6275     2    -1  0.3950
-#> 2        S2 0.4427912 0.13551050 0.8479464 0.5825 0.4175     2    -1  0.6925
-#> 3        S3 1.9525495 1.58449898 2.2832984 1.0000 0.0000     1     1  1.0000
-#> 4        S4 1.9386399 1.55679839 2.3175306 1.0000 0.0000     2     1  1.0000
-#> 5        S5 1.9742330 1.54433252 2.3631369 1.0000 0.0000     1     1  1.0000
-#> 6        S6 0.2651122 0.04975712 0.6005598 0.1900 0.8100     3     1  0.2050
+#>   statement f1_grid     f1_zsc    f1_lower   f1_upper f2_grid     f2_zsc
+#> 1        S1      -1 -0.3436199 -0.75598677  0.1066338      -1 -0.5924826
+#> 2        S2       1  0.3356155 -0.07696179  0.7385355      -1 -0.2080451
+#> 3        S3       4  1.4979823  1.11477391  1.9446729      -3 -1.2921554
+#> 4        S4      -2 -1.2847601 -1.75639810 -0.8298201       4  1.4848346
+#> 5        S5       5  1.5174761  1.01119678  1.9237407      -5 -1.3155732
+#> 6        S6       1 -0.1660726 -0.64869137  0.2149788      -1 -0.1410127
+#>     f2_lower   f2_upper f3_grid      f3_zsc    f3_lower   f3_upper  D_median
+#> 1 -1.0039154 -0.1486896      -1 -0.15075033 -0.55964521  0.2793994 0.3381550
+#> 2 -0.6461072  0.2744403       2  0.34784928 -0.06702773  0.7702793 0.4427912
+#> 3 -1.7067359 -0.8610203      -3 -1.29522175 -1.79044451 -0.8143189 1.9525495
+#> 4  1.0077216  1.9142497      -5 -1.30747085 -1.76660521 -0.8738692 1.9386399
+#> 5 -1.7515059 -0.8978920      -4 -1.30529856 -1.77439164 -0.8363799 1.9742330
+#> 6 -0.5929771  0.3163001       1  0.01668352 -0.42748367  0.4427847 0.2651122
+#>      D_lower   D_upper   pi_D   pi_C
+#> 1 0.06190555 0.7146339 0.3725 0.6275
+#> 2 0.13551050 0.8479464 0.5825 0.4175
+#> 3 1.58449898 2.2832984 1.0000 0.0000
+#> 4 1.55679839 2.3175306 1.0000 0.0000
+#> 5 1.54433252 2.3631369 1.0000 0.0000
+#> 6 0.04975712 0.6005598 0.1900 0.8100
 ```
 
 ``` r

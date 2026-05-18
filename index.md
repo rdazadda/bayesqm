@@ -19,7 +19,7 @@ Stan (cmdstanr or rstan).
 
 ## What the package gives you
 
-For each Q-sort dataset, `bayesqm` returns three things classical Q
+For each Q-sort dataset, `bayesqm` returns four things classical Q
 analysis cannot:
 
 1.  **Posterior credible intervals for every participant loading**,
@@ -32,6 +32,10 @@ analysis cannot:
     peak with the conservative parsimony diagnostic of Sivula et al.
     2025. and surfacing the gap between them as informative about how
           strongly the data discriminate adjacent models.
+4.  **Posterior distinguishing and consensus statements**, reporting
+    `P(D_j > delta | Y)` and `P(D_j < delta | Y)` from the posterior of
+    an explicit viewpoint-divergence measure rather than a classical
+    significance verdict.
 
 ## Installation
 
@@ -179,10 +183,11 @@ probability, and convergence diagnostics.
 
 `bayesqm_fit` deliberately mirrors the slot names from the `qmethod`
 package (Zabala, 2015): `$dataset`, `$loa`, `$zsc`, `$zsc_n`, `$f_char`,
-`$qdc`, `$flagged`. `$qdc` is a Bayesian divergence summary (posterior
-median and 95% CrI of `D_j`, with `pi_D` and `pi_C`), not the classical
-significance-label vocabulary. Intentional Bayesian divergences are
-documented in `?bayesqm-package`:
+`$qdc`, `$flagged`. `$qdc` is the Bayesian divergence table:
+per-viewpoint grid position and z-score with 95% CrI, then `D_j` with
+95% CrI, `pi_D`, and `pi_C`, not the classical significance-label
+vocabulary. Intentional Bayesian divergences are documented in
+`?bayesqm-package`:
 
 - `$flagged` is defined probabilistically as P(argmax_k \|λ_ik\| = k) \>
   0.5, replacing Brown’s (1980) significance-based rule.

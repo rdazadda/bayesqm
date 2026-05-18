@@ -27,7 +27,7 @@ consensus statements, and PSIS-LOO-based factor enumeration."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bayesqm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,9 +108,9 @@ conventions.</p>
 is meaningful, so scripts written against <code>qmethod</code> largely keep
 working:</p><ul><li><p>Slot names match: <code>$dataset</code>, <code>$loa</code>, <code>$zsc</code>, <code>$zsc_n</code>, <code>$f_char</code>,
 <code>$qdc</code>, <code>$flagged</code>.</p></li>
-<li><p>The <code>$qdc$dist.and.cons</code> vocabulary matches exactly
-(<code>"Distinguishes all"</code>, <code>"Consensus"</code>, <code>"Distinguishes f1, f3"</code>,
-<code>""</code>).</p></li>
+<li><p><code>$qdc</code> is the Bayesian divergence table (per-viewpoint grid and
+z-score with 95% CrI, then <code>D_j</code> with 95% CrI, <code>pi_D</code>, <code>pi_C</code>),
+not the classical significance-label vocabulary.</p></li>
 <li><p>Dotted reader aliases (<code><a href="import-aliases.html">import.pqmethod()</a></code>, <code><a href="import-aliases.html">import.htmlq()</a></code>,
 <code><a href="import-aliases.html">import.kenq()</a></code>, <code><a href="import-aliases.html">import.easyhtmlq()</a></code>) forward to the <code>read_*</code>
 readers.</p></li>

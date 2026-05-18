@@ -24,7 +24,7 @@
 
     <a class="navbar-brand me-2" href="index.html">bayesqm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,7 @@
 <div class="section level2">
 <h2 id="what-the-package-gives-you">What the package gives you<a class="anchor" aria-label="anchor" href="#what-the-package-gives-you"></a>
 </h2>
-<p>For each Q-sort dataset, <code>bayesqm</code> returns three things classical Q analysis cannot:</p>
+<p>For each Q-sort dataset, <code>bayesqm</code> returns four things classical Q analysis cannot:</p>
 <ol style="list-style-type: decimal">
 <li>
 <strong>Posterior credible intervals for every participant loading</strong>, replacing the binary flagged / unflagged classification of Brown
@@ -82,6 +82,8 @@
 <li>and surfacing the gap between them as informative about how strongly the data discriminate adjacent models.</li>
 </ol>
 </li>
+<li>
+<strong>Posterior distinguishing and consensus statements</strong>, reporting <code>P(D_j &gt; delta | Y)</code> and <code>P(D_j &lt; delta | Y)</code> from the posterior of an explicit viewpoint-divergence measure rather than a classical significance verdict.</li>
 </ol>
 </div>
 <div class="section level2">
@@ -161,7 +163,7 @@
 <h2 id="compatibility-with-qmethod">Compatibility with <code>qmethod</code>
 <a class="anchor" aria-label="anchor" href="#compatibility-with-qmethod"></a>
 </h2>
-<p><code>bayesqm_fit</code> deliberately mirrors the slot names from the <code>qmethod</code> package (Zabala, 2015): <code>$dataset</code>, <code>$loa</code>, <code>$zsc</code>, <code>$zsc_n</code>, <code>$f_char</code>, <code>$qdc</code>, <code>$flagged</code>. <code>$qdc</code> is a Bayesian divergence summary (posterior median and 95% CrI of <code>D_j</code>, with <code>pi_D</code> and <code>pi_C</code>), not the classical significance-label vocabulary. Intentional Bayesian divergences are documented in <code>?bayesqm-package</code>:</p>
+<p><code>bayesqm_fit</code> deliberately mirrors the slot names from the <code>qmethod</code> package (Zabala, 2015): <code>$dataset</code>, <code>$loa</code>, <code>$zsc</code>, <code>$zsc_n</code>, <code>$f_char</code>, <code>$qdc</code>, <code>$flagged</code>. <code>$qdc</code> is the Bayesian divergence table: per-viewpoint grid position and z-score with 95% CrI, then <code>D_j</code> with 95% CrI, <code>pi_D</code>, and <code>pi_C</code>, not the classical significance-label vocabulary. Intentional Bayesian divergences are documented in <code>?bayesqm-package</code>:</p>
 <ul>
 <li>
 <code>$flagged</code> is defined probabilistically as P(argmax_k |λ_ik| = k) &gt; 0.5, replacing Brown’s (1980) significance-based rule.</li>

@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bayesqm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -143,7 +143,7 @@ al. (<a href="#ref-PoworoznekEtAl2025">2025</a>)</span>:</p>
 <span><span class="co">#&gt;   Data:      N = 33 persons, J = 42 statements</span></span>
 <span><span class="co">#&gt;   Draws:     4 chains x 1000 post-warmup = 4000 total</span></span>
 <span><span class="co">#&gt;   Backend:   demo</span></span>
-<span><span class="co">#&gt;   Fitted:    2026-05-18 21:48:10</span></span>
+<span><span class="co">#&gt;   Fitted:    2026-05-18 22:28:07</span></span>
 <span><span class="co">#&gt;   Max Rhat:  1.010</span></span>
 <span><span class="co">#&gt;   Min ESS:   bulk 820 / tail 950</span></span>
 <span><span class="co">#&gt;   Divergent: 0</span></span>
@@ -321,19 +321,36 @@ default as the Bayesian reliability-adjusted critical difference
 forced-distribution category on the standardised scale) is an
 alternative, and results are reported with sensitivity across the choice
 of delta. No fixed probability cutoff defines a statement.</p>
-<p>The divergence summary is stored on <code>fit$qdc</code>, and
-<code><a href="../reference/critical_delta.html">critical_delta()</a></code> returns the separation the fit used:</p>
+<p>The full distinguishing/consensus table is stored on
+<code>fit$qdc</code> (per viewpoint: grid position and z-score with 95%
+CrI, then <code>D_j</code> with 95% CrI, <code>pi_D</code>,
+<code>pi_C</code>). <code><a href="../reference/critical_delta.html">critical_delta()</a></code> returns the separation
+the fit used:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/critical_delta.html">critical_delta</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.4131967</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">qdc</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   statement  D_median    D_lower   D_upper   pi_D   pi_C kstar gsign p_gstar</span></span>
-<span><span class="co">#&gt; 1        S1 0.3381550 0.06190555 0.7146339 0.3725 0.6275     2    -1  0.3950</span></span>
-<span><span class="co">#&gt; 2        S2 0.4427912 0.13551050 0.8479464 0.5825 0.4175     2    -1  0.6925</span></span>
-<span><span class="co">#&gt; 3        S3 1.9525495 1.58449898 2.2832984 1.0000 0.0000     1     1  1.0000</span></span>
-<span><span class="co">#&gt; 4        S4 1.9386399 1.55679839 2.3175306 1.0000 0.0000     2     1  1.0000</span></span>
-<span><span class="co">#&gt; 5        S5 1.9742330 1.54433252 2.3631369 1.0000 0.0000     1     1  1.0000</span></span>
-<span><span class="co">#&gt; 6        S6 0.2651122 0.04975712 0.6005598 0.1900 0.8100     3     1  0.2050</span></span></code></pre></div>
+<span><span class="co">#&gt;   statement f1_grid     f1_zsc    f1_lower   f1_upper f2_grid     f2_zsc</span></span>
+<span><span class="co">#&gt; 1        S1      -1 -0.3436199 -0.75598677  0.1066338      -1 -0.5924826</span></span>
+<span><span class="co">#&gt; 2        S2       1  0.3356155 -0.07696179  0.7385355      -1 -0.2080451</span></span>
+<span><span class="co">#&gt; 3        S3       4  1.4979823  1.11477391  1.9446729      -3 -1.2921554</span></span>
+<span><span class="co">#&gt; 4        S4      -2 -1.2847601 -1.75639810 -0.8298201       4  1.4848346</span></span>
+<span><span class="co">#&gt; 5        S5       5  1.5174761  1.01119678  1.9237407      -5 -1.3155732</span></span>
+<span><span class="co">#&gt; 6        S6       1 -0.1660726 -0.64869137  0.2149788      -1 -0.1410127</span></span>
+<span><span class="co">#&gt;     f2_lower   f2_upper f3_grid      f3_zsc    f3_lower   f3_upper  D_median</span></span>
+<span><span class="co">#&gt; 1 -1.0039154 -0.1486896      -1 -0.15075033 -0.55964521  0.2793994 0.3381550</span></span>
+<span><span class="co">#&gt; 2 -0.6461072  0.2744403       2  0.34784928 -0.06702773  0.7702793 0.4427912</span></span>
+<span><span class="co">#&gt; 3 -1.7067359 -0.8610203      -3 -1.29522175 -1.79044451 -0.8143189 1.9525495</span></span>
+<span><span class="co">#&gt; 4  1.0077216  1.9142497      -5 -1.30747085 -1.76660521 -0.8738692 1.9386399</span></span>
+<span><span class="co">#&gt; 5 -1.7515059 -0.8978920      -4 -1.30529856 -1.77439164 -0.8363799 1.9742330</span></span>
+<span><span class="co">#&gt; 6 -0.5929771  0.3163001       1  0.01668352 -0.42748367  0.4427847 0.2651122</span></span>
+<span><span class="co">#&gt;      D_lower   D_upper   pi_D   pi_C</span></span>
+<span><span class="co">#&gt; 1 0.06190555 0.7146339 0.3725 0.6275</span></span>
+<span><span class="co">#&gt; 2 0.13551050 0.8479464 0.5825 0.4175</span></span>
+<span><span class="co">#&gt; 3 1.58449898 2.2832984 1.0000 0.0000</span></span>
+<span><span class="co">#&gt; 4 1.55679839 2.3175306 1.0000 0.0000</span></span>
+<span><span class="co">#&gt; 5 1.54433252 2.3631369 1.0000 0.0000</span></span>
+<span><span class="co">#&gt; 6 0.04975712 0.6005598 0.1900 0.8100</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_dist_cons.html">plot_dist_cons</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
