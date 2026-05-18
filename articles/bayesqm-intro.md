@@ -95,7 +95,7 @@ fit
 #>   Data:      N = 33 persons, J = 42 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-05-18 22:28:07
+#>   Fitted:    2026-05-18 22:58:10
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0
@@ -298,9 +298,10 @@ peak, the case is `gap`; when Sivula exceeds the peak, the case is
 explicit viewpoint-divergence measure. For each statement, D_j is the
 mean absolute pairwise difference of the K viewpoint scores; the package
 reports P(D_j \> delta \| Y) and P(D_j \< delta \| Y), the probabilities
-that the viewpoints diverge meaningfully or practically agree. The
-separation delta is computed by default as the Bayesian
-reliability-adjusted critical difference
+that the viewpoints diverge meaningfully or practically agree. By
+default the separation delta is the reliability-adjusted critical
+difference from classical Q analysis ([Brown 1980](#ref-Brown1980)),
+computed from the posterior dominant-factor counts
 ([`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md));
 [`suggest_delta()`](https://rdazadda.github.io/bayesqm/reference/suggest_delta.md)
 (one forced-distribution category on the standardised scale) is an

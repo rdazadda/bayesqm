@@ -143,7 +143,7 @@ al. (<a href="#ref-PoworoznekEtAl2025">2025</a>)</span>:</p>
 <span><span class="co">#&gt;   Data:      N = 33 persons, J = 42 statements</span></span>
 <span><span class="co">#&gt;   Draws:     4 chains x 1000 post-warmup = 4000 total</span></span>
 <span><span class="co">#&gt;   Backend:   demo</span></span>
-<span><span class="co">#&gt;   Fitted:    2026-05-18 22:28:07</span></span>
+<span><span class="co">#&gt;   Fitted:    2026-05-18 22:58:10</span></span>
 <span><span class="co">#&gt;   Max Rhat:  1.010</span></span>
 <span><span class="co">#&gt;   Min ESS:   bulk 820 / tail 950</span></span>
 <span><span class="co">#&gt;   Divergent: 0</span></span>
@@ -315,8 +315,10 @@ posterior of an explicit viewpoint-divergence measure. For each
 statement, D_j is the mean absolute pairwise difference of the K
 viewpoint scores; the package reports P(D_j &gt; delta | Y) and P(D_j
 &lt; delta | Y), the probabilities that the viewpoints diverge
-meaningfully or practically agree. The separation delta is computed by
-default as the Bayesian reliability-adjusted critical difference
+meaningfully or practically agree. By default the separation delta is
+the reliability-adjusted critical difference from classical Q analysis
+<span class="citation">(<a href="#ref-Brown1980">Brown 1980</a>)</span>,
+computed from the posterior dominant-factor counts
 (<code><a href="../reference/critical_delta.html">critical_delta()</a></code>); <code><a href="../reference/suggest_delta.html">suggest_delta()</a></code> (one
 forced-distribution category on the standardised scale) is an
 alternative, and results are reported with sensitivity across the choice

@@ -137,9 +137,10 @@ plot_membership(fit)
 
 Distinguishing and consensus statements come from the posterior of an
 explicit viewpoint-divergence measure `D_j`, with the probabilities
-`P(D_j > delta | Y)` and `P(D_j < delta | Y)` it implies. `delta` is
-computed by default as the Bayesian reliability-adjusted critical
-difference
+`P(D_j > delta | Y)` and `P(D_j < delta | Y)` it implies. By default
+`delta` is the reliability-adjusted critical difference from classical Q
+analysis (Brown, 1980; Zabala & Pascual, 2016), computed from the
+posterior dominant-factor counts
 ([`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md));
 [`suggest_delta()`](https://rdazadda.github.io/bayesqm/reference/suggest_delta.md)
 (one forced-distribution category) is an alternative:
@@ -276,7 +277,7 @@ Brown-threshold flags.
 - [`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md)
   :
 
-  Bayesian reliability-adjusted critical difference (default `delta`)
+  Reliability-adjusted critical difference (default `delta`)
 
 - [`suggest_delta()`](https://rdazadda.github.io/bayesqm/reference/suggest_delta.md)
   :

@@ -1,10 +1,12 @@
-# Bayesian reliability-adjusted critical difference (default `delta`)
+# Reliability-adjusted critical difference (default `delta`)
 
 The default separation for the distinguishing and consensus
-probabilities: a Bayesian reliability-adjusted critical difference
-(Brown 1980; Zabala & Pascual 2016). With `p_f` the number of
-participants whose posterior dominant factor is `f`,
-`r_f = p_f r0 / (1 + (p_f - 1) r0)` and `SE_f = sqrt(1 - r_f)`,
+probabilities: the reliability-adjusted critical difference used to flag
+distinguishing statements in classical Q analysis (Brown 1980; Zabala &
+Pascual 2016), here generalized by computing it from the posterior
+dominant-factor counts. With `p_f` the number of participants whose
+posterior dominant factor is `f`, `r_f = p_f r0 / (1 + (p_f - 1) r0)`
+and `SE_f = sqrt(1 - r_f)`,
 `delta = z * mean_{k < l} sqrt(SE_k^2 + SE_l^2)`. The reliability is the
 stable population reliability of the design, not the posterior
 estimation spread.

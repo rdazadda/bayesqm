@@ -42,7 +42,7 @@ Brown-threshold flags.
 - [`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md)
   :
 
-  Bayesian reliability-adjusted critical difference (default `delta`)
+  Reliability-adjusted critical difference (default `delta`)
 
 - [`suggest_delta()`](https://rdazadda.github.io/bayesqm/reference/suggest_delta.md)
   :
