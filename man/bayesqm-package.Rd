@@ -4,9 +4,9 @@
 \name{bayesqm-package}
 \alias{bayesqm}
 \alias{bayesqm-package}
-\title{bayesqm: Bayesian Q-Methodology Factor Analysis}
+\title{bayesqm: Bayesian Q Methodology: Probabilistic Factor Analysis}
 \description{
-A Bayesian factor-analytic framework for Q methodology. Fits a low-rank factor model to Q-sort data with a Student-t likelihood and a hierarchical normal prior on loadings, samples the posterior with Stan, resolves rotational ambiguity via MatchAlign post-processing, and returns posterior summaries including credible intervals for loadings and factor scores, probabilistic dominant-factor membership, distinguishing and consensus statements, and PSIS-LOO-based factor enumeration.
+A Bayesian factor-analytic framework for Q methodology. Fits a low-rank factor model to Q-sort data with a Student-t likelihood and a hierarchical normal prior on loadings, samples the posterior with Stan, resolves rotational ambiguity via the MatchAlign post-processing of Poworoznek et al. (2025) \doi{10.1214/25-BA1544}, and returns posterior summaries including credible intervals for loadings and factor scores, probabilistic dominant-factor membership, distinguishing and consensus statements, and PSIS-LOO-based factor enumeration following Vehtari et al. (2017) \doi{10.1007/s11222-016-9696-4} with the Sivula et al. (2025) \doi{10.1214/25-BA1569} parsimony rule.
 
 A Bayesian factor-analytic framework for Q methodology. Fits a low-rank
 factor model to Q-sort data with a Student-t likelihood and a hierarchical
@@ -31,8 +31,8 @@ peak-plus-Sivula protocol verdict.
 \item \strong{Summarise the posterior.} \code{\link[=compute_loadings]{compute_loadings()}},
 \code{\link[=compute_zscores]{compute_zscores()}}, \code{\link[=compute_factor_array]{compute_factor_array()}},
 \code{\link[=compute_dominant_prob]{compute_dominant_prob()}}, \code{\link[=compute_threshold_prob]{compute_threshold_prob()}},
-\code{\link[=compute_distinguishing_prob]{compute_distinguishing_prob()}}, \code{\link[=compute_consensus_prob]{compute_consensus_prob()}},
-\code{\link[=classify_membership]{classify_membership()}}, and \code{\link[=compute_posterior_scalars]{compute_posterior_scalars()}}.
+\code{\link[=compute_divergence]{compute_divergence()}}, \code{\link[=classify_membership]{classify_membership()}}, and
+\code{\link[=compute_posterior_scalars]{compute_posterior_scalars()}}.
 \item \strong{Use standard R accessors.} \code{coef()}, \code{fitted()},
 \code{residuals()}, \code{sigma()}, \code{family()}, \code{nobs()}, \code{as.matrix()},
 \code{as.array()}, \code{as.data.frame()}, \code{update()}, plus
@@ -101,7 +101,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Raymond Dacosta Azadda \email{dacostazadda@gmail.com}
+\strong{Maintainer}: Raymond Dacosta Azadda \email{rdazadda@alaska.edu}
+
+Authors:
+\itemize{
+  \item Raymond Dacosta Azadda \email{rdazadda@alaska.edu}
+}
 
 }
 \keyword{internal}

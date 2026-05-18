@@ -62,15 +62,19 @@ test_that("f_char has characteristics and cor_zsc with correct shape", {
   expect_equal(unname(diag(fit$f_char$cor_zsc)), c(1, 1, 1))
 })
 
-test_that("qdc has the qmethod-compatible dist.and.cons column", {
+test_that("qdc reports the divergence summary schema", {
   fit <- make_fake_fit(N = 6, J = 10, K = 3)
-  expect_true("statement" %in% names(fit$qdc))
-  expect_true("dist.and.cons" %in% names(fit$qdc))
+  expect_true(all(c("statement", "D_median", "D_lower", "D_upper",
+                     "pi_D", "pi_C", "kstar", "gsign", "p_gstar")
+                   %in% names(fit$qdc)))
+  expect_false("dist.and.cons" %in% names(fit$qdc))
   expect_equal(nrow(fit$qdc), 10)
-  # Labels must be from the qmethod vocabulary.
-  labs <- unique(fit$qdc$dist.and.cons)
-  expect_true(all(labs %in% c("", "Consensus", "Distinguishes all") |
-                    grepl("^Distinguishes f", labs)))
+  # delta is the computed reliability-adjusted critical difference,
+  # so the probabilities are numeric (not NA) and well formed.
+  expect_true(all(fit$qdc$pi_D >= 0 & fit$qdc$pi_D <= 1))
+  expect_equal(fit$qdc$pi_C, 1 - fit$qdc$pi_D)
+  expect_true(all(fit$qdc$kstar %in% seq_len(3)))
+  expect_true(all(fit$qdc$gsign %in% c(-1, 0, 1)))
 })
 
 test_that("K = 1 fit preserves matrix dimensions across all slots", {

@@ -99,7 +99,7 @@ fit
 ```
 
 `summary(fit)` adds factor characteristics, the PSIS-LOO ELPD (when
-available), distinguishing-statement counts, and the MatchAlign
+available), a divergence summary, and the MatchAlign
 diagnostic.
 
 ## Diagnostics
@@ -189,14 +189,28 @@ case is `reversed` (rare in practice).
 
 ## Distinguishing, consensus, and membership
 
-`bayesqm` replaces the classical z-score test with a direct posterior
-probability. For every statement and every factor pair,
-P(|f_jk − f_jl| > δ) gives the probability that the two factors
-separate that statement by at least δ. The default δ = 1 is on the
-standardised factor-score scale.
+`bayesqm` replaces the classical z-score test with the posterior of an
+explicit viewpoint-divergence measure. For each statement, D_j is the
+mean absolute pairwise difference of the K viewpoint scores; the
+package reports P(D_j > delta | Y) and P(D_j < delta | Y), the
+probabilities that the viewpoints diverge meaningfully or practically
+agree. The separation delta is computed by default as the Bayesian
+reliability-adjusted critical difference (`critical_delta()`);
+`suggest_delta()` (one forced-distribution category on the standardised
+scale) is an alternative, and results are reported with sensitivity
+across the choice of delta. No fixed probability cutoff defines a
+statement.
 
-```{r dist-cons, fig.cap = "Distinguishing-statement probability. Rows sorted so the most discriminating statements are at the top."}
-plot_dist_cons(fit, delta = 1.0)
+The divergence summary is stored on `fit$qdc`, and `critical_delta()`
+returns the separation the fit used:
+
+```{r}
+critical_delta(fit$Lambda_draws)
+head(fit$qdc)
+```
+
+```{r dist-cons, fig.cap = "Posterior viewpoint divergence D_j with 95% credible intervals; statements ordered by P(D_j > delta | Y)."}
+plot_dist_cons(fit)
 ```
 
 Participant-level membership is also probabilistic.

@@ -559,61 +559,95 @@ plot_tucker <- function(fit, ...) {
 }
 
 
-#' Distinguishing-statement posterior-probability heatmap
+#' Distinguishing/consensus divergence forest
 #'
 #' @description
-#' Heatmap of `P(|F[j, k] - F[j, l]| > delta)` for every statement and
-#' every factor pair, rendered on a sequential blue ramp. Rows are
-#' ordered so the most discriminating statements are at the top. A
-#' vertical colour bar in the right margin gives the probability scale.
+#' Horizontal dot-and-whisker plot of the posterior viewpoint
+#' divergence `D_j` for every statement: posterior median with a 95%
+#' credible-interval whisker, statements ordered by the distinguishing
+#' probability `P(D_j > delta | Y)`. A dashed rule marks the substantive
+#' separation `delta` and each point is shaded by `P(D_j > delta | Y)`.
+#' By default the divergence summary stored on the fit is used (computed
+#' at the fit's `delta`); pass `delta` to recompute at a different
+#' separation without refitting.
 #'
 #' @param fit A `bayesqm_fit`.
-#' @param delta Minimum z-score separation (default 1.0).
-#' @param ... Additional arguments forwarded to `image()`.
+#' @param delta Optional separation override. If `NULL` (default) the
+#'   fit's stored summary (`fit$qdc`, at `fit$brief$delta`) is used;
+#'   that default is the Bayesian reliability-adjusted critical
+#'   difference ([critical_delta()]). Pass a numeric value to recompute
+#'   the divergence summary at a different separation.
+#' @param ... Additional arguments forwarded to `plot()`.
 #'
 #' @return The input, invisibly.
 #' @export
-plot_dist_cons <- function(fit, delta = 1.0, ...) {
+plot_dist_cons <- function(fit, delta = NULL, ...) {
   assert_bayesqm_fit(fit)
   if (fit$brief$K < 2) stop("plot_dist_cons requires K >= 2.")
   cols <- .bq_col()
 
-  mat <- compute_distinguishing_prob(fit$F_draws, delta = delta)
-  ord <- order(apply(mat, 1, max))
-  mat <- mat[ord, , drop = FALSE]
-  J <- nrow(mat); P <- ncol(mat)
+  if (is.null(delta)) {
+    q <- fit$qdc
+    if (is.null(q) ||
+        !all(c("D_median", "D_lower", "D_upper", "pi_D") %in% names(q)))
+      stop("This fit has no divergence summary; refit with the current bayesqm.")
+    d <- fit$brief$delta
+  } else {
+    if (!is.numeric(delta) || length(delta) != 1L)
+      stop("delta must be a single numeric value.")
+    dv <- compute_divergence(fit$F_draws, delta = delta)
+    q  <- data.frame(statement = names(dv$D_median),
+                     D_median  = unname(dv$D_median),
+                     D_lower   = unname(dv$D_lower),
+                     D_upper   = unname(dv$D_upper),
+                     pi_D      = unname(dv$pi_D),
+                     stringsAsFactors = FALSE)
+    d <- delta
+  }
 
-  pal <- grDevices::colorRampPalette(
-    c(cols$light, cols$mid, cols$dark))(100)
+  has_pi <- any(is.finite(q$pi_D))
+  ord <- if (has_pi) order(q$pi_D, q$D_median) else order(q$D_median)
+  q   <- q[ord, , drop = FALSE]
+  J   <- nrow(q)
+  yv  <- seq_len(J)
 
-  old_par <- graphics::par(no.readonly = TRUE)
-  on.exit({ graphics::par(old_par); graphics::layout(1) }, add = TRUE)
+  old_par <- graphics::par(mar = c(5, 8, 4, 2))
+  on.exit(graphics::par(old_par), add = TRUE)
 
-  graphics::layout(matrix(c(1, 2), nrow = 1), widths = c(6, 1))
+  xr <- range(c(q$D_lower, q$D_upper,
+                if (!is.null(d) && is.finite(d)) d), na.rm = TRUE)
+  xr[1] <- min(0, xr[1])
 
-  graphics::par(mar = c(5, 8, 4, 1))
   dots <- .bq_dots(list(...),
-                   c("col", "zlim", "axes", "xlab", "ylab", "main", "x", "y", "z"))
-  do.call(graphics::image, c(
-    list(x = seq_len(P), y = seq_len(J), z = t(mat),
-         axes = FALSE, xlab = "Factor pair", ylab = "",
-         col = pal, zlim = c(0, 1),
-         main = sprintf("P(|F[j,k] - F[j,l]| > %.2g)", delta)),
+                   c("xlim", "yaxt", "xlab", "ylab", "main", "type",
+                     "x", "y", "pch", "bg", "col"))
+  do.call(plot, c(
+    list(x = q$D_median, y = yv, xlim = xr, type = "n", yaxt = "n",
+         xlab = "Viewpoint divergence D_j", ylab = "",
+         main = "Distinguishing / consensus: posterior divergence"),
     dots))
-  graphics::axis(1, at = seq_len(P), labels = colnames(mat),
-                 tick = FALSE, cex.axis = 0.85)
-  graphics::axis(2, at = seq_len(J), labels = rownames(mat),
-                 las = 1, tick = FALSE, cex.axis = 0.7)
-  graphics::box()
 
-  # Colour bar in second layout cell.
-  graphics::par(mar = c(5, 1, 4, 4))
-  bar_y <- seq(0, 1, length.out = length(pal) + 1)
-  graphics::image(1, (bar_y[-length(bar_y)] + bar_y[-1]) / 2,
-                  matrix(seq_along(pal), nrow = 1),
-                  col = pal, axes = FALSE, xlab = "", ylab = "")
-  graphics::axis(4, at = c(0, 0.5, 1), las = 1, cex.axis = 0.8)
-  graphics::mtext("probability", side = 4, line = 2.2, cex = 0.8)
+  if (!is.null(d) && is.finite(d))
+    graphics::abline(v = d, lty = 2, col = cols$accent, lwd = 1.1)
+  graphics::segments(q$D_lower, yv, q$D_upper, yv, lwd = 1.0, col = cols$dark)
+
+  if (has_pi) {
+    pal  <- grDevices::colorRampPalette(
+      c(cols$light, cols$mid, cols$dark))(100)
+    pcol <- pal[pmax(1L, pmin(100L, round(q$pi_D * 99) + 1L))]
+  } else {
+    pcol <- "white"
+  }
+  graphics::points(q$D_median, yv, pch = 21, bg = pcol,
+                   col = cols$dark, cex = 1.1, lwd = 1)
+  graphics::axis(2, at = yv, labels = q$statement,
+                 las = 1, tick = FALSE, cex.axis = 0.7)
+
+  note <- if (!is.null(d) && is.finite(d))
+    sprintf("delta = %.2f (dashed); point shade = P(D_j > delta | Y)", d)
+  else
+    "delta not set; showing D_j posterior only"
+  graphics::mtext(note, side = 3, line = 0.3, cex = 0.8)
 
   invisible(fit)
 }

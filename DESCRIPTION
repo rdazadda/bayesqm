@@ -1,7 +1,8 @@
 Package: bayesqm
 Type: Package
 Title: Bayesian Q Methodology: Probabilistic Factor Analysis
-Version: 0.1.0
+Version: 0.2.0
+Date: 2026-05-18
 Authors@R: person(
     "Raymond", "Dacosta Azadda",
     email = "rdazadda@alaska.edu",
@@ -22,7 +23,6 @@ BugReports: https://github.com/rdazadda/bayesqm/issues
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Config/testthat/edition: 3
 Depends:
     R (>= 4.1.0)
@@ -52,3 +52,4 @@ Suggests:
 VignetteBuilder: knitr
 Additional_repositories:
     https://stan-dev.r-universe.dev
+Config/roxygen2/version: 8.0.0

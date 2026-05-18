@@ -21,7 +21,8 @@ fit_bayesian(
   prior_nu_alpha = 2,
   prior_nu_beta = 0.1,
   use_half_cauchy = FALSE,
-  prob = 0.95
+  prob = 0.95,
+  delta = NULL
 )
 }
 \arguments{
@@ -51,6 +52,12 @@ MatchAlign (default 2000).}
 \item{prior_loading_scale, prior_sigma_scale, prior_nu_alpha, prior_nu_beta, use_half_cauchy}{Prior hyperparameters (see the Stan model for parameterization).}
 
 \item{prob}{Credible-interval probability stored on the fit (default 0.95).}
+
+\item{delta}{Substantive viewpoint separation for the
+distinguishing/consensus probabilities. If \code{NULL} (default) it is
+computed as the reliability-adjusted critical difference
+(\code{\link[=critical_delta]{critical_delta()}}); pass a numeric value to override, or use
+\code{\link[=suggest_delta]{suggest_delta()}} as an alternative.}
 }
 \value{
 A \code{bayesqm_fit} object. See \link{bayesqm-fit-methods} for \code{print()}

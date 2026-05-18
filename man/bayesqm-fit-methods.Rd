@@ -32,8 +32,8 @@ The input, invisibly.
 \description{
 \code{print()} shows a compact, brms-style header with convergence and
 the first few loadings. \code{summary()} expands with factor
-characteristics, the PSIS-LOO estimate, the distinguishing/consensus
-count, and the MatchAlign Tucker-phi diagnostic. Both methods
+characteristics, the PSIS-LOO estimate, the divergence summary,
+and the MatchAlign Tucker-phi diagnostic. Both methods
 exist for \code{bayesqm_fit} (returned by \code{\link[=fit_bayesian]{fit_bayesian()}}) and
 \code{bayesqm_run} (returned by \code{\link[=run_bayes]{run_bayes()}}).
 }

@@ -67,8 +67,7 @@ reference:
     contents:
       - compute_dominant_prob
       - compute_threshold_prob
-      - compute_distinguishing_prob
-      - compute_consensus_prob
+      - compute_divergence
       - classify_membership
 
   - title: "Plots (base R)"

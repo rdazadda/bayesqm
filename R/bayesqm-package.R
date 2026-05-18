@@ -28,8 +28,8 @@
 #'   \item **Summarise the posterior.** [compute_loadings()],
 #'     [compute_zscores()], [compute_factor_array()],
 #'     [compute_dominant_prob()], [compute_threshold_prob()],
-#'     [compute_distinguishing_prob()], [compute_consensus_prob()],
-#'     [classify_membership()], and [compute_posterior_scalars()].
+#'     [compute_divergence()], [classify_membership()], and
+#'     [compute_posterior_scalars()].
 #'   \item **Use standard R accessors.** `coef()`, `fitted()`,
 #'     `residuals()`, `sigma()`, `family()`, `nobs()`, `as.matrix()`,
 #'     `as.array()`, `as.data.frame()`, `update()`, plus

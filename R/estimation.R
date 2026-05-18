@@ -28,6 +28,11 @@
 #' @param prior_loading_scale,prior_sigma_scale,prior_nu_alpha,prior_nu_beta,use_half_cauchy
 #'   Prior hyperparameters (see the Stan model for parameterization).
 #' @param prob Credible-interval probability stored on the fit (default 0.95).
+#' @param delta Substantive viewpoint separation for the
+#'   distinguishing/consensus probabilities. If `NULL` (default) it is
+#'   computed as the reliability-adjusted critical difference
+#'   ([critical_delta()]); pass a numeric value to override, or use
+#'   [suggest_delta()] as an alternative.
 #'
 #' @return A `bayesqm_fit` object. See [bayesqm-fit-methods] for `print()`
 #'   and `summary()`, and [coef.bayesqm_fit()] for the standard R
@@ -51,7 +56,8 @@ fit_bayesian <- function(Y, K, stan_dir = NULL, robust = TRUE, nu = "estimate",
                          seed = NULL, adapt_delta = 0.90, max_draws = 2000,
                          prior_loading_scale = 1.0, prior_sigma_scale = 1.0,
                          prior_nu_alpha = 2.0, prior_nu_beta = 0.1,
-                         use_half_cauchy = FALSE, prob = 0.95) {
+                         use_half_cauchy = FALSE, prob = 0.95,
+                         delta = NULL) {
   cl <- match.call()
   if (inherits(Y, "qsort_data")) {
     distribution <- Y$distribution
@@ -132,6 +138,7 @@ fit_bayesian <- function(Y, K, stan_dir = NULL, robust = TRUE, nu = "estimate",
     Y            = Y,
     K            = K,
     distribution = distribution,
+    delta        = delta,
     prob         = prob,
     robust       = robust,
     nu           = nu,

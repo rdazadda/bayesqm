@@ -16,16 +16,16 @@ test_that("compute_threshold_prob handles K = 1", {
   expect_equal(dim(thr), c(5, 1))
 })
 
-test_that("compute_distinguishing_prob and consensus_prob require K >= 2", {
+test_that("compute_divergence requires K >= 2 and returns J-length probabilities", {
   set.seed(1L)
   Fd_k1 <- array(rnorm(40 * 5 * 1), c(40, 5, 1))
-  expect_error(compute_distinguishing_prob(Fd_k1), "K >= 2")
+  expect_error(compute_divergence(Fd_k1), "K >= 2")
 
   Fd <- array(rnorm(40 * 5 * 3), c(40, 5, 3))
-  dist_prob <- compute_distinguishing_prob(Fd, delta = 1)
-  cons_prob <- compute_consensus_prob(Fd,     delta = 1)
-  expect_equal(dim(dist_prob), c(5, 3))
-  expect_length(cons_prob, 5)
+  div <- compute_divergence(Fd, delta = 1)
+  expect_length(div$pi_D, 5)
+  expect_length(div$pi_C, 5)
+  expect_true(all(div$pi_D >= 0 & div$pi_D <= 1))
 })
 
 test_that("classify_membership produces correct tiers", {

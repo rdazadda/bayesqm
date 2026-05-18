@@ -10,7 +10,7 @@ new_bayesqm_fit <- function(call, Y, K, distribution, prob, robust, nu,
                             chains, iter, warmup, backend, priors,
                             Lhat, Lmed, ci_lo, ci_hi,
                             Lambda_draws, F_draws, align_info, hyperparams,
-                            loo_el, loo_ps, diag, ppc) {
+                            loo_el, loo_ps, diag, ppc, delta = NULL) {
   N <- ncol(Y); J <- nrow(Y)
 
   stmt_ids <- rownames(Y); if (is.null(stmt_ids)) stmt_ids <- paste0("S", seq_len(J))
@@ -54,7 +54,14 @@ new_bayesqm_fit <- function(call, Y, K, distribution, prob, robust, nu,
   flagged <- dom > 0.5
   dimnames(flagged) <- list(part_ids, fac_ids)
 
-  qdc <- compute_qdc(F_draws, delta = 1.0, threshold = 0.95)
+  dom_sign     <- compute_dominant_sign(Lambda_draws)
+  names(dom_sign) <- part_ids
+  neg_exemplar <- stats::setNames(dom_sign < 0.5, part_ids)
+
+  # Default delta: Bayesian reliability-adjusted critical difference.
+  if (is.null(delta) && K >= 2)
+    delta <- critical_delta(Lambda_draws, level = 0.05, r0 = 0.80)
+  qdc <- compute_qdc(F_draws, delta = delta)
 
   brief <- list(
     call         = call,
@@ -73,6 +80,7 @@ new_bayesqm_fit <- function(call, Y, K, distribution, prob, robust, nu,
     backend      = backend,
     prob         = prob,
     distribution = distribution,
+    delta        = delta,
     priors       = priors
   )
   brief$info <- make_brief_info(brief, diag)
@@ -90,6 +98,8 @@ new_bayesqm_fit <- function(call, Y, K, distribution, prob, robust, nu,
       zsc_n        = zsc_n,
       f_char       = f_char,
       flagged      = flagged,
+      dom_sign     = dom_sign,
+      neg_exemplar = neg_exemplar,
       qdc          = qdc,
       Lambda_draws = Lambda_draws,
       F_draws      = F_draws,
@@ -148,64 +158,44 @@ rank_to_grid <- function(F_hat, distribution) {
 }
 
 
-# Distinguishing / consensus table. A factor k is "distinguished" at
-# statement j when every pair involving k clears the probability threshold.
-# The dist.and.cons label is "Distinguishes all" (every factor), "Consensus"
-# (every pair falls below 1 - threshold), or "Distinguishes f1, f3..." (the
-# subset of factors that stand apart from all others); "" otherwise.
+# Distinguishing / consensus summary. Reports the posterior of the
+# viewpoint divergence D_j (mean absolute pairwise difference of the K
+# standardized viewpoint scores) per statement: posterior median and
+# 95% credible interval, pi_D = P(D_j > delta | Y), pi_C = P(D_j < delta
+# | Y), and the dominant viewpoint, sign, and P(|g| > delta | Y) of the
+# per-viewpoint departure. No fixed probability cutoff defines a
+# distinguishing or consensus statement; the probabilities are the
+# reported quantities.
 #' @keywords internal
 #' @noRd
-compute_qdc <- function(F_draws, delta = 1.0, threshold = 0.95) {
+compute_qdc <- function(F_draws, delta, delta_grid = NULL) {
   J <- dim(F_draws)[2]
   K <- dim(F_draws)[3]
   stmt_ids <- dimnames(F_draws)[[2]]
   if (is.null(stmt_ids)) stmt_ids <- paste0("S", seq_len(J))
   if (K < 2)
     return(data.frame(statement = stmt_ids,
-                      dist.and.cons = NA_character_,
-                      stringsAsFactors = FALSE))
+                      D_median = NA_real_, D_lower = NA_real_,
+                      D_upper = NA_real_, pi_D = NA_real_, pi_C = NA_real_,
+                      kstar = NA_integer_, gsign = NA_real_,
+                      p_gstar = NA_real_, stringsAsFactors = FALSE))
 
-  Td <- dim(F_draws)[1]
-  F_hat <- .summarize_draws(F_draws, mean)
-  pairs <- combn(K, 2)
-  n_pairs <- ncol(pairs)
-
-  diffs <- probs <- matrix(0, J, n_pairs)
-  pair_names <- character(n_pairs)
-  for (p in seq_len(n_pairs)) {
-    k <- pairs[1, p]; ell <- pairs[2, p]
-    pair_names[p] <- paste0("f", k, "_f", ell)
-    diffs[, p] <- F_hat[, k] - F_hat[, ell]
-    dif <- matrix(F_draws[, , k] - F_draws[, , ell], nrow = Td, ncol = J)
-    probs[, p] <- colMeans(abs(dif) > delta)
-  }
-
-  per_factor_dist <- matrix(FALSE, J, K)
-  for (k in seq_len(K)) {
-    k_pairs <- which(pairs[1, ] == k | pairs[2, ] == k)
-    per_factor_dist[, k] <- apply(probs[, k_pairs, drop = FALSE], 1,
-                                  function(row) all(row >= threshold))
-  }
-
-  label <- vapply(seq_len(J), function(j) {
-    dist_fac <- which(per_factor_dist[j, ])
-    if (length(dist_fac) == K)
-      "Distinguishes all"
-    else if (length(dist_fac) > 0)
-      paste0("Distinguishes ", paste0("f", dist_fac, collapse = ", "))
-    else if (all(probs[j, ] <= 1 - threshold))
-      "Consensus"
-    else
-      ""
-  }, character(1))
-
-  out <- data.frame(statement = stmt_ids, dist.and.cons = label,
-                    stringsAsFactors = FALSE)
-  for (p in seq_len(n_pairs)) {
-    out[[paste0(pair_names[p], "_diff")]] <- diffs[, p]
-    out[[paste0(pair_names[p], "_prob")]] <- probs[, p]
-  }
+  dv <- compute_divergence(F_draws, delta = delta, delta_grid = delta_grid)
+  out <- data.frame(
+    statement = stmt_ids,
+    D_median  = unname(dv$D_median),
+    D_lower   = unname(dv$D_lower),
+    D_upper   = unname(dv$D_upper),
+    pi_D      = unname(dv$pi_D),
+    pi_C      = unname(dv$pi_C),
+    kstar     = unname(dv$kstar),
+    gsign     = unname(dv$gsign),
+    p_gstar   = unname(dv$p_gstar),
+    stringsAsFactors = FALSE
+  )
   rownames(out) <- NULL
+  attr(out, "delta") <- delta
+  attr(out, "sensitivity") <- dv$sensitivity
   out
 }
 
@@ -268,8 +258,8 @@ format_loa_ci <- function(med, lo, hi, digits = 2) {
 #' @description
 #' `print()` shows a compact, brms-style header with convergence and
 #' the first few loadings. `summary()` expands with factor
-#' characteristics, the PSIS-LOO estimate, the distinguishing/consensus
-#' count, and the MatchAlign Tucker-phi diagnostic. Both methods
+#' characteristics, the PSIS-LOO estimate, the divergence summary,
+#' and the MatchAlign Tucker-phi diagnostic. Both methods
 #' exist for `bayesqm_fit` (returned by [fit_bayesian()]) and
 #' `bayesqm_run` (returned by [run_bayes()]).
 #'
@@ -307,8 +297,8 @@ print.bayesqm_fit <- function(x, digits = 2, length = 10, ...) {
   print(format(hps, digits = digits), row.names = FALSE)
   cat("\n")
 
-  cat("Use summary() for factor characteristics, distinguishing/consensus ",
-      "tables, and LOO.\n", sep = "")
+  cat("Use summary() for factor characteristics, the divergence ",
+      "summary, and LOO.\n", sep = "")
   invisible(x)
 }
 
@@ -342,15 +332,26 @@ summary.bayesqm_fit <- function(object, digits = 3, ...) {
     cat("\n")
   }
 
-  if (!is.null(object$qdc$dist.and.cons)) {
-    tab <- table(object$qdc$dist.and.cons)
-    if (length(tab) > 0) {
-      cat("Distinguishing / consensus statements (delta = 1.0, p > 0.95):\n")
-      for (nm in names(tab))
-        if (nchar(nm) > 0)
-          cat(sprintf("  %-24s %d\n", nm, tab[[nm]]))
-      cat("\n")
+  if (!is.null(object$qdc) && nrow(object$qdc) > 0 &&
+      !all(is.na(object$qdc$D_median))) {
+    q <- object$qdc
+    d <- object$brief$delta
+    cat("Divergence summary:\n")
+    cat(sprintf("  posterior median D_j ranges %.2f to %.2f\n",
+                min(q$D_median), max(q$D_median)))
+    if (is.null(d) || all(is.na(q$pi_D))) {
+      cat("  delta not specified; supply delta for distinguishing/consensus probabilities\n")
+    } else {
+      cat(sprintf("  delta = %.2f (reliability-adjusted critical difference)\n", d))
+      cat(sprintf("  statements with P(D_j > delta | Y) >= 0.95: %d of %d\n",
+                  sum(q$pi_D >= 0.95), nrow(q)))
+      cat(sprintf("  strongest consensus, max P(D_j < delta | Y): %.2f\n",
+                  max(q$pi_C)))
     }
+    if (!is.null(object$neg_exemplar))
+      cat(sprintf("  negative exemplars, P(dominant loading > 0 | Y) < 0.5: %d of %d\n",
+                  sum(object$neg_exemplar), length(object$neg_exemplar)))
+    cat("\n")
   }
 
   align <- object$align_info$congruence

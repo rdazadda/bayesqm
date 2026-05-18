@@ -4,21 +4,22 @@ test_that("run_bayes rejects K_max < 1 before any sampling", {
   expect_error(run_bayes(Y, K_max = -1), "positive integer")
 })
 
-test_that("compute_distinguishing_prob works when K = 2 and J is small", {
+test_that("compute_divergence works when K = 2 and J is small", {
   set.seed(1L)
   F_draws <- array(rnorm(100 * 3 * 2), c(100, 3, 2))
-  out <- compute_distinguishing_prob(F_draws, delta = 1.0)
-  expect_equal(dim(out), c(3, 1))
-  expect_true(all(out >= 0 & out <= 1))
+  out <- compute_divergence(F_draws, delta = 1.0)
+  expect_length(out$pi_D, 3)
+  expect_true(all(out$pi_D >= 0 & out$pi_D <= 1))
 })
 
-test_that("compute_consensus_prob returns 1 for every J when K = 1", {
+test_that("compute_divergence returns NA probabilities when delta is NULL", {
   set.seed(1L)
-  F_draws <- array(rnorm(50 * 5 * 1), c(50, 5, 1))
-  dimnames(F_draws) <- list(NULL, paste0("S", 1:5), "f1")
-  out <- compute_consensus_prob(F_draws)
-  expect_length(out, 5)
-  expect_true(all(out == 1))
+  F_draws <- array(rnorm(50 * 5 * 2), c(50, 5, 2))
+  dimnames(F_draws) <- list(NULL, paste0("S", 1:5), c("f1", "f2"))
+  out <- compute_divergence(F_draws)
+  expect_length(out$pi_D, 5)
+  expect_true(all(is.na(out$pi_D)))
+  expect_true(all(is.na(out$pi_C)))
 })
 
 test_that("compute_dominant_prob rows sum to 1 across factors", {

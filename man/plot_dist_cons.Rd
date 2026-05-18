@@ -2,23 +2,31 @@
 % Please edit documentation in R/plots.R
 \name{plot_dist_cons}
 \alias{plot_dist_cons}
-\title{Distinguishing-statement posterior-probability heatmap}
+\title{Distinguishing/consensus divergence forest}
 \usage{
-plot_dist_cons(fit, delta = 1, ...)
+plot_dist_cons(fit, delta = NULL, ...)
 }
 \arguments{
 \item{fit}{A \code{bayesqm_fit}.}
 
-\item{delta}{Minimum z-score separation (default 1.0).}
+\item{delta}{Optional separation override. If \code{NULL} (default) the
+fit's stored summary (\code{fit$qdc}, at \code{fit$brief$delta}) is used;
+that default is the Bayesian reliability-adjusted critical
+difference (\code{\link[=critical_delta]{critical_delta()}}). Pass a numeric value to recompute
+the divergence summary at a different separation.}
 
-\item{...}{Additional arguments forwarded to \code{image()}.}
+\item{...}{Additional arguments forwarded to \code{plot()}.}
 }
 \value{
 The input, invisibly.
 }
 \description{
-Heatmap of \verb{P(|F[j, k] - F[j, l]| > delta)} for every statement and
-every factor pair, rendered on a sequential blue ramp. Rows are
-ordered so the most discriminating statements are at the top. A
-vertical colour bar in the right margin gives the probability scale.
+Horizontal dot-and-whisker plot of the posterior viewpoint
+divergence \code{D_j} for every statement: posterior median with a 95\%
+credible-interval whisker, statements ordered by the distinguishing
+probability \code{P(D_j > delta | Y)}. A dashed rule marks the substantive
+separation \code{delta} and each point is shaded by \code{P(D_j > delta | Y)}.
+By default the divergence summary stored on the fit is used (computed
+at the fit's \code{delta}); pass \code{delta} to recompute at a different
+separation without refitting.
 }
