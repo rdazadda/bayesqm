@@ -68,6 +68,8 @@ reference:
       - compute_dominant_prob
       - compute_threshold_prob
       - compute_divergence
+      - critical_delta
+      - suggest_delta
       - classify_membership
 
   - title: "Plots (base R)"
