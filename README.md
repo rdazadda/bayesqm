@@ -210,6 +210,15 @@ citation("bayesqm")
 - Issues and feature requests:
   <https://github.com/rdazadda/bayesqm/issues>.
 
+## Funding
+
+This research was, in part, funded by the National Institutes of
+Health (NIH) Agreement OT2HL158287 (Stacy Rasmus, Contact PI,
+smrasmus@alaska.edu; Karsten Hueffer and Taa'aii Peter, MPIs). The
+views and conclusions contained in this document are those of the
+authors and should not be interpreted as representing the official
+policies, either expressed or implied, of the NIH.
+
 ## License
 
 Released under the GNU General Public License version 3 (GPL-3); see

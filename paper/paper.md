@@ -57,4 +57,6 @@ For users transitioning from existing Q-methodology workflows, `bayesqm` provide
 
 `bayesqm` grew out of work at the Center for Alaska Native Health Research at the University of Alaska Fairbanks, and would not exist without the people there. I am grateful to the CANHR research team for their discussions and encouragement, and especially to the Numbers Team, particularly Andrew Grogan-Kaylor and KyungSook Lee, for their methodological discussions, feedback on early designs, and patience with the questions that shaped this package over many conversations.
 
+This research was, in part, funded by the National Institutes of Health (NIH) Agreement OT2HL158287 (Stacy Rasmus, Contact PI, smrasmus@alaska.edu; Karsten Hueffer and Taa'aii Peter, MPIs). The views and conclusions contained in this document are those of the authors and should not be interpreted as representing the official policies, either expressed or implied, of the NIH.
+
 # References
