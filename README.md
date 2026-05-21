@@ -196,7 +196,7 @@ draws in Stan-style parameter naming (`Lambda[i,k]`, `F[j,k]`,
 
 Run `citation("bayesqm")` for the canonical citation, or use:
 
-> Dacosta Azadda, R., AK-ACE Team, Hueffer, K., Peter, T., & Rasmus, S.
+> Azadda, R. D., AK-ACE Team, Hueffer, K., Peter, T., & Rasmus, S.
 > (2026). bayesqm: Bayesian Q-Methodology Factor Analysis. R package
 > version 0.1.0. https://github.com/rdazadda/bayesqm
 

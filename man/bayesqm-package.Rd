@@ -107,9 +107,9 @@ Authors:
 \itemize{
   \item Raymond Dacosta Azadda \email{rdazadda@alaska.edu}
   \item  AK-ACE Team
-  \item Stacy Rasmus
   \item Karsten Hueffer
   \item Taa'aii Peter
+  \item Stacy Rasmus
 }
 
 }

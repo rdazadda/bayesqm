@@ -4,7 +4,7 @@ Title: Bayesian Q Methodology: Probabilistic Factor Analysis
 Version: 0.1.0
 Date: 2026-05-18
 Authors@R: c(
-    person("Raymond", "Dacosta Azadda",
+    person(given = "Raymond Dacosta", family = "Azadda",
            email = "rdazadda@alaska.edu",
            role = c("aut", "cre")),
     person(family = "AK-ACE Team", role = "aut"),
