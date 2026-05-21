@@ -13,11 +13,11 @@ authors:
     orcid: 0009-0002-4384-4556
     affiliation: 1
     corresponding: true
-  - name: Stacy Rasmus
-    affiliation: 1
   - name: Karsten Hueffer
     affiliation: 1
   - name: Taa'aii Peter
+    affiliation: 1
+  - name: Stacy Rasmus
     affiliation: 1
 affiliations:
   - name: Center for Alaska Native Health Research, University of Alaska Fairbanks, USA
