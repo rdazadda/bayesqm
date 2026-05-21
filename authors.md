@@ -18,13 +18,13 @@
 Source:
 [`inst/CITATION`](https://github.com/rdazadda/bayesqm/blob/main/inst/CITATION)
 
-Dacosta Azadda, R., AK-ACE Team, Hueffer, K., Peter, T., & Rasmus, S.
-(2026). bayesqm: Bayesian Q-Methodology Factor Analysis. R package
-version 0.1.0. https://github.com/rdazadda/bayesqm
+Azadda, R. D., AK-ACE Team, Hueffer, K., Peter, T., & Rasmus, S. (2026).
+bayesqm: Bayesian Q-Methodology Factor Analysis. R package version
+0.1.0. https://github.com/rdazadda/bayesqm
 
     @Manual{,
       title = {{bayesqm}: Bayesian Q-Methodology Factor Analysis},
-      author = {Raymond {Dacosta Azadda} and {AK-ACE Team} and Karsten Hueffer and Taa'aii Peter and Stacy Rasmus},
+      author = {Raymond Dacosta Azadda and {AK-ACE Team} and Karsten Hueffer and Taa'aii Peter and Stacy Rasmus},
       year = {2026},
       note = {R package version 0.1.0},
       url = {https://github.com/rdazadda/bayesqm},

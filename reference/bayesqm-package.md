@@ -146,8 +146,8 @@ Authors:
 
 - AK-ACE Team
 
-- Stacy Rasmus
-
 - Karsten Hueffer
 
 - Taa'aii Peter
+
+- Stacy Rasmus
