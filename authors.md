@@ -5,6 +5,14 @@
 - **[Raymond Dacosta Azadda](https://github.com/rdazadda)**. Author,
   maintainer.
 
+- **AK-ACE Team**. Author.
+
+- **Stacy Rasmus**. Author.
+
+- **Karsten Hueffer**. Author.
+
+- **Taa'aii Peter**. Author.
+
 ## Citation
 
 Source:
