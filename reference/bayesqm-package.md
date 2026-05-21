@@ -143,3 +143,11 @@ Useful links:
 Authors:
 
 - Raymond Dacosta Azadda <rdazadda@alaska.edu>
+
+- AK-ACE Team
+
+- Stacy Rasmus
+
+- Karsten Hueffer
+
+- Taa'aii Peter
