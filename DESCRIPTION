@@ -3,10 +3,14 @@ Type: Package
 Title: Bayesian Q Methodology: Probabilistic Factor Analysis
 Version: 0.1.0
 Date: 2026-05-18
-Authors@R: person(
-    "Raymond", "Dacosta Azadda",
-    email = "rdazadda@alaska.edu",
-    role = c("aut", "cre"))
+Authors@R: c(
+    person("Raymond", "Dacosta Azadda",
+           email = "rdazadda@alaska.edu",
+           role = c("aut", "cre")),
+    person(family = "AK-ACE Team", role = "aut"),
+    person("Stacy", "Rasmus", role = "aut"),
+    person("Karsten", "Hueffer", role = "aut"),
+    person("Taa'aii", "Peter", role = "aut"))
 Description: A Bayesian factor-analytic framework for Q methodology. Fits a
     low-rank factor model to Q-sort data with a Student-t likelihood and a
     hierarchical normal prior on loadings, samples the posterior with Stan,
