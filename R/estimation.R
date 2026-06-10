@@ -43,11 +43,15 @@
 #'   Bayesian Matrix Sampling with Matching. *Bayesian Analysis*.
 #'
 #' @examples
-#' \dontrun{
-#' qdata <- read_qsort("mystudy.csv")
-#' fit <- fit_bayesian(qdata, K = 3)
-#' fit
-#' summary(fit)
+#' \donttest{
+#' # Needs a working Stan backend; skipped when cmdstanr/CmdStan is absent.
+#' has_stan <- requireNamespace("cmdstanr", quietly = TRUE) &&
+#'   !inherits(try(cmdstanr::cmdstan_path(), silent = TRUE), "try-error")
+#' if (has_stan) {
+#'   sim <- generate_data(N = 8, J = 12, K = 2, seed = 1)
+#'   fit <- fit_bayesian(sim$Y, K = 2, chains = 1, iter = 600, warmup = 300)
+#'   summary(fit)
+#' }
 #' }
 #'
 #' @export

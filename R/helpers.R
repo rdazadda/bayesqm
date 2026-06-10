@@ -41,17 +41,7 @@ generate_data <- function(N, J, K, noise_sd = 1, error_type = "normal",
                           primary_range = c(0.55, 0.85),
                           cross_range  = c(-0.15, 0.15),
                           seed = NULL) {
-  if (!is.null(seed)) {
-    # Restore the user's RNG state on exit instead of leaving it perturbed.
-    if (exists(".Random.seed", envir = globalenv(), inherits = FALSE)) {
-      old_seed <- get(".Random.seed", envir = globalenv(), inherits = FALSE)
-      on.exit(assign(".Random.seed", old_seed, envir = globalenv()), add = TRUE)
-    } else {
-      on.exit(suppressWarnings(rm(".Random.seed", envir = globalenv())),
-              add = TRUE)
-    }
-    set.seed(seed)
-  }
+  if (!is.null(seed)) set.seed(seed)
 
   distr  <- get_distribution(J)
   Lambda <- generate_loadings(N, K, primary_range = primary_range,

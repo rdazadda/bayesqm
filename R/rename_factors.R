@@ -19,10 +19,9 @@
 #' @return The input fit with every factor label replaced.
 #'
 #' @examples
-#' \dontrun{
-#' fit <- fit_bayesian(Y, K = 3)
+#' fit <- demo_fit(N = 6, J = 10, K = 3, Td = 50, seed = 1)
 #' fit <- rename_factors(fit, c("tradition", "innovation", "caution"))
-#' }
+#' colnames(fit$loa)
 #'
 #' @export
 rename_factors <- function(fit, new_names) {

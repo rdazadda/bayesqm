@@ -21,7 +21,8 @@ demo_run(
 
 \item{case}{Case label: \code{"agree"}, \code{"gap"}, or \code{"reversed"}.}
 
-\item{seed}{Integer seed for reproducibility.}
+\item{seed}{Integer seed for reproducibility; \code{NULL} leaves the
+random number generator untouched.}
 }
 \value{
 A \code{bayesqm_run}.

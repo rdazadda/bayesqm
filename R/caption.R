@@ -19,9 +19,8 @@
 #' @return A length-1 character string.
 #'
 #' @examples
-#' \dontrun{
+#' fit <- demo_fit(N = 6, J = 10, K = 2, Td = 50, seed = 1)
 #' cat(caption_bayesqm(fit))
-#' }
 #'
 #' @export
 caption_bayesqm <- function(fit, include_ref = TRUE, include_diag = TRUE) {

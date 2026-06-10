@@ -19,7 +19,8 @@
 #' @param J Number of statements.
 #' @param K Number of factors.
 #' @param Td Number of posterior draws.
-#' @param seed Integer seed for reproducibility.
+#' @param seed Integer seed for reproducibility; `NULL` leaves the
+#'   random number generator untouched.
 #'
 #' @return A `bayesqm_fit`.
 #'
@@ -30,7 +31,7 @@
 #'
 #' @export
 demo_fit <- function(N = 20, J = 22, K = 2, Td = 400, seed = 1L) {
-  set.seed(seed)
+  if (!is.null(seed)) set.seed(seed)
 
   # Loadings: each participant gets a primary factor with a clear
   # positive loading, small random cross-loadings on the others.
@@ -155,7 +156,8 @@ demo_fit <- function(N = 20, J = 22, K = 2, Td = 400, seed = 1L) {
 #' @param k_peak K value where ELPD peaks (default 3).
 #' @param k_sivula K chosen by the Sivula parsimony rule (default 2).
 #' @param case Case label: `"agree"`, `"gap"`, or `"reversed"`.
-#' @param seed Integer seed for reproducibility.
+#' @param seed Integer seed for reproducibility; `NULL` leaves the
+#'   random number generator untouched.
 #'
 #' @return A `bayesqm_run`.
 #'
@@ -169,7 +171,7 @@ demo_run <- function(K_max = 4L, k_peak = 3L, k_sivula = 2L,
                      case = c("gap", "agree", "reversed"),
                      seed = 1L) {
   case <- match.arg(case)
-  set.seed(seed)
+  if (!is.null(seed)) set.seed(seed)
 
   K    <- seq_len(K_max)
   elpd <- -abs(K - k_peak) ^ 1.3 * 6 - 165 + rnorm(K_max, 0, 0.5)

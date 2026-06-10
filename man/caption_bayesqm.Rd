@@ -23,8 +23,7 @@ post-warmup draws), the interval probability, and convergence
 diagnostics (max Rhat, divergent transitions).
 }
 \examples{
-\dontrun{
+fit <- demo_fit(N = 6, J = 10, K = 2, Td = 50, seed = 1)
 cat(caption_bayesqm(fit))
-}
 
 }

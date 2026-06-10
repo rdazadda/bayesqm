@@ -29,10 +29,9 @@ For full control, pass a named list with slots \code{light}, \code{mid},
 }
 \examples{
 bayesqm_colors()
-\dontrun{
+fit <- demo_fit(N = 6, J = 10, K = 2, Td = 50, seed = 1)
 bayesqm_set_colors("teal")
 plot(fit)
 bayesqm_set_colors("blue")  # restore default
-}
 
 }

@@ -15,7 +15,8 @@ demo_fit(N = 20, J = 22, K = 2, Td = 400, seed = 1L)
 
 \item{Td}{Number of posterior draws.}
 
-\item{seed}{Integer seed for reproducibility.}
+\item{seed}{Integer seed for reproducibility; \code{NULL} leaves the
+random number generator untouched.}
 }
 \value{
 A \code{bayesqm_fit}.

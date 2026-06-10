@@ -6,12 +6,11 @@ test_that("generate_data returns the declared shape", {
   expect_equal(sum(dat$distribution), 20)
 })
 
-test_that("generate_data restores the user's RNG state", {
-  set.seed(42)
-  before <- .Random.seed
-  generate_data(N = 8, J = 15, K = 2, seed = 7)
-  after <- .Random.seed
-  expect_identical(before, after)
+test_that("generate_data is reproducible for a given seed", {
+  d1 <- generate_data(N = 8, J = 15, K = 2, seed = 7)
+  d2 <- generate_data(N = 8, J = 15, K = 2, seed = 7)
+  expect_identical(d1$Y, d2$Y)
+  expect_identical(d1$Lambda_true, d2$Lambda_true)
 })
 
 test_that("generate_data without seed leaves RNG advanced (not reset)", {
