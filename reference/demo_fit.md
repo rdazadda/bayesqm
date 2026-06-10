@@ -34,7 +34,8 @@ demo_fit(N = 20, J = 22, K = 2, Td = 400, seed = 1L)
 
 - seed:
 
-  Integer seed for reproducibility.
+  Integer seed for reproducibility; `NULL` leaves the random number
+  generator untouched.
 
 ## Value
 
@@ -54,7 +55,7 @@ summary(fit)
 #>   Data:      N = 12 persons, J = 15 statements
 #>   Draws:     4 chains x 1000 post-warmup = 4000 total
 #>   Backend:   demo
-#>   Fitted:    2026-05-21 21:29:11
+#>   Fitted:    2026-06-10 02:19:15
 #>   Max Rhat:  1.010
 #>   Min ESS:   bulk 820 / tail 950
 #>   Divergent: 0

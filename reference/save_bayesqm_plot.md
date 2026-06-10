@@ -41,10 +41,8 @@ The `file` path, invisibly.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-save_bayesqm_plot("fig_loadings.pdf", plot_loading_posterior(fit))
-save_bayesqm_plot("fig_membership.png", plot_membership(fit),
-                  width = 3.5, height = 4)
-save_bayesqm_plot("fig_elpd.pdf", ggplot2::autoplot(run))
-} # }
+fit <- demo_fit(N = 6, J = 10, K = 2, Td = 50, seed = 1)
+f <- file.path(tempdir(), "fig_loadings.pdf")
+save_bayesqm_plot(f, plot_loading_posterior(fit))
+unlink(f)
 ```

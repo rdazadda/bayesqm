@@ -32,7 +32,7 @@ A length-1 character string.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+fit <- demo_fit(N = 6, J = 10, K = 2, Td = 50, seed = 1)
 cat(caption_bayesqm(fit))
-} # }
+#> Bayesian Q-methodology factor model (K = 2, N = 6, J = 10); fitted with a Student-t likelihood via demo (4 chains, 4,000 post-warmup draws); intervals shown at 95% posterior coverage; max Rhat = 1.010, min bulk ESS = 820, 0 divergent transitions. Fitted with the bayesqm R package.
 ```

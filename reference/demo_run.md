@@ -42,7 +42,8 @@ demo_run(
 
 - seed:
 
-  Integer seed for reproducibility.
+  Integer seed for reproducibility; `NULL` leaves the random number
+  generator untouched.
 
 ## Value
 

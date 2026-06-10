@@ -41,5 +41,5 @@ A single numeric value, the critical-difference `delta`.
 
 ``` r
 critical_delta(array(rnorm(200 * 8 * 3), c(200, 8, 3)))
-#> [1] 1.57724
+#> [1] 0.822852
 ```
