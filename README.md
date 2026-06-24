@@ -1,6 +1,8 @@
-# bayesqm
+# bayesqm <img src="man/figures/logo.png" align="right" height="139" alt="bayesqm logo" />
 
 <!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/bayesqm)](https://CRAN.R-project.org/package=bayesqm)
+[![R-CMD-check](https://github.com/rdazadda/bayesqm/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rdazadda/bayesqm/actions/workflows/R-CMD-check.yaml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- badges: end -->
 
@@ -44,6 +46,10 @@ analysis cannot:
 ## Installation
 
 ```r
+# from CRAN
+install.packages("bayesqm")
+
+# development version from GitHub
 # install.packages("remotes")
 remotes::install_github("rdazadda/bayesqm")
 ```
