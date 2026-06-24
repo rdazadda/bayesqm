@@ -2,7 +2,6 @@ url: https://rdazadda.github.io/bayesqm/
 
 template:
   bootstrap: 5
-  light-switch: true
   bslib:
     primary:   "#1E3A5F"
     secondary: "#DF6A2E"
@@ -10,6 +9,8 @@ template:
     info:      "#87D1E6"
     warning:   "#FFCD00"
     danger:    "#F45197"
+    headings-color: "#1E3A5F"
+    link-color:     "#2C5282"
     base_font:    {google: "Inter"}
     heading_font: {google: "Inter"}
     code_font:    {google: "JetBrains Mono"}
