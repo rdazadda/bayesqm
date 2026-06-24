@@ -7,7 +7,7 @@ scores, credible intervals, raw draws, LOO, PPC, and diagnostics."><meta propert
 posterior with Stan (via cmdstanr or rstan), resolves
 rotational ambiguity with MatchAlign, and returns a classed
 bayesqm_fit object carrying posterior-mean loadings and factor
-scores, credible intervals, raw draws, LOO, PPC, and diagnostics."></head><body>
+scores, credible intervals, raw draws, LOO, PPC, and diagnostics."><meta property="og:image" content="https://rdazadda.github.io/bayesqm/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -41,8 +41,7 @@ scores, credible intervals, raw draws, LOO, PPC, and diagnostics."></head><body>
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Fit a Bayesian Q-methodology factor model</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Fit a Bayesian Q-methodology factor model</h1>
       <small class="dont-index">Source: <a href="https://github.com/rdazadda/bayesqm/blob/main/R/estimation.R" class="external-link"><code>R/estimation.R</code></a></small>
       <div class="d-none name"><code>fit_bayesian.Rd</code></div>
     </div>
@@ -157,7 +156,7 @@ Bayesian Matrix Sampling with Matching. <em>Bayesian Analysis</em>.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Needs a working Stan backend; skipped when cmdstanr/CmdStan is absent.</span></span></span>
 <span class="r-in"><span><span class="va">has_stan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"cmdstanr"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
-<span class="r-in"><span>  <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu">cmdstan_path</span><span class="op">(</span><span class="op">)</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="st">"try-error"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/set_cmdstan_path.html" class="external-link">cmdstan_path</a></span><span class="op">(</span><span class="op">)</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="st">"try-error"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_stan</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_data.html">generate_data</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">8</span>, J <span class="op">=</span> <span class="fl">12</span>, K <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">fit_bayesian</span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">Y</span>, K <span class="op">=</span> <span class="fl">2</span>, chains <span class="op">=</span> <span class="fl">1</span>, iter <span class="op">=</span> <span class="fl">600</span>, warmup <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></span>

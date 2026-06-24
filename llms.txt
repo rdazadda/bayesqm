@@ -41,6 +41,10 @@ analysis cannot:
 
 ``` r
 
+# from CRAN
+install.packages("bayesqm")
+
+# development version from GitHub
 # install.packages("remotes")
 remotes::install_github("rdazadda/bayesqm")
 ```
