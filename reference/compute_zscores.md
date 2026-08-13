@@ -1,28 +1,58 @@
-# Posterior summary of statement factor z-scores
+# Statement scores with credible intervals
 
-Posterior mean and central credible-interval bounds for each
-statement-factor z-score, returned as a tidy data frame with one row per
-statement and three columns per factor.
+Statement scores with credible intervals
 
 ## Usage
 
 ``` r
-compute_zscores(F_draws, prob = 0.95)
+compute_zscores(fit, prob = NULL)
 ```
 
 ## Arguments
 
-- F_draws:
+- fit:
 
-  Array of shape `[T, J, K]` of MatchAlign-aligned factor-score draws
-  (e.g. `fit$F_draws`).
+  A `bayesqm_fit`.
 
 - prob:
 
-  Coverage probability for the credible interval.
+  Credible-interval probability; defaults to the fit's.
 
 ## Value
 
-A data frame with columns `statement`, and three numeric columns per
-factor: `fk_zsc` (posterior mean), `fk_lower`, and `fk_upper`, for
-`k = 1..K`.
+A data frame with one row per statement: `statement`, then `f{k}_zsc`,
+`f{k}_lower`, `f{k}_upper` per factor.
+
+## Examples
+
+``` r
+compute_zscores(demo_fit())
+#>    statement     f1_zsc      f1_lower     f1_upper       f2_zsc    f2_lower
+#> 1         S1 -0.7642786 -1.4925646025  0.006103133 -1.687500747 -2.52661563
+#> 2         S2  0.2387391 -0.5696066709  1.057480468  0.705000038 -0.38682694
+#> 3         S3 -0.8688942 -1.6855841525  0.051724430 -0.248156870 -1.21738309
+#> 4         S4  1.6166499  0.8052125914  2.386454122 -0.535499403 -1.53129050
+#> 5         S5  0.8514840  0.0006442874  1.622890448  0.633446352 -0.49017551
+#> 6         S6 -0.9024984 -1.6644849682  0.146995236  1.307546019  0.20862416
+#> 7         S7 -0.1881508 -0.9725082891  0.537902559  0.243431657 -0.92811504
+#> 8         S8  0.7519454  0.0051088135  1.536849948  0.003260551 -0.98293889
+#> 9         S9  0.5078640 -0.3639557528  1.302744876  1.080694829  0.06014377
+#> 10       S10 -1.3089109 -1.9779833943 -0.571073842 -0.019624590 -0.99223609
+#> 11       S11  1.0484573  0.1574786243  1.890395790 -1.587585312 -2.56493408
+#> 12       S12  0.2346971 -0.5661856331  1.000835919  0.272587105 -0.61880095
+#> 13       S13 -1.2171039 -1.9199300969 -0.423012956 -0.167599629 -1.03769826
+#>      f2_upper
+#> 1  -0.6412988
+#> 2   1.8736307
+#> 3   0.7538681
+#> 4   0.4423898
+#> 5   1.6420288
+#> 6   2.3902776
+#> 7   1.0086332
+#> 8   1.0569034
+#> 9   1.9740567
+#> 10  1.1139282
+#> 11 -0.5499099
+#> 12  1.2488501
+#> 13  0.7412157
+```

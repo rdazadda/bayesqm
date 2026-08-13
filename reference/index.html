@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bayesqm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,6 +17,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/bayesqm-intro.html">Get started</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/rdazadda/bayesqm" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
@@ -33,7 +34,7 @@
     <div class="section level2">
       <h2 id="model-fitting">Model fitting<a class="anchor" aria-label="anchor" href="#model-fitting"></a></h2>
 
-      <div class="section-desc"><p>The main entry points: fit a single Bayesian factor model, or fit across a range of K under the peak-plus-Sivula protocol.</p></div>
+      <div class="section-desc"><p>Fit the exact partition-likelihood model, continue a gated chain, and realign draws.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -45,25 +46,32 @@
           <code><a href="fit_bayesian.html">fit_bayesian()</a></code>
 
         </dt>
-        <dd>Fit a Bayesian Q-methodology factor model</dd>
+        <dd>Fit the exact partition-likelihood model to forced Q sorts</dd>
 
         <dt>
 
-          <code><a href="run_bayes.html">run_bayes()</a></code> <code><a href="run_bayes.html">select_k_peak()</a></code> <code><a href="run_bayes.html">select_k_sivula()</a></code>
+          <code><a href="extend.html">extend()</a></code>
 
         </dt>
-        <dd>Fit the model across a range of K</dd>
+        <dd>Continue sampling a fitted chain</dd>
 
         <dt>
 
           <code><a href="matchalign.html">matchalign()</a></code>
 
         </dt>
-        <dd>MatchAlign post-processing for Bayesian factor draws</dd>
-      </dl></div><div class="section level2">
-      <h2 id="posterior-summaries">Posterior summaries<a class="anchor" aria-label="anchor" href="#posterior-summaries"></a></h2>
+        <dd>MatchAlign post-processing for partition-model draws</dd>
 
-      <div class="section-desc"><p>Tidy summaries of loadings, factor z-scores, and scalar hyperparameters.</p></div>
+        <dt>
+
+          <code><a href="delta_grid.html">delta_grid()</a></code>
+
+        </dt>
+        <dd>Grid width on the z scale</dd>
+      </dl></div><div class="section level2">
+      <h2 id="the-tables">The tables<a class="anchor" aria-label="anchor" href="#the-tables"></a></h2>
+
+      <div class="section-desc"><p>The familiar Q outputs as posterior summaries, and the one false-discovery rule behind every claim.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -75,32 +83,60 @@
           <code><a href="compute_loadings.html">compute_loadings()</a></code>
 
         </dt>
-        <dd>Posterior summary of participant factor loadings</dd>
+        <dd>Bounded participant loadings with credible intervals</dd>
+
+        <dt>
+
+          <code><a href="compute_flags.html">compute_flags()</a></code>
+
+        </dt>
+        <dd>Flag probabilities with an explicit unclassified state</dd>
 
         <dt>
 
           <code><a href="compute_zscores.html">compute_zscores()</a></code>
 
         </dt>
-        <dd>Posterior summary of statement factor z-scores</dd>
+        <dd>Statement scores with credible intervals</dd>
 
         <dt>
 
           <code><a href="compute_factor_array.html">compute_factor_array()</a></code>
 
         </dt>
-        <dd>Factor arrays on the forced Q-sort distribution</dd>
+        <dd>Quota-respecting factor arrays</dd>
 
         <dt>
 
-          <code><a href="compute_posterior_scalars.html">compute_posterior_scalars()</a></code>
+          <code><a href="compute_qdc.html">compute_qdc()</a></code>
 
         </dt>
-        <dd>Posterior summary of scalar hyperparameters</dd>
-      </dl></div><div class="section level2">
-      <h2 id="probabilistic-factor-membership">Probabilistic factor membership<a class="anchor" aria-label="anchor" href="#probabilistic-factor-membership"></a></h2>
+        <dd>Distinguishing and consensus verdicts</dd>
 
-      <div class="section-desc"><p>Posterior probabilities replacing the classical z-score tests and Brown-threshold flags.</p></div>
+        <dt>
+
+          <code><a href="factor_characteristics.html">factor_characteristics()</a></code>
+
+        </dt>
+        <dd>Factor characteristics</dd>
+
+        <dt>
+
+          <code><a href="crib_sheet.html">crib_sheet()</a></code>
+
+        </dt>
+        <dd>Extreme-placement probabilities per statement and factor</dd>
+
+        <dt>
+
+          <code><a href="claims.html">claims()</a></code>
+
+        </dt>
+        <dd>Selected claims at a common false-discovery level</dd>
+      </dl></div><div class="section level2">
+      <h2 id="model-checking-and-choice-of-k">Model checking and choice of K<a class="anchor" aria-label="anchor" href="#model-checking-and-choice-of-k"></a></h2>
+
+
 
       <dl></dl></div><div class="section level2">
 
@@ -109,28 +145,49 @@
 
       <dl><dt>
 
-          <code><a href="bayesqm-membership.html">compute_threshold_prob()</a></code> <code><a href="bayesqm-membership.html">compute_dominant_prob()</a></code> <code><a href="bayesqm-membership.html">compute_dominant_sign()</a></code> <code><a href="bayesqm-membership.html">compute_divergence()</a></code> <code><a href="bayesqm-membership.html">classify_membership()</a></code>
+          <code><a href="check_fit.html">check_fit()</a></code>
 
         </dt>
-        <dd>Probabilistic factor-membership and divergence summaries</dd>
+        <dd>Posterior-predictive checks of the fitted model</dd>
 
         <dt>
 
-          <code><a href="critical_delta.html">critical_delta()</a></code>
+          <code><a href="check_persons.html">check_persons()</a></code>
 
         </dt>
-        <dd>Reliability-adjusted critical difference (default <code>delta</code>)</dd>
+        <dd>The person check against mixed-replication bands</dd>
 
         <dt>
 
-          <code><a href="suggest_delta.html">suggest_delta()</a></code>
+          <code><a href="fit_ladder.html">fit_ladder()</a></code>
 
         </dt>
-        <dd>Suggested separation <code>delta</code> from the forced distribution</dd>
+        <dd>Fit the model over a ladder of K</dd>
+
+        <dt>
+
+          <code><a href="select_k.html">select_k()</a></code>
+
+        </dt>
+        <dd>Choose K by the two-signal rule</dd>
+
+        <dt>
+
+          <code><a href="loo_ladder.html">loo_ladder()</a></code>
+
+        </dt>
+        <dd>PSIS-LOO across the ladder, as directional corroboration</dd>
+
+        <dt>
+
+          <code><a href="loglik_person.html">loglik_person()</a></code>
+
+        </dt>
+        <dd>Person-level partition log-likelihoods</dd>
       </dl></div><div class="section level2">
-      <h2 id="plots-base-r-">Plots (base R)<a class="anchor" aria-label="anchor" href="#plots-base-r-"></a></h2>
+      <h2 id="rotation-and-reporting">Rotation and reporting<a class="anchor" aria-label="anchor" href="#rotation-and-reporting"></a></h2>
 
-      <div class="section-desc"><p>Every view reads a quantity the fit already carries; no new dependencies required.</p></div>
+
 
       <dl></dl></div><div class="section level2">
 
@@ -139,114 +196,114 @@
 
       <dl><dt>
 
-          <code><a href="plot.bayesqm_fit.html">plot(<i>&lt;bayesqm_fit&gt;</i>)</a></code>
+          <code><a href="rotate_factors.html">rotate_factors()</a></code>
 
         </dt>
-        <dd>Factor-score dotchart for a bayesqm_fit</dd>
+        <dd>Rotate every aligned draw toward a target</dd>
 
         <dt>
 
-          <code><a href="plot_loading_posterior.html">plot_loading_posterior()</a></code>
+          <code><a href="flip_factor.html">flip_factor()</a></code>
 
         </dt>
-        <dd>Loading forest with 50 and 95 percent credible intervals</dd>
+        <dd>Flip the pole of one factor</dd>
 
         <dt>
 
-          <code><a href="plot_zscore_posterior.html">plot_zscore_posterior()</a></code>
+          <code><a href="rename_factors.html">rename_factors()</a></code>
 
         </dt>
-        <dd>Per-statement factor-score posterior across factors</dd>
+        <dd>Rename the factors</dd>
+      </dl></div><div class="section level2">
+      <h2 id="plots">Plots<a class="anchor" aria-label="anchor" href="#plots"></a></h2>
+
+      <div class="section-desc"><p>Base-graphics views of the fit; <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">ggplot2::autoplot()</a></code> serves the flagship four (loadings, flags, contrasts, array).</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="plot_loading_posterior.html">plot_loading_posterior()</a></code> <code><a href="plot_loading_posterior.html">plot(<i>&lt;bayesqm_fit&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Bounded loadings with credible intervals</dd>
 
         <dt>
 
-          <code><a href="plot_membership.html">plot_membership()</a></code>
+          <code><a href="plot_sorts.html">plot_sorts()</a></code>
 
         </dt>
-        <dd>Dominant-factor posterior-probability heatmap</dd>
+        <dd>Preview every participant's sort</dd>
 
         <dt>
 
-          <code><a href="plot_elpd.html">plot_elpd()</a></code>
+          <code><a href="plot_zscores.html">plot_zscores()</a></code>
 
         </dt>
-        <dd>ELPD across K with peak and Sivula annotations</dd>
+        <dd>Statement scores across factors, whole panel</dd>
+
+        <dt>
+
+          <code><a href="plot_statement.html">plot_statement()</a></code> <code><a href="plot_statement.html">plot_zscore_posterior()</a></code>
+
+        </dt>
+        <dd>One statement, in depth</dd>
+
+        <dt>
+
+          <code><a href="plot_flags.html">plot_membership()</a></code> <code><a href="plot_flags.html">plot_flags()</a></code>
+
+        </dt>
+        <dd>Flag probabilities with the unclassified state</dd>
+
+        <dt>
+
+          <code><a href="plot_factor_array.html">plot_factor_array()</a></code>
+
+        </dt>
+        <dd>The factor array on its grid</dd>
+
+        <dt>
+
+          <code><a href="plot_contrasts.html">plot_dist_cons()</a></code> <code><a href="plot_contrasts.html">plot_contrasts()</a></code>
+
+        </dt>
+        <dd>Statement contrasts between two factors</dd>
+
+        <dt>
+
+          <code><a href="plot_choice_k.html">plot_choice_k()</a></code>
+
+        </dt>
+        <dd>The two-signal choice-of-K display</dd>
+
+        <dt>
+
+          <code><a href="plot_person_check.html">plot_person_check()</a></code>
+
+        </dt>
+        <dd>The person check against the mixed bands</dd>
+
+        <dt>
+
+          <code><a href="plot_convergence.html">plot_tucker()</a></code> <code><a href="plot_convergence.html">plot_convergence()</a></code>
+
+        </dt>
+        <dd>Convergence and alignment view</dd>
 
         <dt>
 
           <code><a href="plot_ppc.html">plot_ppc()</a></code>
 
         </dt>
-        <dd>Posterior predictive check on the correlation-matrix RMSE</dd>
-
-        <dt>
-
-          <code><a href="plot_tucker.html">plot_tucker()</a></code>
-
-        </dt>
-        <dd>MatchAlign Tucker's phi distribution by factor</dd>
-
-        <dt>
-
-          <code><a href="plot_dist_cons.html">plot_dist_cons()</a></code>
-
-        </dt>
-        <dd>Distinguishing/consensus divergence forest</dd>
-
-        <dt>
-
-          <code><a href="plot_hyper.html">plot_hyper()</a></code>
-
-        </dt>
-        <dd>Hyperparameter posterior densities</dd>
-      </dl></div><div class="section level2">
-      <h2 id="ggplot-figure-renderers">ggplot2 figure renderers<a class="anchor" aria-label="anchor" href="#ggplot-figure-renderers"></a></h2>
-
-      <div class="section-desc"><p>Publication-grade ggplot2 figures for <code>bayesqm_run</code> and <code>bayesqm_fit</code>: the ELPD curve, the dominant-factor panel, and the PPC ridgeline. Also reachable through <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">ggplot2::autoplot()</a></code>.</p></div>
-
-      <dl></dl></div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="make_elpd_diff.html">make_elpd_diff()</a></code>
-
-        </dt>
-        <dd>Delta-ELPD plot with Sivula band, peak, and adopted-K annotations</dd>
-
-        <dt>
-
-          <code><a href="make_dominant_panel.html">make_dominant_panel()</a></code>
-
-        </dt>
-        <dd>Probabilistic dominant-factor panel</dd>
-
-        <dt>
-
-          <code><a href="make_ppc_ridge.html">make_ppc_ridge()</a></code>
-
-        </dt>
-        <dd>Posterior predictive RMSE ridgeline across K</dd>
-
-        <dt>
-
-          <code><a href="autoplot.bayesqm_fit.html">autoplot.bayesqm_fit()</a></code>
-
-        </dt>
-        <dd>ggplot2 renderings of a bayesqm_fit</dd>
-
-        <dt>
-
-          <code><a href="autoplot.bayesqm_run.html">autoplot.bayesqm_run()</a></code>
-
-        </dt>
-        <dd>ggplot2 renderings of a bayesqm_run</dd>
+        <dd>Posterior-predictive check display</dd>
       </dl></div><div class="section level2">
       <h2 id="theming-and-export">Theming and export<a class="anchor" aria-label="anchor" href="#theming-and-export"></a></h2>
 
-      <div class="section-desc"><p>Palette control, figure export, and ready-to-paste captions.</p></div>
+
 
       <dl></dl></div><div class="section level2">
 
@@ -272,18 +329,11 @@
           <code><a href="caption_bayesqm.html">caption_bayesqm()</a></code>
 
         </dt>
-        <dd>Dynamic figure caption for a bayesqm_fit</dd>
-
-        <dt>
-
-          <code><a href="rename_factors.html">rename_factors()</a></code>
-
-        </dt>
-        <dd>Rename factors consistently across a bayesqm_fit</dd>
+        <dd>Caption text for figures from a fit</dd>
       </dl></div><div class="section level2">
       <h2 id="standard-accessors-for-a-bayesqm-fit">Standard accessors for a bayesqm_fit<a class="anchor" aria-label="anchor" href="#standard-accessors-for-a-bayesqm-fit"></a></h2>
 
-      <div class="section-desc"><p><code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code>, <code><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted()</a></code>, <code><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals()</a></code>, and the rstantools generics.</p></div>
+
 
       <dl></dl></div><div class="section level2">
 
@@ -292,17 +342,31 @@
 
       <dl><dt>
 
-          <code><a href="bayesqm-fit-accessors.html">coef(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="bayesqm-fit-accessors.html">fitted(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="bayesqm-fit-accessors.html">residuals(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="bayesqm-fit-accessors.html">nobs(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="bayesqm-fit-accessors.html">sigma(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="bayesqm-fit-accessors.html">family(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="bayesqm-fit-accessors.html">print(<i>&lt;bayesqm_family&gt;</i>)</a></code> <code><a href="bayesqm-fit-accessors.html">as.matrix(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="bayesqm-fit-accessors.html">as.array(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="bayesqm-fit-accessors.html">as.data.frame(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="bayesqm-fit-accessors.html">update(<i>&lt;bayesqm_fit&gt;</i>)</a></code>
+          <code><a href="coef.bayesqm_fit.html">coef(<i>&lt;bayesqm_fit&gt;</i>)</a></code>
 
         </dt>
-        <dd>Standard R accessors for bayesqm_fit</dd>
+        <dd>Posterior-mean bounded loadings</dd>
 
         <dt>
 
-          <code><a href="bayesqm-fit-methods.html">print(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="bayesqm-fit-methods.html">summary(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="bayesqm-fit-methods.html">print(<i>&lt;bayesqm_run&gt;</i>)</a></code> <code><a href="bayesqm-fit-methods.html">summary(<i>&lt;bayesqm_run&gt;</i>)</a></code>
+          <code><a href="fitted.bayesqm_fit.html">fitted(<i>&lt;bayesqm_fit&gt;</i>)</a></code>
 
         </dt>
-        <dd>Print and summary methods for bayesqm_fit and bayesqm_run</dd>
+        <dd>Posterior-mean reconstruction on the utility scale</dd>
+
+        <dt>
+
+          <code><a href="sigma.bayesqm_fit.html">sigma(<i>&lt;bayesqm_fit&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Posterior-mean loading scales</dd>
+
+        <dt>
+
+          <code><a href="posterior_interval.html">posterior_interval()</a></code>
+
+        </dt>
+        <dd>Posterior interval generic</dd>
 
         <dt>
 
@@ -313,14 +377,21 @@
 
         <dt>
 
-          <code><a href="prior_summary.bayesqm_fit.html">prior_summary(<i>&lt;bayesqm_fit&gt;</i>)</a></code> <code><a href="prior_summary.bayesqm_fit.html">print(<i>&lt;bayesqm_prior&gt;</i>)</a></code>
+          <code><a href="prior_summary.html">prior_summary()</a></code>
+
+        </dt>
+        <dd>Prior summary generic</dd>
+
+        <dt>
+
+          <code><a href="prior_summary.bayesqm_fit.html">prior_summary(<i>&lt;bayesqm_fit&gt;</i>)</a></code>
 
         </dt>
         <dd>Prior summary for a bayesqm_fit</dd>
       </dl></div><div class="section level2">
       <h2 id="data-import-and-construction">Data: import and construction<a class="anchor" aria-label="anchor" href="#data-import-and-construction"></a></h2>
 
-      <div class="section-desc"><p>Readers for CSV/Excel/PQMethod/Ken-Q/KADE/HTMLQ and the <code>qsort_data</code> object.</p></div>
+      <div class="section-desc"><p>Readers for CSV/Excel/PQMethod/Ken-Q/KADE/HTMLQ, the <code>qsort_data</code> object, and the shipped example panel.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -354,10 +425,17 @@
 
         </dt>
         <dd>Print, summary, and matrix conversion for qsort_data</dd>
+
+        <dt>
+
+          <code><a href="obesity_sorts.html">obesity_sorts</a></code>
+
+        </dt>
+        <dd>Childhood obesity Q sorts</dd>
       </dl></div><div class="section level2">
       <h2 id="simulation-helpers">Simulation helpers<a class="anchor" aria-label="anchor" href="#simulation-helpers"></a></h2>
 
-      <div class="section-desc"><p>Data-generating functions and assessment utilities.</p></div>
+
 
       <dl></dl></div><div class="section level2">
 
@@ -369,14 +447,7 @@
           <code><a href="demo_fit.html">demo_fit()</a></code>
 
         </dt>
-        <dd>A synthetic bayesqm_fit for examples and tutorials</dd>
-
-        <dt>
-
-          <code><a href="demo_run.html">demo_run()</a></code>
-
-        </dt>
-        <dd>A synthetic bayesqm_run for examples and tutorials</dd>
+        <dd>A small demonstration fit</dd>
 
         <dt>
 
@@ -398,13 +469,29 @@
 
         </dt>
         <dd>Tucker's congruence and orthogonal Procrustes rotation</dd>
+      </dl></div><div class="section level2">
+      <h2 id="defunct">Defunct<a class="anchor" aria-label="anchor" href="#defunct"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="bayesqm-defunct.html">run_bayes()</a></code> <code><a href="bayesqm-defunct.html">plot_hyper()</a></code> <code><a href="bayesqm-defunct.html">select_k_peak()</a></code> <code><a href="bayesqm-defunct.html">select_k_sivula()</a></code> <code><a href="bayesqm-defunct.html">compute_dominant_prob()</a></code> <code><a href="bayesqm-defunct.html">compute_dominant_sign()</a></code> <code><a href="bayesqm-defunct.html">compute_threshold_prob()</a></code> <code><a href="bayesqm-defunct.html">classify_membership()</a></code> <code><a href="bayesqm-defunct.html">compute_divergence()</a></code> <code><a href="bayesqm-defunct.html">critical_delta()</a></code> <code><a href="bayesqm-defunct.html">suggest_delta()</a></code> <code><a href="bayesqm-defunct.html">compute_posterior_scalars()</a></code> <code><a href="bayesqm-defunct.html">demo_run()</a></code> <code><a href="bayesqm-defunct.html">plot_elpd()</a></code> <code><a href="bayesqm-defunct.html">make_elpd_diff()</a></code> <code><a href="bayesqm-defunct.html">make_ppc_ridge()</a></code> <code><a href="bayesqm-defunct.html">make_dominant_panel()</a></code>
+
+        </dt>
+        <dd>Defunct 0.1.0 functions</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://github.com/rdazadda" class="external-link">Raymond Dacosta Azadda</a>, AK-ACE Team, Karsten Hueffer, Taa’aii Peter, Stacy Rasmus. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Developed by <a href="https://github.com/rdazadda" class="external-link">Raymond Dacosta Azadda</a>, AK-ACE Team, Karsten Hueffer, Taa’aii Peter, Stacy Rasmus. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -97,7 +97,7 @@ read_statements(file, column = 1, id_column = NULL)
 
 - statements_file:
 
-  For PQMethod, optional companion statements file.
+  For PQMethod, optional separate statements file.
 
 - column, id_column:
 

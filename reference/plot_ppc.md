@@ -1,31 +1,23 @@
-# Posterior predictive check on the correlation-matrix RMSE
+# Posterior-predictive check display
 
-Histogram of the replicated correlation-matrix RMSE stored on
-`fit$ppc$rmse.r`: per draw, the RMSE between `cor(Y_rep)` and
-`cor(Y_obs)`. Rendered in the bayesplot-idiom (filled bars, no border,
-suppressed y-axis) with the median and central credible interval marked.
+The replicated distributions behind
+[`check_fit()`](https://rdazadda.github.io/bayesqm/reference/check_fit.md):
+the agreement RMSE against its double-replicate reference, and the
+observed extra-factor eigenvalue in its replicated distribution.
 
 ## Usage
 
 ``` r
-plot_ppc(fit, breaks = 30, ...)
+plot_ppc(x)
 ```
 
 ## Arguments
 
-- fit:
+- x:
 
-  A `bayesqm_fit`.
-
-- breaks:
-
-  Passed to [`hist()`](https://rdrr.io/r/graphics/hist.html).
-
-- ...:
-
-  Additional arguments forwarded to
-  [`hist()`](https://rdrr.io/r/graphics/hist.html).
+  A `bayesqm_checks` from
+  [`check_fit()`](https://rdazadda.github.io/bayesqm/reference/check_fit.md).
 
 ## Value
 
-The input, invisibly.
+`x`, invisibly.

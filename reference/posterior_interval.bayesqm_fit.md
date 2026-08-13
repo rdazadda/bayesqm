@@ -2,7 +2,7 @@
 
 Posterior credible intervals for any subset of parameters in a
 `bayesqm_fit`. Method for
-[`rstantools::posterior_interval()`](https://mc-stan.org/rstantools/reference/posterior_interval.html).
+[`posterior_interval()`](https://rdazadda.github.io/bayesqm/reference/posterior_interval.md).
 
 ## Usage
 
@@ -37,4 +37,4 @@ posterior_interval(object, prob = 0.95, pars = NULL, regex_pars = NULL, ...)
 ## Value
 
 A matrix with one row per parameter and two columns for the lower and
-upper interval bounds (as percent strings).
+upper interval bounds.

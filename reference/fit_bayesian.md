@@ -1,10 +1,13 @@
-# Fit a Bayesian Q-methodology factor model
+# Fit the exact partition-likelihood model to forced Q sorts
 
-Fits the low-rank Bayesian factor model to Q-sort data. Samples the
-posterior with Stan (via cmdstanr or rstan), resolves rotational
-ambiguity with MatchAlign, and returns a classed `bayesqm_fit` object
-carrying posterior-mean loadings and factor scores, credible intervals,
-raw draws, LOO, PPC, and diagnostics.
+Models each completed sort as a forced ordered partition of the
+statements and samples the posterior of the latent factor model by a
+parameter-expanded Gibbs sampler. Convergence is gated on
+rotation-invariant person spreads (rank-normalized split-R-hat and
+bulk/tail effective sample size); a chain failing the gate is
+warm-extended at successive doublings up to `max_iterations`. Draws are
+aligned by MatchAlign with a polarity canon, so defining sorts load
+positively.
 
 ## Usage
 
@@ -12,22 +15,19 @@ raw draws, LOO, PPC, and diagnostics.
 fit_bayesian(
   Y,
   K,
-  stan_dir = NULL,
-  robust = TRUE,
-  nu = "estimate",
-  chains = 4,
-  iter = 2000,
-  warmup = 1000,
+  iterations = 12000,
+  burn = 2000,
+  thin = 5,
+  max_iterations = 48000,
   seed = NULL,
-  adapt_delta = 0.9,
-  max_draws = 2000,
-  prior_loading_scale = 1,
-  prior_sigma_scale = 1,
-  prior_nu_alpha = 2,
-  prior_nu_beta = 0.1,
-  use_half_cauchy = FALSE,
+  sigma_scale = 1,
+  rhat_max = 1.01,
+  ess_min = 400,
   prob = 0.95,
-  delta = NULL
+  keep_raw = TRUE,
+  pivot = NULL,
+  quiet = FALSE,
+  ...
 )
 ```
 
@@ -35,88 +35,82 @@ fit_bayesian(
 
 - Y:
 
-  Either a `qsort_data` object or a `J x N` numeric matrix with
-  statements as rows and participants as columns.
+  A `qsort_data` object, or a `J x N` numeric matrix of grid positions
+  with statements as rows and participants as columns. Every sort must
+  obey the forced distribution exactly.
 
 - K:
 
-  Integer number of factors to extract.
+  Integer number of factors.
 
-- stan_dir:
+- iterations:
 
-  Directory containing `stan/factor_model.stan`. `NULL` (the default)
-  uses the copy shipped in `inst/stan/`.
+  First-check chain length (default 12000, the settings frozen in the
+  accompanying paper).
 
-- robust:
+- burn:
 
-  Logical; `TRUE` uses a Student-t likelihood, `FALSE` uses Normal.
+  Burn-in iterations (default 2000), paid once; extensions continue the
+  chain.
 
-- nu:
+- thin:
 
-  Either `"estimate"` (default) to sample the Student-t degrees of
-  freedom, or a numeric value (e.g. `5`, `Inf`) to fix it.
+  Keep every `thin`-th post-burn draw (default 5).
 
-- chains, iter, warmup:
+- max_iterations:
 
-  NUTS sampler settings.
+  Total-iteration cap for the gated extension ladder (default 48000).
 
 - seed:
 
-  Optional integer seed for reproducibility.
+  Optional integer seed; fits are exactly reproducible given the seed.
 
-- adapt_delta:
+- sigma_scale:
 
-  NUTS adapt_delta target (default 0.90).
+  Half-normal prior scale for the per-factor loading scales (default 1).
 
-- max_draws:
+- rhat_max, ess_min:
 
-  Thin post-warmup draws to at most this many before MatchAlign (default
-  2000).
-
-- prior_loading_scale, prior_sigma_scale, prior_nu_alpha, prior_nu_beta,
-  use_half_cauchy:
-
-  Prior hyperparameters (see the Stan model for parameterization).
+  Gate thresholds (defaults 1.01 and 400).
 
 - prob:
 
   Credible-interval probability stored on the fit (default 0.95).
 
-- delta:
+- keep_raw:
 
-  Substantive viewpoint separation for the distinguishing/consensus
-  probabilities. If `NULL` (default) it is computed as the
-  reliability-adjusted critical difference
-  ([`critical_delta()`](https://rdazadda.github.io/bayesqm/reference/critical_delta.md));
-  pass a numeric value to override, or use
-  [`suggest_delta()`](https://rdazadda.github.io/bayesqm/reference/suggest_delta.md)
-  as an alternative.
+  Keep the pre-alignment draws on the fit (default `TRUE`); required by
+  [`extend()`](https://rdazadda.github.io/bayesqm/reference/extend.md)
+  and by realignment under a different pivot.
+
+- pivot:
+
+  Optional draw index for the alignment pivot; `NULL` (the default) uses
+  the median-condition-number rule.
+
+- quiet:
+
+  Suppress progress messages (default `FALSE`).
+
+- ...:
+
+  Unused; supplying a removed 0.1.0 argument gives a migration error.
 
 ## Value
 
-A `bayesqm_fit` object. See
-[bayesqm-fit-methods](https://rdazadda.github.io/bayesqm/reference/bayesqm-fit-methods.md)
-for [`print()`](https://rdrr.io/r/base/print.html) and
-[`summary()`](https://rdrr.io/r/base/summary.html), and
-[`coef.bayesqm_fit()`](https://rdazadda.github.io/bayesqm/reference/bayesqm-fit-accessors.md)
-for the standard R accessors.
-
-## References
-
-Poworoznek et al. (2025). Efficiently Resolving Rotational Ambiguity in
-Bayesian Matrix Sampling with Matching. *Bayesian Analysis*.
+A `bayesqm_fit` carrying aligned draws, the gate report, the alignment
+record, and (when `keep_raw = TRUE`) the raw draws and sampler state.
 
 ## Examples
 
 ``` r
-# \donttest{
-# Needs a working Stan backend; skipped when cmdstanr/CmdStan is absent.
-has_stan <- requireNamespace("cmdstanr", quietly = TRUE) &&
-  !inherits(try(cmdstanr::cmdstan_path(), silent = TRUE), "try-error")
-if (has_stan) {
-  sim <- generate_data(N = 8, J = 12, K = 2, seed = 1)
-  fit <- fit_bayesian(sim$Y, K = 2, chains = 1, iter = 600, warmup = 300)
-  summary(fit)
-}
-# }
+fit <- demo_fit()
+fit
+#> bayesqm fit: exact partition (rank-order) likelihood, PX-Gibbs
+#>   8 participants, 13 statements, 2 factors; grid 1-1-2-2-3-2-1-1
+#>   draws: 200 kept (500 iterations, burn 100, thin 2)
+#>   gate: passed (max Rhat 1.053; min ESS 36 bulk / 98 tail)
+#>   alignment: pivot draw 33, mean congruence 0.78
+#>   tables: compute_loadings(), compute_flags(), compute_factor_array(),
+#>           compute_qdc(), claims()
 ```

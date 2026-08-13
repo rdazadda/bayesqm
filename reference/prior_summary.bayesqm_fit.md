@@ -1,17 +1,14 @@
 # Prior summary for a bayesqm_fit
 
-Returns the priors actually used when the model was fit, as a printable
-`bayesqm_prior` object. Method for
-[`rstantools::prior_summary()`](https://mc-stan.org/rstantools/reference/prior_summary.html).
+The partition model's priors, as a printable `bayesqm_prior` object.
+Method for
+[`prior_summary()`](https://rdazadda.github.io/bayesqm/reference/prior_summary.md).
 
 ## Usage
 
 ``` r
 # S3 method for class 'bayesqm_fit'
 prior_summary(object, ...)
-
-# S3 method for class 'bayesqm_prior'
-print(x, ...)
 ```
 
 ## Arguments
@@ -23,10 +20,6 @@ print(x, ...)
 - ...:
 
   Unused.
-
-- x:
-
-  A `bayesqm_prior` object.
 
 ## Value
 

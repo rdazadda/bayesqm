@@ -1,17 +1,16 @@
-# Loading forest with 50 and 95 percent credible intervals
+# Bounded loadings with credible intervals
 
-Horizontal dotchart of every participant's loading, one panel per
-factor, ranked by posterior mean. Each loading is drawn as a median
-point with nested 50 percent (thick) and 95 percent (thin)
-credible-interval whiskers. A faint grey vertical rule marks Brown's
-descriptive cut-off `+/- 1.96 / sqrt(J)`. When
-`highlight_flagged = TRUE`, participants in `fit$flagged[, k]` are drawn
-as filled points in the accent colour.
+One row per participant, one interval per factor on the bounded loading
+scale, with selected flags marked. The dotted rules sit at the classical
+descriptive cut-off `1.96 / sqrt(J)` (reference).
 
 ## Usage
 
 ``` r
-plot_loading_posterior(fit, factors = NULL, highlight_flagged = TRUE, ...)
+plot_loading_posterior(fit, q = 0.05)
+
+# S3 method for class 'bayesqm_fit'
+plot(x, ...)
 ```
 
 ## Arguments
@@ -20,19 +19,14 @@ plot_loading_posterior(fit, factors = NULL, highlight_flagged = TRUE, ...)
 
   A `bayesqm_fit`.
 
-- factors:
+- q:
 
-  Optional subset of factors to show (integer or name).
+  False-discovery level for the flag marks (default 0.05).
 
-- highlight_flagged:
+- x, ...:
 
-  Logical; fill flagged participants.
-
-- ...:
-
-  Additional arguments forwarded to
-  [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
+  A `bayesqm_fit` and arguments passed on.
 
 ## Value
 
-The input, invisibly.
+`fit`, invisibly.

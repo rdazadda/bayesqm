@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Bayesian Q Methodology: Probabilistic Factor Analysis • bayesqm</title>
+<title>Bayesian Q Methodology: Exact Rank-Order Likelihood for Forced Q Sorts • bayesqm</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -17,9 +17,9 @@
 <link href="deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Bayesian Q Methodology: Probabilistic Factor Analysis">
-<meta name="description" content="A Bayesian factor-analytic framework for Q methodology. Fits a low-rank factor model to Q-sort data with a Student-t likelihood and a hierarchical normal prior on loadings, samples the posterior with Stan, resolves rotational ambiguity via the MatchAlign post-processing of Poworoznek et al. (2025) &lt;doi:10.1214/25-BA1544&gt;, and returns posterior summaries including credible intervals for loadings and factor scores, probabilistic dominant-factor membership, distinguishing and consensus statements, and PSIS-LOO-based factor enumeration following Vehtari et al. (2017) &lt;doi:10.1007/s11222-016-9696-4&gt; with the Sivula et al. (2025) &lt;doi:10.1214/25-BA1569&gt; parsimony rule.">
-<meta property="og:description" content="A Bayesian factor-analytic framework for Q methodology. Fits a low-rank factor model to Q-sort data with a Student-t likelihood and a hierarchical normal prior on loadings, samples the posterior with Stan, resolves rotational ambiguity via the MatchAlign post-processing of Poworoznek et al. (2025) &lt;doi:10.1214/25-BA1544&gt;, and returns posterior summaries including credible intervals for loadings and factor scores, probabilistic dominant-factor membership, distinguishing and consensus statements, and PSIS-LOO-based factor enumeration following Vehtari et al. (2017) &lt;doi:10.1007/s11222-016-9696-4&gt; with the Sivula et al. (2025) &lt;doi:10.1214/25-BA1569&gt; parsimony rule.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Bayesian Q Methodology: Exact Rank-Order Likelihood for Forced Q Sorts">
+<meta name="description" content="A Bayesian analysis for Q methodology, alongside the classical one. Models the forced Q sort as an ordered partition of the statements through an exact rank-order likelihood (the design quotas fix the partition margins, so the likelihood of the observed sorting event is exact), fits it by a parameter-expanded Gibbs sampler in pure R with a convergence gate on rotation-invariant functionals, resolves rotational ambiguity via the MatchAlign post-processing of Poworoznek et al. (2025) &lt;doi:10.1214/25-BA1544&gt;, and returns the familiar Q tables as posterior summaries: credible intervals for bounded participant loadings, flag probabilities with an explicit unclassified state, quota-respecting factor arrays, distinguishing and consensus statements judged against a posterior critical difference and a grid-width equivalence region, one posterior false-discovery rule for all published claims, and a two-signal posterior-predictive workflow for the number of factors.">
+<meta property="og:description" content="A Bayesian analysis for Q methodology, alongside the classical one. Models the forced Q sort as an ordered partition of the statements through an exact rank-order likelihood (the design quotas fix the partition margins, so the likelihood of the observed sorting event is exact), fits it by a parameter-expanded Gibbs sampler in pure R with a convergence gate on rotation-invariant functionals, resolves rotational ambiguity via the MatchAlign post-processing of Poworoznek et al. (2025) &lt;doi:10.1214/25-BA1544&gt;, and returns the familiar Q tables as posterior summaries: credible intervals for bounded participant loadings, flag probabilities with an explicit unclassified state, quota-respecting factor arrays, distinguishing and consensus statements judged against a posterior critical difference and a grid-width equivalence region, one posterior false-discovery rule for all published claims, and a two-signal posterior-predictive workflow for the number of factors.">
 <meta property="og:image" content="https://rdazadda.github.io/bayesqm/logo.png">
 </head>
 <body>
@@ -30,7 +30,7 @@
 
     <a class="navbar-brand me-2" href="index.html">bayesqm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,7 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="articles/bayesqm-intro.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -61,160 +62,111 @@
 </div>
 <!-- badges: start -->
 
-<p><strong>Bayesian Q methodology: probabilistic factor analysis for the study of subjective opinions.</strong></p>
-<p><code>bayesqm</code> is the first fully Bayesian framework for Q-methodology factor analysis. Since Stephenson (1935), Q analysis has relied on frequentist factor extraction with the standard error rule of Brown (1980), which returns participant-to-factor assignments as binary flagged / unflagged decisions and offers no measure of uncertainty about them. <code>bayesqm</code> replaces that with posterior credible intervals for every loading, probabilistic factor membership P(dominant_i = k | Y) that makes cross-loading visible and quantifiable, and a principled K-selection protocol built on element-wise PSIS-LOO. The model uses a Student-t likelihood for robustness to idiosyncratic Q-sorts and resolves rotational, sign, and label-permutation ambiguity through the MatchAlign post-processing of Poworoznek et al. (2025). Posterior sampling is via Stan (cmdstanr or rstan).</p>
-<div class="section level2">
-<h2 id="what-the-package-gives-you">What the package gives you<a class="anchor" aria-label="anchor" href="#what-the-package-gives-you"></a>
-</h2>
-<p>For each Q-sort dataset, <code>bayesqm</code> returns four things classical Q analysis cannot:</p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Posterior credible intervals for every participant loading</strong>, replacing the binary flagged / unflagged classification of Brown
-<ol start="1980" style="list-style-type: decimal">
-<li>with a continuous measure of assignment certainty.</li>
-</ol>
-</li>
-<li>
-<strong>Probabilistic factor membership</strong>, P(dominant_i = k | Y), making cross-loading visible and quantifiable rather than forcing each participant onto a single factor.</li>
-<li>
-<strong>A peak-plus-Sivula protocol for choosing K</strong>, pairing the ELPD peak with the conservative parsimony diagnostic of Sivula et al.
-<ol start="2025" style="list-style-type: decimal">
-<li>and surfacing the gap between them as informative about how strongly the data discriminate adjacent models.</li>
-</ol>
-</li>
-<li>
-<strong>Posterior distinguishing and consensus statements</strong>, reporting <code>P(D_j &gt; delta | Y)</code> and <code>P(D_j &lt; delta | Y)</code> from the posterior of an explicit viewpoint-divergence measure rather than a classical significance verdict.</li>
-</ol>
-</div>
+<p><strong>bayesqm turns forced Q sorts into the full set of Q-methodology reports, each carrying its posterior uncertainty.</strong> It reads the common study formats, PQMethod <code>.DAT</code>, Ken-Q, KADE, HTMLQ and FlashQ exports, CSV and Excel grids, and models the sort itself: each participant places every statement into a fixed grid, the quotas make that placement an ordered partition of the statement set, and the package computes the probability of the observed partition exactly. From one panel it derives what a Q study reports, bounded loadings, flags, factor arrays, statement scores, distinguishing and consensus statements, the number of factors, and the checks behind them. Every analysis returns an object that prints its own summary and draws its own plots.</p>
+<p>Every decision states its rule. One posterior false-discovery rule selects everything the analysis reports, flags, distinguishing listings, consensus statements, and pairwise stars, and gives the expected number of false claims alongside. The number of factors is decided by two checks read together, whether K factors account for the panel and whether every factor earns its place. Quantities classical practice fixes by convention, above all the critical difference behind distinguishing statements, are estimated from the posterior instead, and the alignment of the posterior draws follows the MatchAlign procedure of Poworoznek et al. (2025).</p>
+<p>You can usually see the answer before you compute it. Plot the sorts and each completed grid becomes its own pyramid, every statement on its tile, the color giving the column it was placed in. Two like-minded sorters put the same statements under the same colors, and a panel that shares one viewpoint repeats itself pyramid after pyramid. The numbers that follow put a figure to what the picture shows.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># from CRAN</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"bayesqm"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># development version from GitHub</span></span>
-<span><span class="co"># install.packages("remotes")</span></span>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"rdazadda/bayesqm"</span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="stan-backend">Stan backend<a class="anchor" aria-label="anchor" href="#stan-backend"></a>
-</h3>
-<p><code>bayesqm</code> fits models with Stan and needs a working backend: <code>cmdstanr</code> (recommended) or <code>rstan</code>.</p>
-<p><code>cmdstanr</code> is not on CRAN and is installed from the Stan R-universe. CmdStan itself must then be installed separately:</p>
+<p>CRAN still carries 0.1.0, an earlier model fitted through Stan. This version is a different model with its own sampler. Install from GitHub until 0.2.0 reaches CRAN.</p>
+</div>
+<div class="section level2">
+<h2 id="a-first-analysis">A first analysis<a class="anchor" aria-label="anchor" href="#a-first-analysis"></a>
+</h2>
+<p>One real panel ships with the package, the childhood obesity study of Akhtar-Danesh (2023), so this runs without any data of your own. Thirty-three participants sorted forty-two statements about childhood obesity onto a nine-column grid.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cmdstanr"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://stan-dev.r-universe.dev"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">check_cmdstan_toolchain</a></span><span class="op">(</span>fix <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/set_cmdstan_path.html" class="external-link">cmdstan_version</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># verify</span></span></code></pre></div>
-<p>On Windows you also need Rtools; on macOS, the Xcode command-line tools (<code>xcode-select --install</code>). See the Getting Started vignette for the full setup walkthrough and the <code>rstan</code> alternative.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="minimal-workflow">Minimal workflow<a class="anchor" aria-label="anchor" href="#minimal-workflow"></a>
-</h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rdazadda/bayesqm" class="external-link">bayesqm</a></span><span class="op">)</span></span>
-<span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_qsort.html">read_qsort</a></span><span class="op">(</span><span class="st">"mystudy.csv"</span><span class="op">)</span></span>
-<span><span class="va">fit</span>   <span class="op">&lt;-</span> <span class="fu"><a href="reference/fit_bayesian.html">fit_bayesian</a></span><span class="op">(</span><span class="va">qdata</span>, K <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="va">fit</span></span></code></pre></div>
-<p><code><a href="reference/read_qsort.html">read_qsort()</a></code> auto-detects CSV, Excel (including HTMLQ, FlashQ, and tablet-export variants), PQMethod <code>.DAT</code>, Ken-Q JSON or multi-sheet Excel, KADE ZIP, and Easy-HTMLQ Firebase JSON.</p>
-<p><code><a href="reference/fit_bayesian.html">fit_bayesian()</a></code> returns an object of class <code>bayesqm_fit</code>. Standard R accessors work as expected: <code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code>, <code><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted()</a></code>, <code><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals()</a></code>, <code><a href="https://rdrr.io/r/stats/sigma.html" class="external-link">sigma()</a></code>, <code><a href="https://rdrr.io/r/stats/nobs.html" class="external-link">nobs()</a></code>, <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">family()</a></code>, <code><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, plus <code>posterior_interval()</code> and <code>prior_summary()</code> from the <code>rstantools</code> API.</p>
-</div>
-<div class="section level2">
-<h2 id="choosing-k">Choosing K<a class="anchor" aria-label="anchor" href="#choosing-k"></a>
-</h2>
+<span></span>
+<span><span class="va">obesity_sorts</span></span>
+<span><span class="co">#&gt; Q-sort data</span></span>
+<span><span class="co">#&gt;   statements  : 42   participants : 33 </span></span>
+<span><span class="co">#&gt;   distribution: 2 4 5 6 8 6 5 4 2   (sum = 42 )</span></span>
+<span><span class="co">#&gt;   value range : [-4, 4]</span></span>
+<span><span class="co">#&gt;   source      : excel:Childhood obesity dataset.xlsx</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">obesity_sorts</span>, participants <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-obesity-sorts-1.png" alt="" width="100%"></p>
+<p>How many viewpoints does the panel hold? Fit two, three, and four factors and let two checks read each candidate. One asks whether K factors account for the shared structure. The other asks whether every factor earns its place, meaning at least two participants define it and at least one statement sets it apart from the rest.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sel</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/select_k.html">select_k</a></span><span class="op">(</span><span class="fu"><a href="reference/fit_ladder.html">fit_ladder</a></span><span class="op">(</span><span class="va">obesity_sorts</span>, K_min <span class="op">=</span> <span class="fl">2</span>, K_max <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>                           seed <span class="op">=</span> <span class="fl">11</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/plot_choice_k.html">plot_choice_k</a></span><span class="op">(</span><span class="va">sel</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-obesity-choicek-1.png" alt="" width="100%"></p>
+<p>The classical analysis of this panel reports three factors. Here every K accounts for the panel and no factor at any K is set apart by a single statement, so the rule refuses to select, and the verdict names what the sorts show. One shared viewpoint. The one-factor fit is then the panel’s report, and its array is the shared sort itself.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">run</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_bayes.html">run_bayes</a></span><span class="op">(</span><span class="va">qdata</span>, K_max <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/plot_elpd.html">plot_elpd</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="reference/run_bayes.html">run_bayes()</a></code> fits the model for K = 1..K_max and reports two summaries:</p>
-<ul>
-<li>The <strong>ELPD peak</strong>: argmax of the expected log pointwise predictive density via element-wise PSIS-LOO (Vehtari, Gelman, &amp; Gabry, 2017).</li>
-<li>The <strong>Sivula parsimony diagnostic</strong> (Sivula et al., 2025): a sequential rule that accepts a more complex K only when ΔELPD &gt; 4 and |ΔELPD| / SE(Δ) &gt; 2.</li>
-</ul>
-<p>The <code>$case</code> field labels their relationship as <code>agree</code>, <code>gap</code>, or <code>reversed</code>. The ELPD peak is always the adopted K; the case label indicates how confidently the data discriminate between adjacent models, and a gap between the two is itself diagnostic information.</p>
+<code class="sourceCode R"><span><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fit_bayesian.html">fit_bayesian</a></span><span class="op">(</span><span class="va">obesity_sorts</span>, K <span class="op">=</span> <span class="fl">1</span>, seed <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span>
+<span><span class="co">#&gt; grid labels -4..4 recoded onto categories 1..9 (a monotone relabeling; the sorts are unchanged)</span></span>
+<span><span class="fu"><a href="reference/plot_factor_array.html">plot_factor_array</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-obesity-array-1.png" alt="" width="100%"></p>
+<p>Darker tiles are placements the posterior is more certain of. Each of these fits takes a minute or two.</p>
 </div>
 <div class="section level2">
-<h2 id="probabilistic-factor-membership">Probabilistic factor membership<a class="anchor" aria-label="anchor" href="#probabilistic-factor-membership"></a>
+<h2 id="when-there-are-two-viewpoints">When there are two viewpoints<a class="anchor" aria-label="anchor" href="#when-there-are-two-viewpoints"></a>
 </h2>
-<p>Rather than dichotomizing each loading into flagged or unflagged, <code>bayesqm</code> reports the posterior probability that factor k is participant i’s dominant factor, P(dominant_i = k | Y). <code><a href="reference/bayesqm-membership.html">compute_dominant_sign()</a></code> adds the posterior probability that the dominant loading is positive, so negative exemplars (a viewpoint held by opposition) stay distinct. <code><a href="reference/bayesqm-membership.html">classify_membership()</a></code> turns the probabilities into a descriptive Strong / Moderate / Weak tier:</p>
+<p>Simulated sorts with two planted viewpoints, so the right answer is known and the multi-factor reports have something to find.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/bayesqm-membership.html">compute_dominant_prob</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/bayesqm-membership.html">compute_dominant_sign</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/bayesqm-membership.html">classify_membership</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/plot_membership.html">plot_membership</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
-<p>Distinguishing and consensus statements come from the posterior of an explicit viewpoint-divergence measure <code>D_j</code>, with the probabilities <code>P(D_j &gt; delta | Y)</code> and <code>P(D_j &lt; delta | Y)</code> it implies. By default <code>delta</code> is the reliability-adjusted critical difference from classical Q analysis (Brown, 1980; Zabala &amp; Pascual, 2016), computed from the posterior dominant-factor counts (<code><a href="reference/critical_delta.html">critical_delta()</a></code>); <code><a href="reference/suggest_delta.html">suggest_delta()</a></code> (one forced-distribution category) is an alternative:</p>
+<code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_data.html">generate_data</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">14</span>, J <span class="op">=</span> <span class="fl">20</span>, K <span class="op">=</span> <span class="fl">2</span>, noise_sd <span class="op">=</span> <span class="fl">0.6</span>,</span>
+<span>                     primary_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.65</span>, <span class="fl">0.9</span><span class="op">)</span>, seed <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
+<span><span class="va">qdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/qsort_data.html">qsort_data</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">Y</span>, distribution <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">distribution</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">lad</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fit_ladder.html">fit_ladder</a></span><span class="op">(</span><span class="va">qdata</span>, K_min <span class="op">=</span> <span class="fl">2</span>, K_max <span class="op">=</span> <span class="fl">4</span>, seed <span class="op">=</span> <span class="fl">7</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/plot_choice_k.html">plot_choice_k</a></span><span class="op">(</span><span class="fu"><a href="reference/select_k.html">select_k</a></span><span class="op">(</span><span class="va">lad</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-choicek-1.png" alt="" width="100%"></p>
+<p>Two factors pass both checks, boxed on their row. Fit that model. The sampler runs until a convergence check passes, and the printout reports it.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/critical_delta.html">critical_delta</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">Lambda_draws</span><span class="op">)</span>   <span class="co"># default separation (computed)</span></span>
-<span><span class="fu"><a href="reference/bayesqm-membership.html">compute_divergence</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">F_draws</span>, delta <span class="op">=</span> <span class="va">d</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/plot_dist_cons.html">plot_dist_cons</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                 <span class="co"># uses the fit's stored divergence summary</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
-</h2>
-<p>The package provides nine base-R plots and matching <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">ggplot2::autoplot()</a></code> methods (registered when <code>ggplot2</code> and <code>ggdist</code> are installed). All read their palette through <code><a href="reference/bayesqm-colors.html">bayesqm_colors()</a></code> and restore <code><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par()</a></code> on exit:</p>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fit_bayesian.html">fit_bayesian</a></span><span class="op">(</span><span class="va">qdata</span>, K <span class="op">=</span> <span class="fl">2</span>, seed <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
+<span><span class="co">#&gt; grid labels -4..4 recoded onto categories 1..9 (a monotone relabeling; the sorts are unchanged)</span></span>
+<span><span class="va">fit</span></span>
+<span><span class="co">#&gt; bayesqm fit: exact partition (rank-order) likelihood, PX-Gibbs</span></span>
+<span><span class="co">#&gt;   14 participants, 20 statements, 2 factors; grid 1-2-2-3-4-3-2-2-1</span></span>
+<span><span class="co">#&gt;   draws: 2000 kept (12000 iterations, burn 2000, thin 5)</span></span>
+<span><span class="co">#&gt;   gate: passed (max Rhat 1.003; min ESS 1255 bulk / 1606 tail)</span></span>
+<span><span class="co">#&gt;   alignment: pivot draw 332, mean congruence 0.89</span></span>
+<span><span class="co">#&gt;   tables: compute_loadings(), compute_flags(), compute_factor_array(),</span></span>
+<span><span class="co">#&gt;           compute_qdc(), claims()</span></span></code></pre></div>
+<p>What gets reported is decided by one rule. <code><a href="reference/claims.html">claims()</a></code> keeps the most probable flags, distinguishing statements, consensus statements, and pairwise stars, and stops adding claims when the expected share of false ones passes five percent.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                       <span class="co"># cross-panel z-score dotchart</span></span>
-<span><span class="fu"><a href="reference/plot_loading_posterior.html">plot_loading_posterior</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>     <span class="co"># loadings with 50% / 95% intervals</span></span>
-<span><span class="fu"><a href="reference/plot_membership.html">plot_membership</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>            <span class="co"># dominant-factor probability heatmap</span></span>
-<span><span class="fu"><a href="reference/plot_dist_cons.html">plot_dist_cons</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>             <span class="co"># distinguishing/consensus divergence forest</span></span>
-<span><span class="fu"><a href="reference/plot_ppc.html">plot_ppc</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                   <span class="co"># posterior predictive check on by-person correlations</span></span>
-<span><span class="fu"><a href="reference/plot_tucker.html">plot_tucker</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                <span class="co"># MatchAlign alignment quality</span></span>
-<span><span class="fu"><a href="reference/plot_hyper.html">plot_hyper</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>                 <span class="co"># hyperparameter posteriors</span></span>
-<span><span class="fu"><a href="reference/plot_elpd.html">plot_elpd</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span>                  <span class="co"># ELPD across K with peak / Sivula annotations</span></span></code></pre></div>
-<p>For figure export, <code><a href="reference/save_bayesqm_plot.html">save_bayesqm_plot()</a></code> opens the appropriate device from the file extension and <code><a href="reference/caption_bayesqm.html">caption_bayesqm()</a></code> returns a figure caption that reports K, N, J, chains, coverage probability, and convergence diagnostics.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/claims.html">claims</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Selected claims at q = 0.05 (posterior expected FDR):</span></span>
+<span><span class="co">#&gt;   flags             9 participants selected (expected false 0.41)</span></span>
+<span><span class="co">#&gt;   distinguishing   11 listings selected (expected false 0.47)</span></span>
+<span><span class="co">#&gt;   consensus         0 statements selected (expected false 0.00)</span></span>
+<span><span class="co">#&gt;   stars             5 pairwise selected (expected false 0.17)</span></span></code></pre></div>
+<p>Behind the counts sit the full tables, and two of the views show the result at a glance. The reported sort for each factor, on its own grid:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_factor_array.html">plot_factor_array</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-array-1.png" alt="" width="100%"></p>
+<p>And statement by statement, where the two viewpoints separate and where they agree:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_contrasts.html">plot_contrasts</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-contrasts-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="compatibility-with-qmethod">Compatibility with <code>qmethod</code>
-<a class="anchor" aria-label="anchor" href="#compatibility-with-qmethod"></a>
+<h2 id="what-the-package-covers">What the package covers<a class="anchor" aria-label="anchor" href="#what-the-package-covers"></a>
 </h2>
-<p><code>bayesqm_fit</code> deliberately mirrors the slot names from the <code>qmethod</code> package (Zabala, 2015): <code>$dataset</code>, <code>$loa</code>, <code>$zsc</code>, <code>$zsc_n</code>, <code>$f_char</code>, <code>$qdc</code>, <code>$flagged</code>. <code>$qdc</code> is the Bayesian divergence table: per-viewpoint grid position and z-score with 95% CrI, then <code>D_j</code> with 95% CrI, <code>pi_D</code>, and <code>pi_C</code>, not the classical significance-label vocabulary. Intentional Bayesian divergences are documented in <code>?bayesqm-package</code>:</p>
-<ul>
-<li>
-<code>$flagged</code> is defined probabilistically as P(argmax_k |λ_ik| = k) &gt; 0.5, replacing Brown’s (1980) significance-based rule.</li>
-<li>
-<code>$f_char$characteristics</code> omits the classical test-theory columns; factor-score uncertainty is already in the posterior credible intervals on <code>$ci_lower</code> and <code>$ci_upper</code>.</li>
-</ul>
-<p>When you have substantive factor labels, <code>rename_factors(fit, c("a", "b", "c"))</code> relabels every factor-indexed slot in one call.</p>
+<p><strong>Import.</strong> <code><a href="reference/read_qsort.html">read_qsort()</a></code> reads CSV, Excel (HTMLQ, FlashQ, and tablet exports), PQMethod <code>.DAT</code>, Ken-Q JSON and Excel, KADE ZIP, and Easy-HTMLQ Firebase JSON. Grids labeled <code>-4..+4</code>, from zero, or with any distinct printed values work as they are, and the sorts are never altered. <code><a href="reference/qsort_data.html">qsort_data()</a></code> builds the object from a plain matrix, and <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> on it draws the pyramids.</p>
+<p><strong>The tables.</strong> <code><a href="reference/compute_loadings.html">compute_loadings()</a></code> gives bounded loadings with credible intervals, <code><a href="reference/compute_flags.html">compute_flags()</a></code> flag probabilities with an explicit unclassified state, <code><a href="reference/compute_factor_array.html">compute_factor_array()</a></code> quota-exact arrays, <code><a href="reference/compute_zscores.html">compute_zscores()</a></code> statement scores, and <code><a href="reference/compute_qdc.html">compute_qdc()</a></code> distinguishing and consensus verdicts against a posterior critical difference and the one-grid-column region. <code><a href="reference/factor_characteristics.html">factor_characteristics()</a></code> is the per-factor block a results section quotes, and <code><a href="reference/claims.html">claims()</a></code> selects what gets reported. <code><a href="reference/rename_factors.html">rename_factors()</a></code> relabels every table at once, and <code><a href="reference/rotate_factors.html">rotate_factors()</a></code> and <code><a href="reference/flip_factor.html">flip_factor()</a></code> apply judgmental rotation to every draw.</p>
+<p><strong>The number of factors.</strong> <code><a href="reference/fit_ladder.html">fit_ladder()</a></code> fits the candidate models, <code><a href="reference/select_k.html">select_k()</a></code> applies the two checks, and <code><a href="reference/plot_choice_k.html">plot_choice_k()</a></code> draws the whole decision. <code><a href="reference/loo_ladder.html">loo_ladder()</a></code> adds PSIS-LOO as directional corroboration.</p>
+<p><strong>Checks.</strong> <code><a href="reference/check_fit.html">check_fit()</a></code> runs the posterior-predictive checks, and <code><a href="reference/check_persons.html">check_persons()</a></code> separates sorts the model spans from shared viewpoints it does not. Every fit passes a convergence check before it returns, and <code><a href="reference/extend.html">extend()</a></code> continues a chain draw for draw.</p>
+<p><strong>Plots and draws.</strong> Eleven views in one style, from the raw sorts to the reported arrays, with <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">ggplot2::autoplot()</a></code> methods for loadings, flags, contrasts, and the array; <code><a href="reference/bayesqm-colors.html">bayesqm_set_colors()</a></code> themes them and <code><a href="reference/save_bayesqm_plot.html">save_bayesqm_plot()</a></code> writes the figures. <code><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix()</a></code>, <code><a href="https://rdrr.io/r/base/array.html" class="external-link">as.array()</a></code>, and <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> return the draws under Stan-style names, and the <code>posterior::as_draws_*()</code> family is registered, so <code>bayesplot</code> and <code>tidybayes</code> read a fit directly.</p>
 </div>
 <div class="section level2">
-<h2 id="integration-with-posterior-and-bayesplot">Integration with <code>posterior</code> and <code>bayesplot</code>
-<a class="anchor" aria-label="anchor" href="#integration-with-posterior-and-bayesplot"></a>
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
-<p><code>as.matrix(fit)</code>, <code>as.array(fit)</code>, and <code>as.data.frame(fit)</code> return draws in Stan-style parameter naming (<code>Lambda[i,k]</code>, <code>F[j,k]</code>, <code>nu</code>, <code>sigma</code>, <code>tau</code>). <code>as_draws_df()</code>, <code>as_draws_matrix()</code>, and <code>as_draws_array()</code> are registered for <code>posterior::as_draws_*</code> when <code>posterior</code> is installed, so <code>bayesplot</code> and <code>tidybayes</code> consume <code>bayesqm_fit</code> objects natively.</p>
+<p>The package website is <a href="https://rdazadda.github.io/bayesqm/" class="uri">https://rdazadda.github.io/bayesqm/</a>. <code><a href="articles/bayesqm-intro.html">vignette("bayesqm-intro")</a></code> walks one analysis end to end, the reference index groups every function by task, and issues belong at <a href="https://github.com/rdazadda/bayesqm/issues" class="external-link uri">https://github.com/rdazadda/bayesqm/issues</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="citing-the-package">Citing the package<a class="anchor" aria-label="anchor" href="#citing-the-package"></a>
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<p>Run <code>citation("bayesqm")</code> for the canonical citation, or use:</p>
-<blockquote>
-<p>Azadda, R. D., AK-ACE Team, Hueffer, K., Peter, T., &amp; Rasmus, S. (2026). bayesqm: Bayesian Q-Methodology Factor Analysis. R package version 0.1.0. <a href="https://github.com/rdazadda/bayesqm" class="external-link uri">https://github.com/rdazadda/bayesqm</a></p>
-</blockquote>
-<p>BibTeX is available via <code>toBibtex(citation("bayesqm"))</code>.</p>
-</div>
-<div class="section level2">
-<h2 id="where-to-look-next">Where to look next<a class="anchor" aria-label="anchor" href="#where-to-look-next"></a>
-</h2>
-<ul>
-<li>
-<code><a href="articles/bayesqm-intro.html">vignette("bayesqm-intro")</a></code> walks the full workflow end to end on a synthetic Q-sort.</li>
-<li>
-<code><a href="reference/fit_bayesian.html">?fit_bayesian</a></code> documents every prior and sampler option.</li>
-<li>
-<code><a href="reference/run_bayes.html">?run_bayes</a></code> covers the peak-plus-Sivula thresholds and the three case labels.</li>
-<li>
-<code>?bayesqm-membership</code> covers the probabilistic membership and distinguishing-statement summaries.</li>
-<li>Issues and feature requests: <a href="https://github.com/rdazadda/bayesqm/issues" class="external-link uri">https://github.com/rdazadda/bayesqm/issues</a>.</li>
-</ul>
-</div>
-<div class="section level2">
-<h2 id="funding">Funding<a class="anchor" aria-label="anchor" href="#funding"></a>
-</h2>
-<p>This research was, in part, funded by the National Institutes of Health (NIH) Agreement OT2HL158287 (Stacy Rasmus, Contact PI, <a href="mailto:smrasmus@alaska.edu" class="email">smrasmus@alaska.edu</a>; Karsten Hueffer and Taa’aii Peter, MPIs). The views and conclusions contained in this document are those of the authors and should not be interpreted as representing the official policies, either expressed or implied, of the NIH.</p>
+<p><code>citation("bayesqm")</code> gives the reference. Report the version with <code>packageVersion("bayesqm")</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
 </h2>
-<p>Released under the GNU General Public License version 3 (GPL-3); see <a href="https://www.gnu.org/licenses/gpl-3.0.html" class="external-link uri">https://www.gnu.org/licenses/gpl-3.0.html</a> for the full text.</p>
+<p>GPL (&gt;= 3); see <a href="https://www.gnu.org/licenses/gpl-3.0.html" class="external-link uri">https://www.gnu.org/licenses/gpl-3.0.html</a> for the full text.</p>
+<p>bayesqm is developed and maintained at the Center for Alaska Native Health Research, University of Alaska Fairbanks.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -257,7 +209,6 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://CRAN.R-project.org/package=bayesqm" class="external-link"><img src="https://www.r-pkg.org/badges/version/bayesqm" alt="CRAN status"></a></li>
 <li><a href="https://github.com/rdazadda/bayesqm/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/rdazadda/bayesqm/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"></a></li>
 </ul>
@@ -268,7 +219,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://github.com/rdazadda" class="external-link">Raymond Dacosta Azadda</a>, AK-ACE Team, Karsten Hueffer, Taa’aii Peter, Stacy Rasmus. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Developed by <a href="https://github.com/rdazadda" class="external-link">Raymond Dacosta Azadda</a>, AK-ACE Team, Karsten Hueffer, Taa’aii Peter, Stacy Rasmus. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
 <div class="pkgdown-footer-right">

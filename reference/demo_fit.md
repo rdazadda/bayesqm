@@ -1,41 +1,31 @@
-# A synthetic bayesqm_fit for examples and tutorials
+# A small demonstration fit
 
-Returns a `bayesqm_fit` with realistic Q-methodology structure: every
-participant has a dominant factor, roughly 40 percent of the statements
-polarise the factor pair, 10 percent are consensus, and the remainder
-are weakly partial. Use it for documentation, teaching materials, and
-the package vignette; it is not a substitute for
+Runs the partition-model sampler on a small synthetic forced-sort
+dataset with a fixed seed and the convergence gate disabled. It exists
+so examples and tests have a complete `bayesqm_fit` in about a second;
+it is no substitute for
 [`fit_bayesian()`](https://rdazadda.github.io/bayesqm/reference/fit_bayesian.md)
-on real data.
+at its defaults on real data.
 
 ## Usage
 
 ``` r
-demo_fit(N = 20, J = 22, K = 2, Td = 400, seed = 1L)
+demo_fit(N = 8, J = 13, K = 2, draws = 200, seed = 1)
 ```
 
 ## Arguments
 
-- N:
+- N, J, K:
 
-  Number of participants.
+  Panel size, statement count, factors (defaults 8, 13, 2).
 
-- J:
+- draws:
 
-  Number of statements.
-
-- K:
-
-  Number of factors.
-
-- Td:
-
-  Number of posterior draws.
+  Kept posterior draws (default 200).
 
 - seed:
 
-  Integer seed for reproducibility; `NULL` leaves the random number
-  generator untouched.
+  Random seed (default 1).
 
 ## Value
 
@@ -44,40 +34,13 @@ A `bayesqm_fit`.
 ## Examples
 
 ``` r
-fit <- demo_fit(N = 12, J = 15, K = 2)
-plot(fit)
-
-summary(fit)
-#> Bayesian Q-methodology factor model
-#>   Call:      fit_bayesian(Y, K = K)
-#>   Family:    Student-t (nu = estimated)
-#>   Factors:   K = 2
-#>   Data:      N = 12 persons, J = 15 statements
-#>   Draws:     4 chains x 1000 post-warmup = 4000 total
-#>   Backend:   demo
-#>   Fitted:    2026-06-24 21:33:17
-#>   Max Rhat:  1.010
-#>   Min ESS:   bulk 820 / tail 950
-#>   Divergent: 0
-#> 
-#> Factor characteristics:
-#>    nload eigenvals expl_var
-#> f1     6     3.204    26.70
-#> f2     6     3.122    26.01
-#> 
-#> Hyperparameters (posterior summary):
-#>  parameter   mean median     sd  lower  upper
-#>         nu 20.233 20.246 4.2205 12.144 28.767
-#>      sigma  0.498  0.500 0.0786  0.345  0.646
-#>        tau  0.507  0.511 0.0820  0.358  0.660
-#> 
-#> Divergence summary:
-#>   posterior median D_j ranges 0.20 to 2.81
-#>   delta = 0.55 (reliability-adjusted critical difference)
-#>   statements with P(D_j > delta | Y) >= 0.95: 7 of 15
-#>   strongest consensus, max P(D_j < delta | Y): 0.94
-#>   negative exemplars, P(dominant loading > 0 | Y) < 0.5: 0 of 12
-#> 
-#> MatchAlign diagnostics (mean Tucker phi per factor):
-#>   f1 = 0.943  f2 = 0.945  
+fit <- demo_fit()
+fit
+#> bayesqm fit: exact partition (rank-order) likelihood, PX-Gibbs
+#>   8 participants, 13 statements, 2 factors; grid 1-1-2-2-3-2-1-1
+#>   draws: 200 kept (500 iterations, burn 100, thin 2)
+#>   gate: passed (max Rhat 1.053; min ESS 36 bulk / 98 tail)
+#>   alignment: pivot draw 33, mean congruence 0.78
+#>   tables: compute_loadings(), compute_flags(), compute_factor_array(),
+#>           compute_qdc(), claims()
 ```
