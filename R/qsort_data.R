@@ -137,13 +137,12 @@ validate_qsort <- function(qdata, distribution = NULL) {
 #' @export
 check_distribution <- function(Y, distribution) {
   n_pos <- length(distribution)
-  if (n_pos %% 2 == 1) {
-    half <- (n_pos - 1) / 2
-    grid_vals <- seq(-half, half)
-  } else {
-    half <- n_pos / 2
-    grid_vals <- c(seq(-half, -1), seq(1, half))
-  }
+  # the printed labels are conventional (any monotone scheme: -4..+4,
+  # 0-based, 1..C); take the ordered values the sorts actually use
+  grid_vals <- sort(unique(Y[is.finite(Y)]))
+  if (length(grid_vals) != n_pos)
+    return(list(ok = FALSE, non_conforming = seq_len(ncol(Y)),
+                grid_values = grid_vals))
 
   non_conforming <- integer(0)
   for (i in seq_len(ncol(Y))) {
@@ -162,9 +161,15 @@ infer_distribution <- function(Y) {
   vals <- Y[is.finite(Y)]
   if (length(vals) == 0) return(integer(0))
   grid_vals <- sort(unique(vals))
-  col1 <- Y[, 1]
-  col1 <- col1[is.finite(col1)]
-  as.integer(tabulate(match(col1, grid_vals), nbins = length(grid_vals)))
+  # majority vote across participants, so one aberrant sort (even the
+  # first) cannot define the design and get everyone else blamed
+  counts <- apply(as.matrix(Y), 2, function(col)
+    paste(tabulate(match(col[is.finite(col)], grid_vals),
+                   nbins = length(grid_vals)), collapse = ","))
+  tab <- table(counts)
+  cands <- names(tab)[tab == max(tab)]
+  modal <- counts[counts %in% cands][1]     # first occurrence breaks ties
+  as.integer(strsplit(modal, ",", fixed = TRUE)[[1]])
 }
 
 

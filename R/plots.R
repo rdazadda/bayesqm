@@ -1,749 +1,520 @@
 # plots.R
-# Base-R plots for bayesqm objects. Every function visualises a
-# quantity already on the fit (aligned posterior draws, PPC
-# summaries, MatchAlign congruence, or the ELPD-over-K table). The
-# family shares:
-#   - a bayesplot-compatible "blue" palette (light -> mid -> dark plus
-#     one muted-red accent), colourblind-safe and greyscale-legible;
-#   - a single consistent idiom: nested 50 / 95 percent intervals, open
-#     points, sort-once-apply-everywhere for multi-panel comparability;
-#   - par() fully restored on exit; user-set par("mfrow") respected;
-#   - user ... filtered against hardcoded args to avoid "formal argument
-#     matched by multiple actual arguments" collisions.
+# Base-graphics views of the partition-model fit, one per user question.
+# Every plot reads its palette through bayesqm_colors(), restores par()
+# on exit, and returns its input invisibly. Factor identity always rides
+# on the qualitative palette plus position or symbol, never colour alone.
 
 
-# Internal helpers. .bq_col() lives in colors.R and reads from the active scheme.
-
-.bq_dots <- function(dots, exclude) {
-  dots[!(names(dots) %in% exclude)]
+#' @keywords internal
+#' @noRd
+.bq_par <- function(...) {
+  op <- par(no.readonly = TRUE)
+  par(font.axis = 2, font.lab = 2, font.main = 2, cex.main = 1.1)
+  par(...)
+  op
 }
 
 
-.bq_mfrow <- function(K) {
-  cur <- graphics::par("mfrow")
-  if (identical(as.integer(cur), c(1L, 1L))) {
-    cols <- if (K <= 3L) K else 3L
-    rows <- as.integer(ceiling(K / cols))
-    list(override = TRUE, mfrow = c(rows, cols))
-  } else {
-    list(override = FALSE, mfrow = cur)
-  }
-}
+# every legend sits in a white box with a grey border
+#' @keywords internal
+#' @noRd
+.bq_legend <- function(...)
+  legend(..., bg = "white", box.col = "gray70", box.lwd = 0.8)
 
 
-#' Factor-score dotchart for a bayesqm_fit
+#' Bounded loadings with credible intervals
 #'
 #' @description
-#' One panel per factor: horizontal dotchart of every statement's
-#' posterior median z-score with nested 50 percent (thick) and
-#' `prob`-coverage (thin) credible-interval whiskers. Statements are
-#' sorted once -- by default, by the first factor's posterior mean --
-#' and that ordering is reused across panels so the reader can scan
-#' horizontally to compare factors. For a loadings-only view, see
-#' [plot_loading_posterior()]; for a single statement across factors,
-#' see [plot_zscore_posterior()].
+#' One row per participant, one interval per factor on the bounded
+#' loading scale, with selected flags marked. The dotted rules sit at
+#' the classical descriptive cut-off `1.96 / sqrt(J)` (reference).
 #'
-#' @param x A `bayesqm_fit`.
-#' @param sort_by Integer factor index whose posterior mean is used to
-#'   sort rows (default 1).
-#' @param prob Outer-interval coverage probability; defaults to
-#'   `fit$brief$prob`.
-#' @param cex.lab Axis-label text size.
-#' @param ... Additional arguments forwarded to `plot()`.
+#' @param fit A `bayesqm_fit`.
+#' @param q False-discovery level for the flag marks (default 0.05).
 #'
-#' @return The input, invisibly.
+#' @return `fit`, invisibly.
+#'
 #' @export
-plot.bayesqm_fit <- function(x, sort_by = 1L, prob = NULL,
-                             cex.lab = 0.7, ...) {
-  cols <- .bq_col()
-  K    <- x$brief$K
-  if (is.null(prob)) prob <- x$brief$prob
-  alpha <- 1 - prob
+plot_loading_posterior <- function(fit, q = 0.05) {
+  assert_bayesqm_fit(fit)
+  cols <- bayesqm_colors()
+  lo <- compute_loadings(fit)
+  fl <- compute_flags(fit, q = q)
+  K <- fit$brief$K; N <- fit$brief$N
+  fac_ids <- dimnames(fit$draws$sigma)[[2]]
+  thr <- 1.96 / sqrt(fit$brief$J)
 
-  fac_names <- colnames(x$loa)
-  if (is.null(fac_names)) fac_names <- paste0("f", seq_len(K))
-  sort_by <- as.integer(sort_by)
-  if (sort_by < 1L || sort_by > K)
-    stop("sort_by must be an integer in 1:K.")
+  inner <- compute_loadings(fit, prob = 0.5)     # nested 50% interval
 
-  med  <- .summarize_draws(x$F_draws, median)
-  o_lo <- .summarize_draws(x$F_draws, quantile, probs = alpha / 2,     names = FALSE)
-  o_hi <- .summarize_draws(x$F_draws, quantile, probs = 1 - alpha / 2, names = FALSE)
-  i_lo <- .summarize_draws(x$F_draws, quantile, probs = 0.25,          names = FALSE)
-  i_hi <- .summarize_draws(x$F_draws, quantile, probs = 0.75,          names = FALSE)
-
-  labels <- dimnames(x$F_draws)[[2]]
-  if (is.null(labels)) labels <- paste0("S", seq_len(nrow(med)))
-
-  ord <- order(med[, sort_by])
-  med <- med[ord, , drop = FALSE]
-  o_lo <- o_lo[ord, , drop = FALSE]; o_hi <- o_hi[ord, , drop = FALSE]
-  i_lo <- i_lo[ord, , drop = FALSE]; i_hi <- i_hi[ord, , drop = FALSE]
-  labels <- labels[ord]
-
-  lay <- .bq_mfrow(K)
-  old_par <- if (lay$override)
-    graphics::par(mfrow = lay$mfrow, mar = c(4, 8, 3, 1))
-  else
-    graphics::par(mar = c(4, 8, 3, 1))
-  on.exit(graphics::par(old_par), add = TRUE)
-
-  xlim <- range(c(o_lo, o_hi), na.rm = TRUE)
-  dots <- .bq_dots(list(...),
-                   c("xlim", "yaxt", "xlab", "ylab", "main",
-                     "pch", "bg", "col", "type"))
-  y <- seq_len(nrow(med))
-
+  op <- .bq_par(mar = c(4, 6, 3, 1))
+  on.exit(par(op), add = TRUE)
+  plot(NULL, xlim = c(-1, 1), ylim = c(0.5, N + 0.5), yaxt = "n",
+       xlab = "bounded loading", ylab = "",
+       main = "Participant loadings, 50% and 95% intervals")
+  axis(2, at = seq_len(N), labels = lo$participant, las = 1, cex.axis = 0.8)
+  abline(v = 0, col = cols$grey)
+  abline(v = c(-thr, thr), col = cols$gridgrey, lty = 3)
+  text(thr, N + 0.5, expression(bold(1.96 / sqrt(J))), pos = 4, cex = 0.7,
+       col = cols$grey, xpd = TRUE)
+  off <- seq(-0.22, 0.22, length.out = K)
   for (k in seq_len(K)) {
-    do.call(plot, c(
-      list(x = med[, k], y = y, xlim = xlim, yaxt = "n",
-           xlab = "z-score", ylab = "", main = fac_names[k],
-           type = "n"),
-      dots))
-    graphics::abline(v = 0, lty = 3, col = cols$grey)
-    graphics::segments(o_lo[, k], y, o_hi[, k], y, lwd = 0.9)
-    graphics::segments(i_lo[, k], y, i_hi[, k], y, lwd = 2.5)
-    graphics::points(med[, k], y, pch = 21, bg = "white",
-                     col = cols$dark, cex = 1.1, lwd = 1.1)
-    graphics::axis(2, at = y, labels = labels,
-                   las = 1, tick = FALSE, cex.axis = cex.lab)
+    ck <- cols$qual[(k - 1) %% length(cols$qual) + 1]
+    y <- seq_len(N) + off[k]
+    segments(lo[[paste0(fac_ids[k], "_lower")]], y,
+             lo[[paste0(fac_ids[k], "_upper")]], y, col = ck, lwd = 1.2)
+    segments(inner[[paste0(fac_ids[k], "_lower")]], y,
+             inner[[paste0(fac_ids[k], "_upper")]], y, col = ck, lwd = 3.2)
+    pub_k <- fl$selected & fl$factor == fac_ids[k]
+    points(lo[[paste0(fac_ids[k], "_loading")]], y,
+           pch = ifelse(pub_k, 19, 21), col = ck, bg = "white", cex = 0.9)
   }
+  .bq_legend("topleft", legend = c(fac_ids, "selected flag"),
+             col = c(cols$qual[seq_len(K)], cols$grey),
+             pch = c(rep(15, K), 19), cex = 0.8)
+  invisible(fit)
+}
 
+
+#' Flag probabilities with the unclassified state
+#'
+#' @description
+#' One row per participant, one dot per factor at its posterior flag
+#' probability (both poles combined; a minus sign marks a dominant
+#' negative pole), and a grey square for the probability of remaining
+#' unclassified. Filled dots are selected flags, and the dotted rule is
+#' the 0.5 selection floor.
+#'
+#' @param fit A `bayesqm_fit`.
+#' @param q False-discovery level for the selection marks (default 0.05).
+#'
+#' @return `fit`, invisibly.
+#'
+#' @export
+plot_flags <- function(fit, q = 0.05) {
+  assert_bayesqm_fit(fit)
+  cols <- bayesqm_colors()
+  fl <- compute_flags(fit, q = q)
+  phi <- attr(fl, "phi")
+  K <- fit$brief$K; N <- fit$brief$N
+  fac_ids <- dimnames(fit$draws$sigma)[[2]]
+  kq <- cols$qual[(seq_len(K) - 1) %% length(cols$qual) + 1]
+
+  op <- .bq_par(mar = c(4, 6, 3, 1))
+  on.exit(par(op), add = TRUE)
+  plot(NULL, xlim = c(0, 1.05), ylim = c(0.5, N + 1.4), yaxt = "n",
+       xlab = "posterior flag probability", ylab = "",
+       main = "Flag probabilities")
+  axis(2, at = seq_len(N), labels = rownames(phi), las = 1, cex.axis = 0.8)
+  abline(v = 0.5, col = cols$grey, lty = 3)
+  text(0.5, 0.56, "selection floor", pos = 4, cex = 0.7,
+       col = cols$grey, font = 3)
+  off <- seq(-0.26, 0.26, length.out = K + 1)
+  for (k in seq_len(K)) {
+    pk <- phi[, 2 * k - 1] + phi[, 2 * k]
+    neg <- phi[, 2 * k] > phi[, 2 * k - 1]
+    y <- seq_len(N) + off[k]
+    sel <- fl$selected & fl$factor == fac_ids[k]
+    points(pk, y, pch = ifelse(sel, 19, 21), col = kq[k], bg = "white",
+           cex = 1.05, lwd = 1.4)
+    show <- neg & pk > 0.02
+    if (any(show))
+      text(pk[show] + 0.02, y[show], "-", col = kq[k], font = 2)
+  }
+  points(phi[, 2 * K + 1], seq_len(N) + off[K + 1], pch = 22,
+         col = cols$grey, bg = cols$gridgrey, cex = 1.0)
+  .bq_legend("top", ncol = min(K + 2, 4),
+             legend = c(fac_ids, "unclassified", "filled: selected"),
+             col = c(kq, cols$grey, cols$grey),
+             pt.bg = c(rep("white", K), cols$gridgrey, "white"),
+             pch = c(rep(21, K), 22, 19), cex = 0.75)
+  invisible(fit)
+}
+
+
+#' The factor array on its grid
+#'
+#' @description
+#' The reported array for one factor drawn as the physical sorting grid:
+#' columns are grid positions with their quota heights, each cell carries
+#' its statement, and cell shading shows how certain the placement is
+#' (the posterior probability of that statement landing in that column).
+#'
+#' @param fit A `bayesqm_fit`.
+#' @param factor Which factor to draw (index or `"f2"`-style name;
+#'   default 1).
+#' @param labels Optional statement labels (defaults to the statement
+#'   ids).
+#'
+#' @return `fit`, invisibly.
+#'
+#' @export
+plot_factor_array <- function(fit, factor = 1, labels = NULL) {
+  assert_bayesqm_fit(fit)
+  cols <- bayesqm_colors()
+  distr <- fit$distribution
+  C <- length(distr)
+  fac_ids <- dimnames(fit$draws$sigma)[[2]]
+  k <- if (is.character(factor)) match(factor, fac_ids) else as.integer(factor)
+  if (is.na(k) || k < 1 || k > fit$brief$K) .bq_abort("no such factor.")
+
+  ar <- compute_factor_array(fit)
+  slot <- ar[[paste0(fac_ids[k], "_grid")]]
+  pcol <- attr(ar, "certainty")[, k]
+  if (is.null(labels)) labels <- ar$statement
+
+  op <- .bq_par(mar = c(4, 1, 3.5, 1))
+  on.exit(par(op), add = TRUE)
+  plot(NULL, xlim = c(0.5, C + 0.5), ylim = c(0, max(distr) + 0.5),
+       axes = FALSE, xlab = "grid column", ylab = "",
+       main = sprintf("Factor %s array", fac_ids[k]))
+  mtext("darker tiles are more certain of their column", side = 3,
+        line = 0.2, cex = 0.8, font = 3, col = cols$grey)
+  col_labels <- if (C %% 2 == 0)
+    c(seq(-C / 2, -1), seq(1, C / 2)) else seq_len(C) - (C + 1) / 2
+  axis(1, at = seq_len(C), labels = col_labels)
+  shade <- colorRampPalette(.bq_certainty)(101)
+  for (cc in seq_len(C)) {
+    js <- which(slot == cc)
+    js <- js[order(-pcol[js])]
+    for (h in seq_along(js)) {
+      fill <- shade[round(100 * pcol[js[h]]) + 1]
+      rect(cc - 0.45, h - 1 + 0.05, cc + 0.45, h - 0.05,
+           col = fill, border = cols$grey)
+      text(cc, h - 0.5, labels[js[h]], cex = 0.7,
+           col = .tile_text_col(fill))
+    }
+  }
+  invisible(fit)
+}
+
+
+#' Statement contrasts between two factors
+#'
+#' @description
+#' Per statement, the posterior contrast interval for one factor pair,
+#' the posterior critical difference `delta_kl` (dashed), and the
+#' grid-width consensus region ([delta_grid()], shaded). Verdict
+#' colours: selected distinguishing listings, consensus statements,
+#' indeterminate.
+#'
+#' @param fit A `bayesqm_fit` with `K >= 2`.
+#' @param pair Which factor pair to draw (index into the pair list or
+#'   `"f1-f2"`-style name; default 1).
+#' @param q,cons_floor As in [compute_qdc()].
+#'
+#' @return `fit`, invisibly.
+#'
+#' @export
+plot_contrasts <- function(fit, pair = 1, q = 0.05, cons_floor = 0.95) {
+  assert_bayesqm_fit(fit)
+  cols <- bayesqm_colors()
+  qdc <- compute_qdc(fit, q = q, cons_floor = cons_floor)
+  ct50 <- attr(compute_qdc(fit, q = q, cons_floor = cons_floor,
+                           prob = 0.5), "contrasts")
+  ct <- attr(qdc, "contrasts")
+  dkl <- attr(qdc, "delta_kl")
+  dg <- attr(qdc, "delta_grid")
+  pair_ids <- unique(ct$pair)
+  p <- if (is.character(pair)) match(pair, pair_ids) else as.integer(pair)
+  if (is.na(p) || p < 1 || p > length(pair_ids)) .bq_abort("no such pair.")
+  keep <- ct$pair == pair_ids[p]
+  ct <- ct[keep, ]; ct50 <- ct50[keep, ]
+  o <- order(ct$median)
+  ct <- ct[o, ]; ct50 <- ct50[o, ]
+  verdict <- qdc$verdict[o]
+  vcol <- ifelse(grepl("^distinguishing", verdict),
+                 .bq_verdict[["distinguishing"]],
+                 ifelse(verdict == "consensus", .bq_verdict[["consensus"]],
+                        .bq_verdict[["indeterminate"]]))
+  J <- nrow(ct)
+
+  op <- .bq_par(mar = c(4, 6, 3, 1))
+  on.exit(par(op), add = TRUE)
+  xr <- range(c(ct$lower, ct$upper, dkl[p], -dkl[p]))
+  plot(NULL, xlim = xr, ylim = c(0.5, J + 0.5), yaxt = "n",
+       xlab = sprintf("score contrast (%s)", pair_ids[p]), ylab = "",
+       main = sprintf("Statement contrasts, %s", pair_ids[p]))
+  rect(-dg, 0, dg, J + 1, col = adjustcolor(cols$fill, 0.5), border = NA)
+  abline(v = c(-dkl[p], dkl[p]), col = cols$accent, lty = 2)
+  abline(v = 0, col = cols$grey)
+  text(dkl[p], J + 0.5, expression(bold(+delta[kl])), pos = 4, cex = 0.75,
+       col = cols$accent, xpd = TRUE)
+  text(-dkl[p], J + 0.5, expression(bold(-delta[kl])), pos = 2, cex = 0.75,
+       col = cols$accent, xpd = TRUE)
+  axis(2, at = seq_len(J), labels = ct$statement, las = 1, cex.axis = 0.7)
+  segments(ct$lower, seq_len(J), ct$upper, seq_len(J), col = vcol, lwd = 1.2)
+  segments(ct50$lower, seq_len(J), ct50$upper, seq_len(J), col = vcol,
+           lwd = 3.2)
+  points(ct$median, seq_len(J), pch = 19, col = vcol, cex = 0.8)
+  .bq_legend("topleft",
+             legend = expression("distinguishing", "consensus",
+                                 "indeterminate",
+                                 "consensus region (one grid column)",
+                                 delta[kl] * ", critical difference"),
+             col = c(unname(.bq_verdict), cols$grey, cols$accent),
+             pch = c(19, 19, 19, 22, NA),
+             lty = c(NA, NA, NA, NA, 2),
+             pt.bg = c(NA, NA, NA, adjustcolor(cols$fill, 0.7), NA),
+             pt.cex = c(0.9, 0.9, 0.9, 1.6, NA), cex = 0.72)
+  invisible(fit)
+}
+
+
+#' The two-signal choice-of-K display
+#'
+#' @description
+#' The whole decision in one strip, one row per ladder rung. The left
+#' span shows the adequacy signal, the extra-factor percentile inside
+#' its shaded band, with a warning ring where the person check found a
+#' mutual unspanned cluster. The right span shows one chip per factor,
+#' coloured when the factor is supported and grey when not, with the
+#' reason inside: `f` means fewer than two selected flags, `d` means no
+#' selected distinguishing statement. Each row ends with its own verdict
+#' in words, the selected row is boxed, and when no K passes both checks
+#' the conclusion is written across the bottom of the plot.
+#'
+#' @param x A `bayesqm_selection` from [select_k()].
+#'
+#' @return `x`, invisibly.
+#'
+#' @export
+plot_choice_k <- function(x) {
+  if (!inherits(x, "bayesqm_selection"))
+    .bq_abort("plot_choice_k() takes a bayesqm_selection from select_k().")
+  cols <- bayesqm_colors()
+  tab <- x$table
+  det <- x$detail
+  nK <- nrow(tab)
+  Kmax <- max(tab$K)
+  kq <- cols$qual[(seq_len(Kmax) - 1) %% length(cols$qual) + 1]
+  chipw <- 0.45 / Kmax
+  cx0 <- 1.12
+  vx0 <- cx0 + Kmax * chipw + 0.06
+  xmax <- vx0 + 0.62
+
+  row_word <- function(r) {
+    if (!tab$adequate[r]) return("not adequate")
+    if (!tab$all_supported[r]) return("adequate, but unsupported")
+    if (!is.na(x$K) && tab$K[r] == x$K) return("report this one")
+    "also passes"
+  }
+  concl <- switch(x$verdict,
+    no_shared_structure = "No factor is supported at any K. Report no factor solution.",
+    single_viewpoint = "The sorts agree as one shared viewpoint, consider K = 1.",
+    adequate_but_unsupported = "Adequate, but no K has every factor supported.",
+    no_adequate_rung = "No K is adequate. Try a larger K or read the person check.",
+    tension = "The two checks disagree, read the rows before choosing.",
+    NULL)
+
+  op <- .bq_par(mar = c(6, 4.5, 4, 1))
+  on.exit(par(op), add = TRUE)
+  y0 <- if (is.null(concl)) 0.5 else -0.15
+  plot(NULL, xlim = c(0, xmax), ylim = c(y0, nK + 0.9), axes = FALSE,
+       xlab = "", ylab = "", main = "Choice of K, two signals")
+  mtext(sprintf("verdict: %s", gsub("_", " ", x$verdict)), side = 3,
+        line = 0.3, cex = 0.85, font = 3, col = cols$grey)
+
+  # left span: adequacy
+  rect(x$band[1], 0.5, x$band[2], nK + 0.5,
+       col = adjustcolor(cols$fill, 0.4), border = NA)
+  text(mean(x$band), nK + 0.7, "adequate range", cex = 0.7,
+       col = cols$grey, font = 3)
+  axis(1, at = seq(0, 1, 0.25), cex.axis = 0.8)
+  axis(2, at = seq_len(nK), labels = paste0("K = ", tab$K), las = 1,
+       tick = FALSE)
+  mtext("extra-factor percentile", side = 1, line = 2.3, at = 0.5,
+        cex = 0.85, font = 2)
+  segments(0, seq_len(nK), 1, seq_len(nK), col = "grey92")
+  points(tab$extra_factor, seq_len(nK),
+         pch = ifelse(tab$adequate, 19, 21), col = cols$dark,
+         bg = "white", cex = 1.4, lwd = 1.4)
+  if (any(tab$cluster))
+    points(tab$extra_factor[tab$cluster], which(tab$cluster), pch = 1,
+           col = cols$accent, cex = 2.6, lwd = 2)
+
+  # right span: one chip per factor, then the row's verdict in words
+  abline(v = 1.06, col = "grey85")
+  for (r in seq_len(nK)) {
+    dr <- det[det$K == tab$K[r], ]
+    for (k in seq_len(nrow(dr))) {
+      xc <- cx0 + (k - 0.5) * chipw
+      ok <- dr$supported[k]
+      rect(xc - 0.46 * chipw, r - 0.3, xc + 0.46 * chipw, r + 0.3,
+           col = if (ok) kq[k] else "grey92",
+           border = if (ok) cols$grey else "grey80")
+      if (!ok) {
+        why <- paste0(if (dr$flags[k] < 2) "f" else "",
+                      if (!dr$has_dist[k]) "d" else "")
+        text(xc, r, why, col = cols$accent, cex = 0.8, font = 2)
+      }
+    }
+    win <- !is.na(x$K) && tab$K[r] == x$K
+    text(vx0, r, row_word(r), adj = 0, cex = 0.75,
+         col = if (win) cols$accent else cols$grey,
+         font = if (win) 2 else 3, xpd = TRUE)
+    if (win)
+      rect(-0.02, r - 0.45, xmax, r + 0.45, border = cols$accent, lwd = 2,
+           xpd = TRUE)
+  }
+  text(cx0 + Kmax * chipw / 2, nK + 0.7, "every factor supported",
+       cex = 0.7, col = cols$grey, font = 3)
+  axis(1, at = cx0 + (seq_len(Kmax) - 0.5) * chipw,
+       labels = seq_len(Kmax), tick = FALSE, cex.axis = 0.7, line = -0.7)
+  mtext("factor", side = 1, line = 2.3, at = cx0 + Kmax * chipw / 2,
+        cex = 0.85, font = 2)
+  if (!is.null(concl))
+    text(xmax / 2, 0.12, concl, cex = 0.8, font = 2, col = cols$dark,
+         xpd = TRUE)
+  .bq_legend(x = grconvertX(0.5, "ndc", "user"),
+             y = grconvertY(0.012, "ndc", "user"),
+             xjust = 0.5, yjust = 0, xpd = NA, ncol = 2,
+             legend = c("in band: adequate", "coloured chip: supported",
+                        "f / d: too few flags / nothing distinguishes"),
+             pch = c(19, 22, NA),
+             col = c(cols$dark, cols$grey, cols$accent),
+             pt.bg = c(NA, kq[1], NA),
+             pt.cex = c(1, 1.4, NA), cex = 0.7)
   invisible(x)
 }
 
 
-#' ELPD across K with peak and Sivula annotations
+#' The person check against the mixed bands
 #'
 #' @description
-#' ELPD against K with +/- 1.96 SE whiskers, a solid vertical rule at
-#' the ELPD peak, and a dashed rule at the Sivula (parsimony) K. Both
-#' rules are drawn in the primary blue, distinguished by line type and
-#' by text annotations at the top of the axis. The title reports the
-#' peak-plus-Sivula case (`agree`, `gap`, `reversed`).
+#' The `m` (model agreement) by `w` (person agreement) scatter with the
+#' mixed-replication bands; verdict colours, and arrows from unspanned
+#' persons to their nearest partners.
 #'
-#' @param run A `bayesqm_run`.
-#' @param ... Additional arguments forwarded to `plot()`.
+#' @param x A `bayesqm_persons` from [check_persons()].
 #'
-#' @return The input, invisibly.
+#' @return `x`, invisibly.
+#'
 #' @export
-plot_elpd <- function(run, ...) {
-  assert_bayesqm_run(run)
-  cols <- .bq_col()
+plot_person_check <- function(x) {
+  if (!inherits(x, "bayesqm_persons"))
+    .bq_abort("plot_person_check() takes a bayesqm_persons from check_persons().")
+  cols <- bayesqm_colors()
+  band_m <- attr(x, "band_m"); band_w <- attr(x, "band_w")
+  vmap <- c(fits = "#17A589", no_shared = "grey72",
+            unspanned = "#E67E22", atypical = "#6C3483")
+  vlab <- c(fits = "fits the factors", no_shared = "no shared viewpoint",
+            unspanned = "unspanned viewpoint", atypical = "atypical")
 
-  tab <- run$tab
-  K   <- tab$K
-  y   <- tab$elpd
-  se  <- tab$se
-  lo  <- y - 1.96 * se
-  hi  <- y + 1.96 * se
-  if (!any(is.finite(y))) stop("No finite ELPD values on this run.")
-
-  old_par <- graphics::par(mar = c(5, 5, 4, 2))
-  on.exit(graphics::par(old_par), add = TRUE)
-
-  dots <- .bq_dots(list(...),
-                   c("xlim", "ylim", "xlab", "ylab",
-                     "xaxt", "type", "main"))
-  do.call(plot, c(
-    list(x = K, y = y, type = "n", xaxt = "n",
-         xlim = range(K),
-         ylim = range(c(lo, hi), na.rm = TRUE),
-         xlab = "Number of factors (K)",
-         ylab = "ELPD (leave-one-out)"),
-    dots))
-  graphics::axis(1, at = K)
-
-  if (!is.na(run$k_peak))
-    graphics::abline(v = run$k_peak, lwd = 1.6, col = cols$dark)
-  if (!is.na(run$k_sivula))
-    graphics::abline(v = run$k_sivula, lwd = 1.6, lty = 2, col = cols$dark)
-
-  usr <- graphics::par("usr")
-  y_top <- usr[4] - 0.03 * (usr[4] - usr[3])
-  if (!is.na(run$k_peak))
-    graphics::text(run$k_peak, y_top, " Peak", pos = 4,
-                   cex = 0.8, col = cols$dark)
-  if (!is.na(run$k_sivula) && run$k_sivula != run$k_peak)
-    graphics::text(run$k_sivula, y_top, " Sivula", pos = 4,
-                   cex = 0.8, col = cols$dark)
-
-  valid <- is.finite(y)
-  graphics::segments(K[valid], lo[valid], K[valid], hi[valid], lwd = 1.1)
-  graphics::points(K[valid], y[valid], pch = 21, bg = "white",
-                   col = cols$dark, cex = 1.3, lwd = 1.2)
-
-  case_str <- if (is.na(run$case)) "NA" else run$case
-  graphics::title(main = sprintf("ELPD across K (case: %s)", case_str))
-
-  invisible(run)
+  op <- .bq_par(mar = c(4, 4, 3, 1))
+  on.exit(par(op), add = TRUE)
+  plot(NULL, xlim = range(c(x$m, band_m)), ylim = c(0, 1),
+       xlab = "model agreement m", ylab = "person agreement w",
+       main = "Person check")
+  rect(band_m[1], -0.04, band_m[2], 1.04,
+       col = adjustcolor(cols$fill, 0.45), border = NA)
+  abline(v = band_m, col = cols$grey, lty = 3)
+  text(mean(band_m), 0.02, "reference band", cex = 0.7, col = cols$grey,
+       font = 3)
+  segments(x$m, band_w[, 1], x$m, band_w[, 2], col = cols$gridgrey)
+  points(x$m, x$w, pch = 19, col = vmap[x$verdict], cex = 1.1)
+  text(x$m, x$w, x$participant, pos = 3, cex = 0.7, col = cols$grey)
+  unsp <- which(x$verdict == "unspanned")
+  for (i in unsp) {
+    j <- if (!is.null(x$partner_index)) x$partner_index[i]
+         else match(x$partner[i], x$participant)
+    arrows(x$m[i], x$w[i], x$m[j], x$w[j], length = 0.08, col = cols$accent)
+  }
+  .bq_legend("bottomright", legend = unname(vlab), col = vmap, pch = 19,
+             cex = 0.75)
+  invisible(x)
 }
 
 
-#' Dominant-factor posterior-probability heatmap
+#' Convergence and alignment view
 #'
 #' @description
-#' Tiled heatmap of `P(argmax_k |Lambda[i, k]| = k)` with one row per
-#' participant, one column per factor, rendered on a sequential blue
-#' ramp. A right-side tier strip encodes Strong / Moderate / Weak
-#' membership (per [classify_membership()]). A horizontal colourbar
-#' under the plot gives the probability scale. Rows are sorted by
-#' dominant factor first, then tier, then probability -- so the block
-#' structure a reader wants to see is preserved.
+#' Traces of the invariant person spreads `s_i` for the persons with the
+#' lowest effective sample size — the series the convergence gate reads —
+#' plus the per-draw congruence of the aligned draws to the pivot, with
+#' the gate report in the margin. A congruence histogram hugging 1 says
+#' the alignment found one common orientation; a long left tail says some
+#' draws sit far from it.
 #'
 #' @param fit A `bayesqm_fit`.
-#' @param sort Logical; apply the default ordering.
-#' @param ... Additional arguments forwarded to `image()`.
+#' @param n_series How many worst-ESS persons to trace (default 3).
 #'
-#' @return The input, invisibly.
+#' @return `fit`, invisibly.
+#'
 #' @export
-plot_membership <- function(fit, sort = TRUE, ...) {
+plot_convergence <- function(fit, n_series = 3) {
   assert_bayesqm_fit(fit)
-  cols <- .bq_col()
+  cols <- bayesqm_colors()
+  s <- fit$draws$s_i
+  ess <- apply(s, 2, function(x) conv_stats(x)["bulk"])
+  worst <- order(ess)[seq_len(min(n_series, ncol(s)))]
+  g <- fit$gate
 
-  prob <- compute_dominant_prob(fit$Lambda_draws)
-  tier <- classify_membership(fit$Lambda_draws)
-
-  if (sort) {
-    ord <- order(tier$dominant_factor,
-                 as.integer(tier$tier),
-                 -tier$max_prob)
-    prob <- prob[ord, , drop = FALSE]
-    tier <- tier[ord, , drop = FALSE]
+  op <- .bq_par(mfrow = c(length(worst) + 1, 1), mar = c(2, 4, 1.5, 1),
+                oma = c(2, 0, 2, 0))
+  on.exit(par(op), add = TRUE)
+  for (i in worst) {
+    plot(s[, i], type = "l", col = cols$dark, xlab = "", ylab = "s_i",
+         main = sprintf("%s (bulk ESS %.0f)", colnames(s)[i], ess[i]),
+         cex.main = 0.9)
   }
-
-  N <- nrow(prob); K <- ncol(prob)
-  pal <- grDevices::colorRampPalette(
-    c(cols$light, cols$mid, cols$dark))(100)
-
-  old_par <- graphics::par(mar = c(6.5, 8, 4, 7))
-  on.exit(graphics::par(old_par), add = TRUE)
-
-  dots <- .bq_dots(list(...),
-                   c("col", "zlim", "axes", "xlab", "ylab", "main", "x", "y", "z"))
-  do.call(graphics::image, c(
-    list(x = seq_len(K), y = seq_len(N),
-         z = t(prob[N:1, , drop = FALSE]),
-         axes = FALSE, xlab = "", ylab = "",
-         col = pal, zlim = c(0, 1)),
-    dots))
-  graphics::axis(1, at = seq_len(K), labels = colnames(prob),
-                 tick = FALSE, line = -0.5)
-  graphics::axis(2, at = N:1, labels = rownames(prob),
-                 las = 1, tick = FALSE, cex.axis = 0.75)
-  graphics::box()
-
-  tier_cols <- c(Strong = cols$dark, Moderate = cols$mid, Weak = cols$light)
-  x_strip <- K + 0.6
-  graphics::rect(x_strip, seq_len(N) - 0.5,
-                 x_strip + 0.4, seq_len(N) + 0.5,
-                 col = tier_cols[as.character(tier$tier[N:1])],
-                 border = NA, xpd = TRUE)
-  graphics::mtext("tier", side = 3, at = x_strip + 0.2, line = 0.1,
-                  cex = 0.8)
-  graphics::legend("topright", inset = c(-0.10, -0.15), xpd = TRUE,
-                   legend = names(tier_cols), fill = tier_cols,
-                   bty = "n", cex = 0.75, border = NA)
-
-  # Horizontal colour bar below the plot.
-  usr <- graphics::par("usr")
-  bar_y1 <- usr[3] - 0.08 * (usr[4] - usr[3])
-  bar_y2 <- usr[3] - 0.03 * (usr[4] - usr[3])
-  bx <- seq(usr[1], usr[2], length.out = length(pal) + 1)
-  graphics::rect(bx[-length(bx)], bar_y1, bx[-1], bar_y2,
-                 col = pal, border = NA, xpd = NA)
-  lab_y <- usr[3] - 0.14 * (usr[4] - usr[3])
-  graphics::text(c(usr[1], mean(usr[1:2]), usr[2]), lab_y,
-                 labels = c("0", "P(dominant)", "1"),
-                 cex = 0.75, xpd = NA)
-
-  graphics::title(main = "Dominant-factor posterior probability")
-
+  cg <- fit$align$congruence
+  hist(cg, breaks = 30, col = cols$fill, border = cols$grey,
+       xlim = c(min(cg, 0.8), 1), xlab = "", ylab = "draws",
+       main = sprintf("alignment congruence (mean %.2f)", mean(cg)),
+       cex.main = 0.9)
+  mtext(sprintf("gate %s: max Rhat %.3f, min ESS %.0f bulk / %.0f tail (%d iterations%s)",
+                if (g$converged) "passed" else "NOT MET", g$rhat, g$ess_bulk,
+                g$ess_tail, g$iterations,
+                if (g$extended) ", warm-extended" else ""),
+        outer = TRUE, side = 3, cex = 0.85)
   invisible(fit)
 }
 
 
-#' Posterior predictive check on the correlation-matrix RMSE
+#' Posterior-predictive check display
 #'
 #' @description
-#' Histogram of the replicated correlation-matrix RMSE stored on
-#' `fit$ppc$rmse.r`: per draw, the RMSE between `cor(Y_rep)` and
-#' `cor(Y_obs)`. Rendered in the bayesplot-idiom (filled bars, no
-#' border, suppressed y-axis) with the median and central credible
-#' interval marked.
+#' The replicated distributions behind [check_fit()]: the agreement RMSE
+#' against its double-replicate reference, and the observed extra-factor
+#' eigenvalue in its replicated distribution.
 #'
-#' @param fit A `bayesqm_fit`.
-#' @param breaks Passed to `hist()`.
-#' @param ... Additional arguments forwarded to `hist()`.
+#' @param x A `bayesqm_checks` from [check_fit()].
 #'
-#' @return The input, invisibly.
+#' @return `x`, invisibly.
+#'
 #' @export
-plot_ppc <- function(fit, breaks = 30, ...) {
-  assert_bayesqm_fit(fit)
-  cols <- .bq_col()
+plot_ppc <- function(x) {
+  if (!inherits(x, "bayesqm_checks"))
+    .bq_abort("plot_ppc() takes a bayesqm_checks from check_fit().")
+  cols <- bayesqm_colors()
+  op <- .bq_par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
+  on.exit(par(op), add = TRUE)
 
-  rmse <- fit$ppc$rmse.r
-  if (is.null(rmse)) stop("No posterior predictive RMSE stored on this fit.")
-  rmse <- rmse[is.finite(rmse)]
-  if (length(rmse) < 2)
-    stop("Not enough finite PPC draws to plot (need >= 2).")
+  a <- x$agreement
+  hist(a$ref, breaks = 20, col = cols$fill, border = cols$grey,
+       xlim = range(c(a$ref, a$obs)), xlab = "agreement RMSE",
+       main = sprintf("Agreement check (p = %.2f)", a$p))
+  hist(a$obs, breaks = 20, col = adjustcolor(cols$qual[2], 0.55),
+       border = NA, add = TRUE)
+  .bq_legend("topright", legend = c("reference", "observed"),
+             fill = c(cols$fill, adjustcolor(cols$qual[2], 0.55)),
+             border = c(cols$grey, NA), cex = 0.75)
 
-  prob  <- fit$brief$prob
-  alpha <- 1 - prob
-  med <- median(rmse)
-  q   <- quantile(rmse, probs = c(alpha / 2, 1 - alpha / 2), names = FALSE)
-
-  old_par <- graphics::par(mar = c(5, 4, 4, 2))
-  on.exit(graphics::par(old_par), add = TRUE)
-
-  dots <- .bq_dots(list(...),
-                   c("col", "border", "main", "xlab", "ylab", "yaxt",
-                     "breaks", "x"))
-  do.call(graphics::hist, c(
-    list(x = rmse, breaks = breaks,
-         col = cols$fill, border = NA, yaxt = "n",
-         main = "Posterior predictive: correlation-matrix RMSE",
-         xlab = "RMSE( cor(Y_rep), cor(Y_obs) )",
-         ylab = ""),
-    dots))
-
-  graphics::abline(v = q,   lwd = 1,   col = cols$dark, lty = 2)
-  graphics::abline(v = med, lwd = 2.3, col = cols$dark)
-  graphics::mtext(sprintf("median %.3f   (%d%% CrI: %.3f, %.3f)",
-                          med, round(100 * prob), q[1], q[2]),
-                  side = 3, line = 0.25, cex = 0.85)
-
-  invisible(fit)
+  e <- x$extra_factor
+  hist(e$replicated, breaks = 20, col = cols$fill, border = cols$grey,
+       xlim = range(c(e$replicated, e$observed)),
+       xlab = expression(e[K + 1]),
+       main = sprintf("Extra-factor check (percentile %.2f)", e$percentile))
+  abline(v = e$observed, col = cols$accent, lwd = 2)
+  .bq_legend("topright", legend = c("replicated", "observed"),
+             fill = c(cols$fill, NA), border = c(cols$grey, NA),
+             lty = c(NA, 1), lwd = c(NA, 2),
+             col = c(NA, cols$accent), cex = 0.75)
+  invisible(x)
 }
 
 
-#' Loading forest with 50 and 95 percent credible intervals
-#'
-#' @description
-#' Horizontal dotchart of every participant's loading, one panel per
-#' factor, ranked by posterior mean. Each loading is drawn as a
-#' median point with nested 50 percent (thick) and 95 percent (thin)
-#' credible-interval whiskers. A faint grey vertical rule marks
-#' Brown's descriptive cut-off `+/- 1.96 / sqrt(J)`. When
-#' `highlight_flagged = TRUE`, participants in `fit$flagged[, k]` are
-#' drawn as filled points in the accent colour.
-#'
-#' @param fit A `bayesqm_fit`.
-#' @param factors Optional subset of factors to show (integer or name).
-#' @param highlight_flagged Logical; fill flagged participants.
-#' @param ... Additional arguments forwarded to `plot()`.
-#'
-#' @return The input, invisibly.
+#' @rdname plot_loading_posterior
+#' @param x,... A `bayesqm_fit` and arguments passed on.
 #' @export
-plot_loading_posterior <- function(fit, factors = NULL,
-                                   highlight_flagged = TRUE, ...) {
-  assert_bayesqm_fit(fit)
-  cols <- .bq_col()
-
-  L <- fit$Lambda_draws
-  N <- dim(L)[2]; K <- dim(L)[3]
-  fac_names  <- colnames(fit$loa)
-  part_names <- rownames(fit$loa)
-
-  if (is.null(factors)) {
-    fac_ix <- seq_len(K)
-  } else if (is.character(factors)) {
-    fac_ix <- match(factors, fac_names)
-    if (anyNA(fac_ix))
-      stop("Unknown factor(s): ",
-           paste(factors[is.na(fac_ix)], collapse = ", "))
-  } else {
-    fac_ix <- as.integer(factors)
-  }
-  if (length(fac_ix) == 0L) stop("No factors selected.")
-
-  prob    <- fit$brief$prob
-  alpha_o <- 1 - prob
-
-  med  <- .summarize_draws(L, median)
-  o_lo <- .summarize_draws(L, quantile, probs = alpha_o / 2,     names = FALSE)
-  o_hi <- .summarize_draws(L, quantile, probs = 1 - alpha_o / 2, names = FALSE)
-  i_lo <- .summarize_draws(L, quantile, probs = 0.25,            names = FALSE)
-  i_hi <- .summarize_draws(L, quantile, probs = 0.75,            names = FALSE)
-
-  brown <- 1.96 / sqrt(fit$brief$J)
-  xlim  <- range(c(o_lo, o_hi, -brown, brown), na.rm = TRUE)
-
-  lay <- .bq_mfrow(length(fac_ix))
-  old_par <- if (lay$override)
-    graphics::par(mfrow = lay$mfrow, mar = c(5, 7, 3, 1))
-  else
-    graphics::par(mar = c(5, 7, 3, 1))
-  on.exit(graphics::par(old_par), add = TRUE)
-
-  dots <- .bq_dots(list(...),
-                   c("xlim", "yaxt", "xlab", "ylab", "main", "type",
-                     "pch", "bg", "col", "x", "y"))
-
-  for (k in fac_ix) {
-    ord <- order(med[, k])
-    y   <- seq_len(N)
-
-    do.call(plot, c(
-      list(x = med[ord, k], y = y, xlim = xlim, type = "n",
-           yaxt = "n", xlab = "Loading", ylab = "",
-           main = fac_names[k]),
-      dots))
-
-    graphics::abline(v = 0, lty = 3, col = cols$grey)
-    graphics::abline(v = c(-brown, brown), lty = 2,
-                     col = cols$gridgrey, lwd = 1)
-
-    graphics::segments(o_lo[ord, k], y, o_hi[ord, k], y, lwd = 0.9)
-    graphics::segments(i_lo[ord, k], y, i_hi[ord, k], y, lwd = 2.5)
-
-    flagged <- if (isTRUE(highlight_flagged) && !is.null(fit$flagged) &&
-                   identical(dim(fit$flagged), c(N, K)))
-      fit$flagged[ord, k]
-    else
-      rep(FALSE, N)
-
-    graphics::points(med[ord, k], y, pch = 21,
-                     bg = ifelse(flagged, cols$accent, "white"),
-                     col = cols$dark, cex = 1.1, lwd = 1)
-
-    graphics::axis(2, at = y, labels = part_names[ord],
-                   las = 1, tick = FALSE, cex.axis = 0.7)
-  }
-
-  invisible(fit)
-}
-
-
-#' Per-statement factor-score posterior across factors
-#'
-#' @description
-#' For a single statement, draws the posterior median z-score per
-#' factor with nested 50 percent (thick) and 95 percent (thin)
-#' credible-interval whiskers, stacked vertically. The x-axis is
-#' symmetric around zero so the zero reference is centred.
-#'
-#' @param fit A `bayesqm_fit`.
-#' @param statement Integer index or statement name.
-#' @param ... Additional arguments forwarded to `plot()`.
-#'
-#' @return The input, invisibly.
-#' @export
-plot_zscore_posterior <- function(fit, statement, ...) {
-  assert_bayesqm_fit(fit)
-  cols <- .bq_col()
-
-  F <- fit$F_draws
-  J <- dim(F)[2]; K <- dim(F)[3]
-  stmt_names <- dimnames(F)[[2]]
-  fac_names  <- dimnames(F)[[3]]
-  if (is.null(stmt_names)) stmt_names <- paste0("S", seq_len(J))
-  if (is.null(fac_names))  fac_names  <- paste0("f", seq_len(K))
-
-  if (is.character(statement)) {
-    j <- match(statement, stmt_names)
-    if (is.na(j)) stop("Statement '", statement, "' not found.")
-  } else {
-    j <- as.integer(statement)
-    if (j < 1L || j > J) stop("statement index out of range.")
-  }
-
-  prob    <- fit$brief$prob
-  alpha_o <- 1 - prob
-
-  med  <- vapply(seq_len(K),
-                 function(k) median(F[, j, k], na.rm = TRUE), numeric(1))
-  i_lo <- vapply(seq_len(K),
-                 function(k) quantile(F[, j, k], 0.25,
-                                      names = FALSE, na.rm = TRUE), numeric(1))
-  i_hi <- vapply(seq_len(K),
-                 function(k) quantile(F[, j, k], 0.75,
-                                      names = FALSE, na.rm = TRUE), numeric(1))
-  o_lo <- vapply(seq_len(K),
-                 function(k) quantile(F[, j, k], alpha_o / 2,
-                                      names = FALSE, na.rm = TRUE), numeric(1))
-  o_hi <- vapply(seq_len(K),
-                 function(k) quantile(F[, j, k], 1 - alpha_o / 2,
-                                      names = FALSE, na.rm = TRUE), numeric(1))
-
-  span <- max(abs(c(o_lo, o_hi)), na.rm = TRUE)
-  xlim <- c(-span, span) * 1.05
-
-  old_par <- graphics::par(mar = c(5, 7, 4, 2))
-  on.exit(graphics::par(old_par), add = TRUE)
-
-  dots <- .bq_dots(list(...),
-                   c("xlim", "ylim", "type", "yaxt",
-                     "xlab", "ylab", "main", "x", "y"))
-  do.call(plot, c(
-    list(x = med, y = seq_len(K), xlim = xlim,
-         ylim = c(0.5, K + 0.5), type = "n", yaxt = "n",
-         xlab = "z-score", ylab = "",
-         main = sprintf("Posterior z-score: %s", stmt_names[j])),
-    dots))
-
-  graphics::abline(v = 0, lty = 3, col = cols$grey)
-  graphics::segments(o_lo, seq_len(K), o_hi, seq_len(K), lwd = 0.9)
-  graphics::segments(i_lo, seq_len(K), i_hi, seq_len(K), lwd = 2.6)
-  graphics::points(med, seq_len(K), pch = 21, bg = "white",
-                   col = cols$dark, cex = 1.3, lwd = 1.2)
-  graphics::axis(2, at = seq_len(K), labels = fac_names,
-                 las = 1, tick = FALSE)
-
-  invisible(fit)
-}
-
-
-#' MatchAlign Tucker's phi distribution by factor
-#'
-#' @description
-#' Boxplot of the per-draw Tucker's phi between each aligned loading
-#' column and the MatchAlign pivot, stored on
-#' `fit$align_info$congruence`. A semi-transparent strip of the
-#' individual draws is overlaid so bimodality -- the visible signature
-#' of residual label-switching -- is not hidden by the box. A dashed
-#' rule at 0.95 marks the conventional near-identity threshold.
-#'
-#' @param fit A `bayesqm_fit`.
-#' @param ... Additional arguments forwarded to `boxplot()`.
-#'
-#' @return The input, invisibly.
-#' @export
-plot_tucker <- function(fit, ...) {
-  assert_bayesqm_fit(fit)
-  cols <- .bq_col()
-
-  cng <- fit$align_info$congruence
-  if (is.null(cng)) stop("No MatchAlign congruence on this fit.")
-  if (!is.matrix(cng))
-    stop("align_info$congruence must be a matrix (draws x factor).")
-
-  fac_names <- colnames(cng)
-  if (is.null(fac_names)) fac_names <- colnames(fit$loa)
-  K <- ncol(cng)
-
-  old_par <- graphics::par(mar = c(5, 5, 4, 2))
-  on.exit(graphics::par(old_par), add = TRUE)
-
-  y_lo <- min(c(cng, 0.5), na.rm = TRUE)
-
-  dots <- .bq_dots(list(...),
-                   c("names", "outline", "boxwex", "col", "border",
-                     "ylim", "xlab", "ylab", "main", "x"))
-  do.call(graphics::boxplot, c(
-    list(x = as.data.frame(cng),
-         names   = fac_names,
-         outline = FALSE,
-         boxwex  = 0.45,
-         col     = cols$light,
-         border  = cols$dark,
-         ylim    = c(y_lo, 1),
-         xlab    = "Factor",
-         ylab    = "Tucker's phi (aligned vs pivot)",
-         main    = "MatchAlign alignment quality"),
-    dots))
-
-  # Strip of per-draw points to reveal multimodality.
-  jit_col <- grDevices::adjustcolor(cols$mid, alpha.f = 0.18)
-  for (k in seq_len(K)) {
-    xp <- k + stats::runif(nrow(cng), -0.12, 0.12)
-    graphics::points(xp, cng[, k], pch = 16, cex = 0.35, col = jit_col)
-  }
-
-  graphics::abline(h = 0.95, lty = 2, col = cols$accent, lwd = 1.1)
-  graphics::abline(h = 1,    lty = 3, col = cols$grey)
-  graphics::mtext("0.95 near-identity", side = 4, at = 0.95,
-                  line = 0.4, las = 1, cex = 0.7, col = cols$accent)
-
-  invisible(fit)
-}
-
-
-#' Distinguishing/consensus divergence forest
-#'
-#' @description
-#' Horizontal dot-and-whisker plot of the posterior viewpoint
-#' divergence `D_j` for every statement: posterior median with a 95%
-#' credible-interval whisker, statements ordered by the distinguishing
-#' probability `P(D_j > delta | Y)`. A dashed rule marks the substantive
-#' separation `delta` and each point is shaded by `P(D_j > delta | Y)`.
-#' By default the divergence summary stored on the fit is used (computed
-#' at the fit's `delta`); pass `delta` to recompute at a different
-#' separation without refitting.
-#'
-#' @param fit A `bayesqm_fit`.
-#' @param delta Optional separation override. If `NULL` (default) the
-#'   fit's stored summary (`fit$qdc`, at `fit$brief$delta`) is used;
-#'   that default is the Bayesian reliability-adjusted critical
-#'   difference ([critical_delta()]). Pass a numeric value to recompute
-#'   the divergence summary at a different separation.
-#' @param ... Additional arguments forwarded to `plot()`.
-#'
-#' @return The input, invisibly.
-#' @export
-plot_dist_cons <- function(fit, delta = NULL, ...) {
-  assert_bayesqm_fit(fit)
-  if (fit$brief$K < 2) stop("plot_dist_cons requires K >= 2.")
-  cols <- .bq_col()
-
-  if (is.null(delta)) {
-    q <- fit$qdc
-    if (is.null(q) ||
-        !all(c("D_median", "D_lower", "D_upper", "pi_D") %in% names(q)))
-      stop("This fit has no divergence summary; refit with the current bayesqm.")
-    d <- fit$brief$delta
-  } else {
-    if (!is.numeric(delta) || length(delta) != 1L)
-      stop("delta must be a single numeric value.")
-    dv <- compute_divergence(fit$F_draws, delta = delta)
-    q  <- data.frame(statement = names(dv$D_median),
-                     D_median  = unname(dv$D_median),
-                     D_lower   = unname(dv$D_lower),
-                     D_upper   = unname(dv$D_upper),
-                     pi_D      = unname(dv$pi_D),
-                     stringsAsFactors = FALSE)
-    d <- delta
-  }
-
-  has_pi <- any(is.finite(q$pi_D))
-  ord <- if (has_pi) order(q$pi_D, q$D_median) else order(q$D_median)
-  q   <- q[ord, , drop = FALSE]
-  J   <- nrow(q)
-  yv  <- seq_len(J)
-
-  old_par <- graphics::par(mar = c(5, 8, 4, 2))
-  on.exit(graphics::par(old_par), add = TRUE)
-
-  xr <- range(c(q$D_lower, q$D_upper,
-                if (!is.null(d) && is.finite(d)) d), na.rm = TRUE)
-  xr[1] <- min(0, xr[1])
-
-  dots <- .bq_dots(list(...),
-                   c("xlim", "yaxt", "xlab", "ylab", "main", "type",
-                     "x", "y", "pch", "bg", "col"))
-  do.call(plot, c(
-    list(x = q$D_median, y = yv, xlim = xr, type = "n", yaxt = "n",
-         xlab = "Viewpoint divergence D_j", ylab = "",
-         main = "Distinguishing / consensus: posterior divergence"),
-    dots))
-
-  if (!is.null(d) && is.finite(d))
-    graphics::abline(v = d, lty = 2, col = cols$accent, lwd = 1.1)
-  graphics::segments(q$D_lower, yv, q$D_upper, yv, lwd = 1.0, col = cols$dark)
-
-  if (has_pi) {
-    pal  <- grDevices::colorRampPalette(
-      c(cols$light, cols$mid, cols$dark))(100)
-    pcol <- pal[pmax(1L, pmin(100L, round(q$pi_D * 99) + 1L))]
-  } else {
-    pcol <- "white"
-  }
-  graphics::points(q$D_median, yv, pch = 21, bg = pcol,
-                   col = cols$dark, cex = 1.1, lwd = 1)
-  graphics::axis(2, at = yv, labels = q$statement,
-                 las = 1, tick = FALSE, cex.axis = 0.7)
-
-  note <- if (!is.null(d) && is.finite(d))
-    sprintf("delta = %.2f (dashed); point shade = P(D_j > delta | Y)", d)
-  else
-    "delta not set; showing D_j posterior only"
-  graphics::mtext(note, side = 3, line = 0.3, cex = 0.8)
-
-  invisible(fit)
-}
-
-
-#' Hyperparameter posterior densities
-#'
-#' @description
-#' One panel per scalar hyperparameter (default `nu`, `sigma`, `tau`)
-#' showing a two-tone kernel density: the full posterior in the light
-#' shade, the central credible interval re-shaded in the mid shade,
-#' and the posterior median marked by a short tick at the baseline.
-#' Coverage defaults to `fit$brief$prob`. When a parameter's support
-#' spans more than one order of magnitude (`max / min > 20`, all
-#' positive), the x-axis is automatically rendered on a log scale so
-#' the density shape is not crushed against the lower bound.
-#'
-#' @param fit A `bayesqm_fit`.
-#' @param pars Character vector of hyperparameter names to show.
-#' @param log `NULL` (default) auto-detects per parameter; set to
-#'   `"x"` to force log, or `""` to force linear.
-#' @param ... Additional arguments forwarded to `plot()`.
-#'
-#' @return The input, invisibly.
-#' @export
-plot_hyper <- function(fit, pars = c("nu", "sigma", "tau"),
-                       log = NULL, ...) {
-  assert_bayesqm_fit(fit)
-  cols <- .bq_col()
-
-  hp    <- fit$hyperparams
-  prob  <- fit$brief$prob
-  alpha <- 1 - prob
-
-  avail <- pars[vapply(pars, function(p) {
-    v <- hp[[p]]
-    !is.null(v) && sum(is.finite(v)) >= 2L
-  }, logical(1))]
-  if (length(avail) == 0L)
-    stop("No non-empty hyperparameter draws to plot.")
-
-  old_par <- graphics::par(mfrow = c(1, length(avail)),
-                           mar  = c(5, 4.5, 6, 2.5),
-                           oma  = c(0, 0, 1, 0))
-  on.exit(graphics::par(old_par), add = TRUE)
-
-  dots <- .bq_dots(list(...),
-                   c("main", "xlab", "ylab", "lwd", "col", "type",
-                     "xlim", "ylim", "log", "x", "y"))
-
-  for (p in avail) {
-    v <- hp[[p]]
-    v <- v[is.finite(v)]
-
-    use_log <- if (is.null(log))
-      all(v > 0) && (max(v) / min(v[v > 0]) > 20)
-    else
-      identical(log, "x")
-
-    bw <- if (use_log) "SJ" else "nrd0"
-    d_raw <- stats::density(if (use_log) log(v) else v, bw = bw)
-    d_x <- if (use_log) exp(d_raw$x) else d_raw$x
-    d_y <- d_raw$y
-
-    lo  <- quantile(v, alpha / 2,     names = FALSE)
-    hi  <- quantile(v, 1 - alpha / 2, names = FALSE)
-    med <- median(v)
-
-    do.call(plot, c(
-      list(x = d_x, y = d_y, type = "n",
-           log  = if (use_log) "x" else "",
-           main = "", xlab = "", ylab = "Posterior density"),
-      dots))
-
-    graphics::polygon(c(d_x[1], d_x, d_x[length(d_x)]),
-                      c(0,      d_y, 0),
-                      col = cols$light, border = NA)
-    in_band <- d_x >= lo & d_x <= hi
-    graphics::polygon(c(lo, d_x[in_band], hi),
-                      c(0,  d_y[in_band], 0),
-                      col = cols$fill, border = NA)
-    graphics::lines(d_x, d_y, lwd = 1.4, col = cols$dark)
-    y_tick <- -0.02 * max(d_y)
-    graphics::segments(med, 0, med, y_tick, lwd = 2, col = cols$dark)
-
-    scale_note <- if (use_log) "  (log x)" else ""
-    graphics::mtext(p, side = 3, line = 4.0,
-                    cex = 1.1, font = 2, col = cols$dark)
-    graphics::mtext(
-      sprintf("median = %.3g", med),
-      side = 3, line = 2.3, cex = 0.78, col = "grey30")
-    graphics::mtext(
-      sprintf("%d%% CrI: [%.3g, %.3g]%s",
-              round(100 * prob), lo, hi, scale_note),
-      side = 3, line = 0.9, cex = 0.78, col = "grey30")
-  }
-
-  invisible(fit)
-}
+plot.bayesqm_fit <- function(x, ...) plot_loading_posterior(x, ...)

@@ -22,16 +22,16 @@ invisibly.
 \description{
 Every plot in the package reads its palette through
 \code{bayesqm_colors()}. Call \code{bayesqm_set_colors()} to switch the active
-scheme for every subsequent plot. The available built-in schemes
-are \code{"blue"} (default), \code{"teal"}, \code{"red"}, \code{"purple"}, and \code{"grey"}.
-For full control, pass a named list with slots \code{light}, \code{mid},
-\code{dark}, \code{accent}, \code{grey}, \code{gridgrey}, and \code{fill}.
+scheme for every subsequent plot. The available built-in schemes are
+\code{"sorts"} (default, the \code{\link[=plot_sorts]{plot_sorts()}} colour family), \code{"blue"},
+\code{"teal"}, \code{"red"}, \code{"purple"}, and \code{"grey"}.
+For full control, pass a named list with slots \code{dark}, \code{accent},
+\code{grey}, \code{gridgrey}, and \code{fill}.
 }
 \examples{
 bayesqm_colors()
-fit <- demo_fit(N = 6, J = 10, K = 2, Td = 50, seed = 1)
-bayesqm_set_colors("teal")
-plot(fit)
-bayesqm_set_colors("blue")  # restore default
+old <- bayesqm_set_colors("teal")
+bayesqm_colors()[["fill"]]
+bayesqm_set_colors(old)
 
 }

@@ -20,9 +20,9 @@ in addition to those named in \code{pars}.}
 }
 \value{
 A matrix with one row per parameter and two columns for the
-lower and upper interval bounds (as percent strings).
+lower and upper interval bounds.
 }
 \description{
 Posterior credible intervals for any subset of parameters in a
-\code{bayesqm_fit}. Method for \code{\link[rstantools:posterior_interval]{rstantools::posterior_interval()}}.
+\code{bayesqm_fit}. Method for \code{\link[=posterior_interval]{posterior_interval()}}.
 }

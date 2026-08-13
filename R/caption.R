@@ -1,61 +1,59 @@
 # caption.R
-# Builds a one-line figure caption summarising the model configuration,
-# sampler settings, and convergence diagnostics from fit$brief and
-# fit$diagnostics.
+# One-line figure caption carrying the fit's provenance.
 
 
-#' Dynamic figure caption for a bayesqm_fit
+#' Caption text for figures from a fit
 #'
 #' @description
-#' Returns a human-readable caption string summarising the model
-#' configuration (`K`, `N`, `J`, family), the sampler (backend, chains,
-#' post-warmup draws), the interval probability, and convergence
-#' diagnostics (max Rhat, divergent transitions).
+#' A single string naming the model, the panel, the draws, and the gate
+#' verdict — the provenance a figure caption should carry.
 #'
 #' @param fit A `bayesqm_fit`.
-#' @param include_ref Logical; append a brief package-attribution line.
-#' @param include_diag Logical; append the convergence-diagnostic line.
+#' @param include_gate Append the gate report (default `TRUE`).
 #'
-#' @return A length-1 character string.
+#' @return A length-one character string.
 #'
 #' @examples
-#' fit <- demo_fit(N = 6, J = 10, K = 2, Td = 50, seed = 1)
-#' cat(caption_bayesqm(fit))
+#' caption_bayesqm(demo_fit())
 #'
 #' @export
-caption_bayesqm <- function(fit, include_ref = TRUE, include_diag = TRUE) {
+caption_bayesqm <- function(fit, include_gate = TRUE) {
   assert_bayesqm_fit(fit)
-  b <- fit$brief
-  d <- if (is.null(fit$diagnostics)) list() else fit$diagnostics
-
-  parts <- c(
-    sprintf("Bayesian Q-methodology factor model (K = %d, N = %d, J = %d)",
-            b$K, b$N, b$J),
-    sprintf("fitted with a %s likelihood via %s (%d chain%s, %s post-warmup draws)",
-            b$family, b$backend, b$chains,
-            if (b$chains == 1L) "" else "s",
-            format(b$post_warmup, big.mark = ",", scientific = FALSE)),
-    sprintf("intervals shown at %d%% posterior coverage",
-            round(100 * b$prob))
-  )
-
-  if (isTRUE(include_diag)) {
-    rhat_s <- if (is.null(d$rhat_max) || !is.finite(d$rhat_max))
-      "NA" else sprintf("%.3f", d$rhat_max)
-    ess_s  <- if (is.null(d$ess_bulk) || !is.finite(d$ess_bulk))
-      "NA" else format(round(d$ess_bulk), big.mark = ",")
-    div_s  <- if (is.null(d$divergences) || !is.finite(d$divergences))
-      "NA" else as.character(d$divergences)
-    parts <- c(parts,
-               sprintf("max Rhat = %s, min bulk ESS = %s, %s divergent transition%s",
-                       rhat_s, ess_s, div_s,
-                       if (identical(div_s, "1")) "" else "s"))
-  }
-
-  out <- paste0(paste(parts, collapse = "; "), ".")
-
-  if (isTRUE(include_ref))
-    out <- paste(out, "Fitted with the bayesqm R package.")
-
+  b <- fit$brief; g <- fit$gate
+  out <- sprintf(
+    "Exact partition (rank-order) likelihood; N = %d, J = %d, K = %d; %d posterior draws.",
+    b$N, b$J, b$K, dim(fit$draws$F)[1])
+  if (include_gate)
+    out <- paste(out, sprintf(
+      "Convergence gate %s (max Rhat %.3f, min ESS %.0f).",
+      if (g$converged) "passed" else "not met", g$rhat,
+      min(g$ess_bulk, g$ess_tail)))
   out
+}
+
+
+# one-release aliases for the 0.1.0 plot names whose concept survived
+
+#' @rdname plot_flags
+#' @param ... Passed on.
+#' @export
+plot_membership <- function(...) {
+  .Deprecated("plot_flags", package = "bayesqm")
+  plot_flags(...)
+}
+
+#' @rdname plot_contrasts
+#' @param ... Passed on.
+#' @export
+plot_dist_cons <- function(...) {
+  .Deprecated("plot_contrasts", package = "bayesqm")
+  plot_contrasts(...)
+}
+
+#' @rdname plot_convergence
+#' @param ... Passed on.
+#' @export
+plot_tucker <- function(...) {
+  .Deprecated("plot_convergence", package = "bayesqm")
+  plot_convergence(...)
 }

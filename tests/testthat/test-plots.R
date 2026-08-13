@@ -1,257 +1,111 @@
-# Every plot function must (a) run end-to-end on a synthetic fit,
-# (b) return its input invisibly, and (c) not error on the K = 1 edge
-# case or when factor labels have been renamed. All drawing is routed
-# to a temporary PDF device so the tests produce no visible output.
+# The plot suite: every view draws without error on a complete fit, par()
+# is restored, and each returns its input invisibly.
 
-with_pdf_device <- function(expr) {
-  f <- tempfile(fileext = ".pdf")
-  grDevices::pdf(file = f)
-  on.exit({ grDevices::dev.off(); unlink(f) }, add = TRUE)
-  force(expr)
+expect_plots_cleanly <- function(code) {
+  tmp <- tempfile(fileext = ".pdf")
+  grDevices::pdf(tmp)
+  op <- par(no.readonly = TRUE)
+  out <- force(code)
+  expect_identical(par("mfrow"), op$mfrow)
+  grDevices::dev.off()
+  unlink(tmp)
+  invisible(out)
 }
 
-
-test_that("plot_elpd runs on a fake bayesqm_run", {
-  fake_tab <- data.frame(
-    K = 1:4,
-    elpd = c(-200, -180, -175, -178),
-    se   = c(8, 6, 5, 5),
-    delta_elpd = c(NA, -20, -5, 3),
-    se_delta   = c(NA, 4, 3, 3),
-    ratio      = c(NA, 5, 1.7, 1)
-  )
-  run <- structure(
-    list(call = NULL, fits = list(), tab = fake_tab,
-         loo_list = vector("list", 4),
-         k_peak = 3L, k_sivula = 2L, case = "gap"),
-    class = "bayesqm_run")
-
-  with_pdf_device({
-    res <- plot_elpd(run)
-    expect_identical(res, run)
-  })
+test_that("every fit view draws cleanly", {
+  fit <- demo_fit()
+  expect_plots_cleanly(expect_invisible(plot_loading_posterior(fit)))
+  expect_plots_cleanly(expect_invisible(plot_flags(fit)))
+  expect_plots_cleanly(expect_invisible(plot_factor_array(fit)))
+  expect_plots_cleanly(expect_invisible(plot_factor_array(fit, factor = "f2")))
+  expect_plots_cleanly(expect_invisible(plot_contrasts(fit)))
+  expect_plots_cleanly(expect_invisible(plot_convergence(fit)))
+  expect_plots_cleanly(expect_invisible(plot(fit)))
 })
 
-
-test_that("plot_elpd with all-NA ELPD errors cleanly", {
-  fake_tab <- data.frame(
-    K = 1:3, elpd = NA_real_, se = NA_real_,
-    delta_elpd = NA_real_, se_delta = NA_real_, ratio = NA_real_)
-  run <- structure(
-    list(tab = fake_tab, loo_list = list(),
-         k_peak = NA_integer_, k_sivula = NA_integer_, case = NA_character_),
-    class = "bayesqm_run")
-  with_pdf_device({
-    expect_error(plot_elpd(run), "No finite ELPD")
-  })
+test_that("check and selection views draw cleanly", {
+  fit <- demo_fit()
+  ck <- check_fit(fit, draws = 15)
+  expect_plots_cleanly(expect_invisible(plot_ppc(ck)))
+  pc <- check_persons(fit, draws = 10, mixes = 20)
+  expect_plots_cleanly(expect_invisible(plot_person_check(pc)))
 })
 
-
-test_that("plot_membership produces tiles on a multi-factor fit", {
-  fit <- make_fake_fit(N = 8, J = 10, K = 3)
-  with_pdf_device({
-    res <- plot_membership(fit)
-    expect_identical(res, fit)
-  })
+test_that("plot inputs are validated", {
+  fit <- demo_fit()
+  expect_error(plot_factor_array(fit, factor = 9), "no such factor")
+  expect_error(plot_contrasts(fit, pair = "f9-f1"), "no such pair")
+  expect_error(plot_ppc(fit), "bayesqm_checks")
+  expect_error(plot_person_check(fit), "bayesqm_persons")
 })
 
-
-test_that("plot_membership handles sort = FALSE", {
-  fit <- make_fake_fit(N = 6, J = 10, K = 2)
-  with_pdf_device({
-    expect_silent(plot_membership(fit, sort = FALSE))
-  })
+test_that("deprecated plot names forward with a deprecation signal", {
+  fit <- demo_fit()
+  tmp <- tempfile(fileext = ".pdf")
+  grDevices::pdf(tmp)
+  expect_warning(plot_membership(fit), "plot_flags")
+  expect_warning(plot_dist_cons(fit), "plot_contrasts")
+  expect_error(plot_hyper(fit), "factor_characteristics")
+  grDevices::dev.off()
+  unlink(tmp)
 })
 
-
-test_that("plot_ppc renders the histogram of PPC RMSE", {
-  fit <- make_fake_fit(N = 6, J = 10, K = 2)
-  with_pdf_device({
-    res <- plot_ppc(fit)
-    expect_identical(res, fit)
-  })
+test_that("autoplot serves the flagship four", {
+  skip_if_not_installed("ggplot2")
+  fit <- demo_fit()
+  for (ty in c("loadings", "flags", "contrasts", "array")) {
+    p <- ggplot2::autoplot(fit, type = ty)
+    expect_s3_class(p, "ggplot")
+  }
 })
 
-
-test_that("plot_ppc errors when the fit has no PPC stored", {
-  fit <- make_fake_fit(N = 6, J = 10, K = 2)
-  fit$ppc <- list()
-  with_pdf_device({
-    expect_error(plot_ppc(fit), "No posterior predictive")
-  })
+test_that("caption carries provenance and the gate verdict", {
+  fit <- demo_fit()
+  cap <- caption_bayesqm(fit)
+  expect_match(cap, "Exact partition")
+  expect_match(cap, "N = 8, J = 13, K = 2")
+  expect_match(cap, "gate passed")
+  expect_false(grepl("gate", caption_bayesqm(fit, include_gate = FALSE)))
 })
 
-
-test_that("plot_loading_posterior renders one panel per factor", {
-  fit <- make_fake_fit(N = 8, J = 12, K = 3)
-  with_pdf_device({
-    res <- plot_loading_posterior(fit)
-    expect_identical(res, fit)
-  })
+test_that("plot_sorts previews every participant on any labeling", {
+  distr <- c(1, 2, 3, 2, 1)
+  set.seed(2)
+  Y <- t(quota_sort_rows(matrix(rnorm(5 * 9), 5, 9), distr)) - 3   # -2..+2
+  qd <- qsort_data(Y, distribution = distr, validate = FALSE)
+  expect_plots_cleanly(expect_invisible(plot_sorts(qd)))
+  expect_plots_cleanly(expect_invisible(plot(qd)))                 # dispatch
+  expect_plots_cleanly(expect_invisible(plot_sorts(qd, participants = c(2, 4))))
+  expect_plots_cleanly(expect_invisible(plot_sorts(qd, per_page = 2)))
+  expect_error(plot_sorts(qd, participants = "nobody"), "unknown participant")
+  # asymmetric grid
+  distr2 <- c(1, 2, 4, 2)
+  Y2 <- t(quota_sort_rows(matrix(rnorm(3 * 9), 3, 9), distr2))
+  expect_plots_cleanly(
+    expect_invisible(plot_sorts(qsort_data(Y2, distribution = distr2,
+                                           validate = FALSE))))
 })
 
-
-test_that("plot_loading_posterior supports factor subsetting by name and index", {
-  fit <- make_fake_fit(N = 6, J = 10, K = 3)
-  with_pdf_device({
-    expect_silent(plot_loading_posterior(fit, factors = 1))
-    expect_silent(plot_loading_posterior(fit, factors = c("f1", "f3")))
-    expect_error(plot_loading_posterior(fit, factors = "does_not_exist"),
-                 "Unknown factor")
-  })
+test_that("autoplot previews sorts as faceted pyramids", {
+  skip_if_not_installed("ggplot2")
+  distr <- c(1, 2, 3, 2, 1)
+  set.seed(2)
+  Y <- t(quota_sort_rows(matrix(rnorm(4 * 9), 4, 9), distr))
+  qd <- qsort_data(Y, distribution = distr, validate = FALSE)
+  p <- ggplot2::autoplot(qd)
+  expect_s3_class(p, "ggplot")
 })
 
-
-test_that("plot_loading_posterior respects rename_factors", {
-  fit  <- make_fake_fit(N = 6, J = 10, K = 2)
-  fit2 <- rename_factors(fit, c("tradition", "innovation"))
-  with_pdf_device({
-    expect_silent(plot_loading_posterior(fit2))
-  })
-})
-
-
-test_that("plot_zscore_posterior runs for one statement (index or name)", {
-  fit <- make_fake_fit(N = 5, J = 10, K = 3)
-  with_pdf_device({
-    expect_silent(plot_zscore_posterior(fit, 1))
-    expect_silent(plot_zscore_posterior(fit, "S5"))
-    expect_error(plot_zscore_posterior(fit, "nope"), "not found")
-  })
-})
-
-
-test_that("plot_tucker renders when congruence is present", {
-  fit <- make_fake_fit(N = 6, J = 10, K = 2)
-  with_pdf_device({
-    res <- plot_tucker(fit)
-    expect_identical(res, fit)
-  })
-})
-
-
-test_that("plot_tucker errors when align_info is missing", {
-  fit <- make_fake_fit(N = 6, J = 10, K = 2)
-  fit$align_info$congruence <- NULL
-  with_pdf_device({
-    expect_error(plot_tucker(fit), "No MatchAlign congruence")
-  })
-})
-
-
-test_that("plot_dist_cons renders a heatmap and errors for K < 2", {
-  fit  <- make_fake_fit(N = 6, J = 8, K = 3)
-  fit1 <- make_fake_fit(N = 6, J = 8, K = 1)
-  with_pdf_device({
-    res <- plot_dist_cons(fit, delta = 1.0)
-    expect_identical(res, fit)
-    expect_error(plot_dist_cons(fit1), "K >= 2")
-  })
-})
-
-
-test_that("plot_hyper renders a panel per available parameter", {
-  fit <- make_fake_fit(N = 5, J = 10, K = 2)
-  with_pdf_device({
-    res <- plot_hyper(fit)
-    expect_identical(res, fit)
-  })
-})
-
-
-test_that("plot_hyper gracefully handles partially-NA hyperparams", {
-  fit <- make_fake_fit(N = 5, J = 10, K = 2)
-  fit$hyperparams$nu <- rep(NA_real_, length(fit$hyperparams$nu))
-  with_pdf_device({
-    # sigma and tau remain; nu should be silently skipped
-    expect_silent(plot_hyper(fit))
-  })
-})
-
-
-test_that("plot_hyper errors when every parameter is empty", {
-  fit <- make_fake_fit(N = 5, J = 10, K = 2)
-  for (p in c("nu", "sigma", "tau"))
-    fit$hyperparams[[p]] <- rep(NA_real_, length(fit$hyperparams[[p]]))
-  with_pdf_device({
-    expect_error(plot_hyper(fit), "No non-empty hyperparameter")
-  })
-})
-
-
-test_that("plot.bayesqm_fit sort_by accepts a factor index", {
-  fit <- make_fake_fit(N = 5, J = 10, K = 3)
-  with_pdf_device({
-    expect_silent(plot(fit, sort_by = 2))
-    expect_error(plot(fit, sort_by = 0), "1:K")
-    expect_error(plot(fit, sort_by = 99), "1:K")
-  })
-})
-
-
-test_that("plot functions do not collide with user-supplied ... args", {
-  # These args all conflict with hardcoded ones -- must NOT error.
-  fit <- make_fake_fit(N = 4, J = 8, K = 2)
-
-  fake_run <- structure(
-    list(tab = data.frame(K = 1:3, elpd = c(-10, -8, -9), se = c(1, 1, 1),
-                          delta_elpd = c(NA, -2, 1), se_delta = c(NA, 0.5, 0.5),
-                          ratio = c(NA, 4, 2)),
-         k_peak = 2L, k_sivula = 2L, case = "agree",
-         loo_list = list()),
-    class = "bayesqm_run")
-
-  with_pdf_device({
-    expect_silent(plot(fit, main = "Custom", xlab = "Custom"))
-    expect_silent(plot_elpd(fake_run, main = "Custom", xlab = "Custom"))
-    expect_silent(plot_ppc(fit, main = "Custom", col = "red"))
-    expect_silent(plot_membership(fit, main = "Custom"))
-    expect_silent(plot_loading_posterior(fit, main = "Custom"))
-    expect_silent(plot_zscore_posterior(fit, 1, main = "Custom"))
-    expect_silent(plot_tucker(fit, main = "Custom", col = "red"))
-    expect_silent(plot_dist_cons(fit, main = "Custom"))
-    expect_silent(plot_hyper(fit, main = "Custom"))
-  })
-})
-
-
-test_that("plot_ppc errors when PPC draws are non-finite or too few", {
-  fit <- make_fake_fit(N = 4, J = 8, K = 2)
-  fit$ppc$rmse.r <- rep(Inf, 10L)
-  with_pdf_device({
-    expect_error(plot_ppc(fit), "Not enough finite")
-  })
-  fit$ppc$rmse.r <- c(0.3, NA, NA)
-  with_pdf_device({
-    expect_error(plot_ppc(fit), "Not enough finite")
-  })
-})
-
-
-test_that("plot_tucker rejects non-matrix congruence", {
-  fit <- make_fake_fit(N = 4, J = 8, K = 2, T = 40)
-  fit$align_info$congruence <- array(0.9, dim = c(40, 2, 2))
-  with_pdf_device({
-    expect_error(plot_tucker(fit), "must be a matrix")
-  })
-})
-
-
-test_that("plot_loading_posterior rejects empty factor selection", {
-  fit <- make_fake_fit(N = 4, J = 8, K = 2)
-  with_pdf_device({
-    expect_error(plot_loading_posterior(fit, factors = integer(0)),
-                 "No factors selected")
-  })
-})
-
-
-test_that("plot_dist_cons cleans up layout() on exit", {
-  fit <- make_fake_fit(N = 5, J = 10, K = 3)
-  with_pdf_device({
-    plot_dist_cons(fit)
-    # A fresh plot() must succeed after the function returns; this
-    # verifies that layout() was restored on exit.
-    expect_silent(plot(1:3))
-  })
+test_that("statement views draw cleanly and validate", {
+  fit <- demo_fit()
+  expect_plots_cleanly(expect_invisible(plot_zscores(fit)))
+  expect_plots_cleanly(expect_invisible(plot_zscores(fit, order_by = "score")))
+  expect_plots_cleanly(expect_invisible(plot_statement(fit, "S3")))
+  expect_plots_cleanly(expect_invisible(plot_statement(fit, 5)))
+  expect_error(plot_statement(fit, "S99"), "no such statement")
+  tmp <- tempfile(fileext = ".pdf"); grDevices::pdf(tmp)
+  expect_warning(plot_zscore_posterior(fit, 2), "plot_statement")
+  grDevices::dev.off(); unlink(tmp)
+  fit1 <- make_fake_fit(N = 5, J = 9, K = 1, T = 80)
+  expect_plots_cleanly(expect_invisible(plot_zscores(fit1)))   # K = 1 path
 })

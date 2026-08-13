@@ -2,87 +2,72 @@
 #' @aliases bayesqm-package
 "_PACKAGE"
 
-#' bayesqm: Bayesian Q-Methodology Factor Analysis
+#' bayesqm: Bayesian Q Methodology
 #'
 #' @description
-#' A Bayesian factor-analytic framework for Q methodology. Fits a low-rank
-#' factor model to Q-sort data with a Student-t likelihood and a hierarchical
-#' normal prior on loadings, samples the posterior with Stan, resolves
-#' rotational ambiguity via MatchAlign post-processing, and returns
-#' posterior summaries including credible intervals for loadings and factor
-#' scores, probabilistic dominant-factor membership, distinguishing and
-#' consensus statements, and PSIS-LOO-based factor enumeration.
+#' A Bayesian analysis for Q methodology, alongside the classical one. The
+#' forced Q sort is modeled as an ordered partition of the statements
+#' through an exact rank-order likelihood: the design quotas fix the
+#' partition margins, so the probability of the observed sorting event is
+#' the full observed-data likelihood. The posterior is sampled by a
+#' parameter-expanded Gibbs sampler in pure R, gated on rotation-invariant
+#' convergence diagnostics, aligned by MatchAlign, and returned as the
+#' familiar Q tables with uncertainty attached.
 #'
 #' @details
-#' The typical workflow is:
+#' The typical workflow:
 #'
 #' \enumerate{
 #'   \item **Import data.** [read_qsort()] auto-detects CSV, Excel,
 #'     PQMethod `.DAT`, Ken-Q JSON / multi-sheet Excel, KADE ZIP, or
 #'     Easy-HTMLQ Firebase JSON. [qsort_data()] constructs the object
-#'     directly from a matrix.
-#'   \item **Fit the model.** [fit_bayesian()] returns a `bayesqm_fit`
-#'     object. [run_bayes()] fits the model for a range of K and returns
-#'     a `bayesqm_run` object carrying the ELPD comparison table and the
-#'     peak-plus-Sivula protocol verdict.
-#'   \item **Summarise the posterior.** [compute_loadings()],
-#'     [compute_zscores()], [compute_factor_array()],
-#'     [compute_dominant_prob()], [compute_threshold_prob()],
-#'     [compute_divergence()], [classify_membership()], and
-#'     [compute_posterior_scalars()].
-#'   \item **Use standard R accessors.** `coef()`, `fitted()`,
-#'     `residuals()`, `sigma()`, `family()`, `nobs()`, `as.matrix()`,
-#'     `as.array()`, `as.data.frame()`, `update()`, plus
-#'     [rstantools::posterior_interval()] and
-#'     [rstantools::prior_summary()] work directly on the fit.
+#'     directly from a matrix. The exact likelihood needs forced sorts:
+#'     every participant must match the design grid.
+#'   \item **Fit.** [fit_bayesian()] returns a `bayesqm_fit`; [extend()]
+#'     warm-continues a chain the convergence gate flagged.
+#'   \item **Read the tables.** [compute_loadings()] (bounded loadings
+#'     with credible intervals), [compute_flags()] (flag probabilities
+#'     with an unclassified state), [compute_zscores()],
+#'     [compute_factor_array()] (quota-exact arrays),
+#'     [compute_qdc()] (distinguishing / consensus / indeterminate),
+#'     [crib_sheet()], and [claims()] — one posterior false-discovery
+#'     rule selecting every claim.
+#'   \item **Check the model.** [check_fit()] (agreement, extra-factor,
+#'     and paired-comparison checks) and [check_persons()] (the person check,
+#'     against mixed-replication bands).
+#'   \item **Choose K.** [fit_ladder()] and [select_k()] run the
+#'     two-signal workflow; [loo_ladder()] adds directional
+#'     corroboration.
+#'   \item **Report.** The `plot_*` views, [rotate_factors()] for
+#'     judgmental rotation, [rename_factors()], and the standard R
+#'     accessors (`coef()`, `fitted()`, `as_draws_df()`,
+#'     [posterior_interval()], [prior_summary()]).
 #' }
 #'
-#' Draws extraction works with the `posterior` package (`as_draws_df()`,
-#' `as_draws_matrix()`, `as_draws_array()`), which in turn makes the fit
-#' usable with `bayesplot` and `tidybayes` through their standard
-#' conventions.
+#' @section Relationship to classical Q analysis:
+#' The questions and the reporting conventions are Q's own; what the
+#' Bayesian account adds is a probability behind each familiar verdict.
+#' Vocabulary carries over: flags, factor arrays, defining sorts,
+#' distinguishing and consensus statements. Two deliberate differences in
+#' the tables:
 #'
-#' @section Relationship to the qmethod package:
-#' The `bayesqm_fit` object parallels `qmethod::qmethod` output where that
-#' is meaningful, so scripts written against `qmethod` largely keep
-#' working:
-#'
-#' - Slot names match: `$dataset`, `$loa`, `$zsc`, `$zsc_n`, `$f_char`,
-#'   `$qdc`, `$flagged`.
-#' - `$qdc` is the Bayesian divergence table (per-viewpoint grid and
-#'   z-score with 95% CrI, then `D_j` with 95% CrI, `pi_D`, `pi_C`),
-#'   not the classical significance-label vocabulary.
-#' - Dotted reader aliases ([import.pqmethod()], [import.htmlq()],
-#'   [import.kenq()], [import.easyhtmlq()]) forward to the `read_*`
-#'   readers.
-#'
-#' Intentional Bayesian divergences:
-#'
-#' - `$f_char$characteristics` omits the classical test-theory columns
-#'   (`av_rel_coef`, `reliability`, `se_fscores`, `sd_dif`). Factor-score
-#'   uncertainty is already quantified by the posterior credible
-#'   intervals in `$ci_lower` and `$ci_upper`, so Spearman-Brown
-#'   composite reliability is not the right construct.
-#' - `$flagged` is a logical `N x K` matrix defined as
-#'   `P(argmax_k |Lambda[i, k]| = k) > 0.5` rather than Brown's (1980)
-#'   significance-based rule. The posterior probability makes the
-#'   Bayesian analogue direct.
-#' - `$brief` uses `K`, `N`, `J` (not `nfactors`, `nqsort`, `nstat`) and
-#'   includes Bayesian-specific fields (`family`, `prob`, `priors`,
-#'   `backend`).
+#' - Factor characteristics do not print eigenvalues or explained
+#'   variance, which have no counterpart in a generative model; report
+#'   the defining-sort counts from [claims()] and the extra-factor check
+#'   of [check_fit()] in their place.
+#' - Consensus is a positive finding (an equivalence region of one grid
+#'   column, [delta_grid()]), not the complement of distinguishing, so a
+#'   statement can be distinguishing, consensus, or neither.
 #'
 #' @references
-#' Poworoznek, E., Anceschi, N., Ferrari, F., & Dunson, D. (2025). Efficiently
-#'   Resolving Rotational Ambiguity in Bayesian Matrix Sampling with
-#'   Matching. *Bayesian Analysis*.
+#' Poworoznek, E., Anceschi, N., Ferrari, F., & Dunson, D. (2025).
+#'   Efficiently Resolving Rotational Ambiguity in Bayesian Matrix
+#'   Sampling with Matching. *Bayesian Analysis*.
 #'
-#' Sivula, T., Magnusson, M., Matamoros, A. A., & Vehtari, A. (2025).
-#'   Uncertainty in Bayesian Leave-One-Out Cross-Validation Based Model
-#'   Comparison. *Bayesian Analysis*.
-#'
-#' Vehtari, A., Gelman, A., & Gabry, J. (2017). Practical Bayesian model
-#'   evaluation using leave-one-out cross-validation and WAIC. *Statistics
-#'   and Computing*, 27(5), 1413-1432.
+#' Vehtari, A., Gelman, A., Simpson, D., Carpenter, B., & Bürkner, P.-C.
+#'   (2021). Rank-Normalization, Folding, and Localization: An Improved
+#'   R-hat for Assessing Convergence of MCMC. *Bayesian Analysis*, 16(2),
+#'   667-718.
 #'
 #' @name bayesqm-package
 NULL

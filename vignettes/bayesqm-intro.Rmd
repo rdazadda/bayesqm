@@ -4,288 +4,214 @@ output:
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 2
-bibliography: REFERENCES.bib
-link-citations: true
 vignette: >
   %\VignetteIndexEntry{Getting started with bayesqm}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: REFERENCES.bib
+csl: apa.csl
+link-citations: true
 ---
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment  = "#>",
-  fig.width  = 7,
-  fig.height = 4.5,
-  dpi = 110
-)
-```
-
-This vignette walks through one Q study end to end in **bayesqm**:
-import, fit, diagnose, interpret, select K, and export. The running
-example is a synthetic 33-participant, 42-statement Q-sort.
-
-```{r, message = FALSE, warning = FALSE}
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7, fig.height = 5)
 library(bayesqm)
-library(ggplot2)
 ```
 
-## Setup
+You have a stack of completed Q sorts and a practical question. How
+many viewpoints does the panel hold, who holds each one, and which
+statements set them apart? `bayesqm` answers from a model of the
+sorting event itself. Each participant placed every statement into a
+fixed grid, the quotas make that placement an ordered partition of the
+statement set, and the package computes the probability of the
+observed partition exactly. The tables that come back are the ones a
+Q study reports, with the uncertainty of every entry.
 
-bayesqm performs inference with Stan, so you need a working Stan
-backend before the modelling functions will run. The package
-supports cmdstanr (recommended) and rstan.
+This vignette walks one analysis end to end on a small demonstration
+fit, so it knits in seconds. On real data, replace `demo_fit()` with
+`fit_bayesian()`. A fit at typical panel sizes takes a minute or two.
 
-cmdstanr is distributed through the Stan R-universe rather than
-CRAN, and installing the R package does not install CmdStan itself;
-that is a separate step. Run the following once (not evaluated
-here):
+## The sorts
 
-```{r setup-cmdstan, eval = FALSE}
-install.packages("cmdstanr", repos = c("https://stan-dev.r-universe.dev", getOption("repos")))
-cmdstanr::check_cmdstan_toolchain(fix = TRUE)
-cmdstanr::install_cmdstan()
-cmdstanr::cmdstan_version()   # should print a version
-```
-
-On Windows you additionally need Rtools matching your R version; on
-macOS, run `xcode-select --install`. If you prefer rstan, install
-it from CRAN with a C++ toolchain; bayesqm uses whichever backend
-is available.
-
-The remainder of this vignette uses small precomputed demonstration
-objects (`demo_fit()`, `demo_run()`) so it renders without a Stan
-backend. To reproduce the examples on real data you will need the
-backend installed as above.
-
-## The Q-sort data
-
-A Q study asks each participant to rank-order a set of statements
-into a forced distribution. `bayesqm` represents that as a `J × N`
-numeric matrix (statements as rows, participants as columns) plus a
-vector of forced-distribution counts. `read_qsort()` auto-detects
-the file format:
+`read_qsort()` reads the common formats. CSV and Excel grids, PQMethod
+`.DAT`, Ken-Q JSON and multi-sheet Excel, KADE ZIP exports, and
+Easy-HTMLQ Firebase JSON.
 
 ```{r, eval = FALSE}
-qdata <- read_qsort("mystudy.csv")   # CSV / Excel / HTMLQ / FlashQ
-qdata <- read_qsort("mystudy.DAT")   # PQMethod
-qdata <- read_qsort("mystudy.zip")   # KADE project
+qdata <- read_qsort("mystudy.dat")        # PQMethod file, for example
+qdata <- qsort_data(Y, distribution = c(2, 3, 4, 5, 4, 3, 2))
 ```
 
-The example dataset:
+One scope note up front. The exact likelihood is a statement about the
+forced sorting event, so `fit_bayesian()` requires every sort to match
+the design grid and names any participant who does not.
+Free-distribution studies, which Ken-Q, HTMLQ, and KADE permit, are
+outside this model's scope. The import functions still read them for
+inspection.
+
+Before any model runs, look at what the participants actually did.
+`plot(qdata)` draws every completed sort as its own pyramid, one tile
+per statement, the color giving the column it was placed in. Here on
+`obesity_sorts`, the childhood obesity panel of @AkhtarDanesh2023 that
+ships with the package. Thirty-three participants, forty-two
+statements, a nine-column grid.
+
+```{r, fig.height = 6}
+data(obesity_sorts)
+plot(obesity_sorts, participants = 1:6)
+```
+
+A reversed sorter, a pattern shared by nobody, a data-entry slip, all
+of it shows up here first, while it is still a data question rather
+than a modeling one.
+
+## The fit
 
 ```{r}
-sim   <- generate_data(N = 33, J = 42, K = 3, seed = 1)
-qdata <- qsort_data(sim$Y, distribution = sim$distribution)
-qdata
-```
-
-## Fitting the model
-
-`fit_bayesian()` samples the posterior of a low-rank factor model
-with a Student-t likelihood (by default) and a hierarchical normal
-prior on the loadings, then resolves rotational ambiguity with the
-MatchAlign post-processing of @PoworoznekEtAl2025:
-
-```{r, eval = FALSE}
-fit <- fit_bayesian(qdata, K = 3, chains = 4, iter = 2000,
-                    warmup = 1000, seed = 1)
-```
-
-```{r}
-fit <- demo_fit(N = 33, J = 42, K = 3, seed = 1)
+fit <- demo_fit(seed = 1)
 fit
 ```
 
-`summary(fit)` adds factor characteristics, the PSIS-LOO ELPD (when
-available), a divergence summary, and the MatchAlign
-diagnostic.
+The header carries what a fit is. The likelihood, the panel, the
+draws, the convergence check, and the alignment. Convergence is judged
+on summaries that do not depend on rotation, and a chain that misses
+the bar is extended at successive doublings up to a cap. If it still
+misses, the fit warns, and `extend(fit)` continues exactly where it
+stopped, draw for draw identical to one longer run. Rotational, sign,
+and label ambiguity is resolved by the MatchAlign procedure of
+@PoworoznekEtAl2025 with a polarity rule, so defining sorts load
+positively and every summary comes from one common orientation.
 
-## Diagnostics
+## Who holds each viewpoint
 
-Convergence statistics are stored on `fit$diagnostics`. The
-recommended thresholds are R-hat below 1.01, bulk and tail effective
-sample sizes above 400, and zero divergent transitions
-[@VehtariEtAl2021]:
-
-```{r}
-fit$diagnostics
-```
-
-`plot_tucker()` visualises the per-draw Tucker phi between each
-aligned factor column and the MatchAlign pivot. Values near 1
-indicate a stable alignment; bimodality signals residual
-label-switching.
-
-```{r tucker, fig.cap = "MatchAlign alignment quality by factor."}
-plot_tucker(fit)
-```
-
-## Factor loadings
-
-Each participant has a posterior distribution over their loading on
-every factor. `plot_loading_posterior()` draws the loading forest,
-with nested 50% and 95% credible-interval whiskers and the classical
-@Brown1980 cut-off as a faint reference. Filled points are
-participants with `P(factor k dominant) > 0.5`.
-
-```{r loadings, fig.cap = "Loadings with nested 50% and 95% credible intervals."}
-plot_loading_posterior(fit)
-```
-
-The same information as a tidy data frame:
+Loadings on a bounded correlation scale, with credible intervals.
 
 ```{r}
-head(compute_loadings(fit$Lambda_draws, prob = 0.95))
+head(compute_loadings(fit))
 ```
 
-## Factor z-scores
+A flag probability is the posterior share of draws in which a
+participant defines the factor, and the unclassified state keeps
+cross-loading and abstention visible instead of forcing a yes or no.
 
-`plot()` produces a cross-panel z-score dotchart; rows share an
-order (by factor 1's posterior mean, configurable via `sort_by`) so
-factors can be compared horizontally.
-
-```{r zscores, fig.cap = "Posterior z-scores across factors with 50% and 95% credible intervals."}
-plot(fit)
+```{r}
+compute_flags(fit)
 ```
 
-For a single statement across factors, `plot_zscore_posterior()`
-shows the per-factor view:
+## What each viewpoint says
 
-```{r zscore-one, fig.cap = "Posterior z-score for a single statement across factors."}
-plot_zscore_posterior(fit, statement = 1)
+The factor array is the viewpoint written as a completed sort,
+quota-exact by construction.
+
+```{r}
+head(compute_factor_array(fit))
 ```
 
-## Choosing K
+```{r}
+plot_factor_array(fit)
+```
 
-`run_bayes()` fits the model for each K in a range and applies the
-**peak-plus-Sivula** protocol: the ELPD peak is the automated choice
-and the Sivula parsimony rule [@SivulaEtAl2025] is reported alongside
-as a diagnostic.
+Darker tiles are placements the posterior is more certain of.
 
-On real data:
+## Where they differ and where they agree
+
+The critical difference is computed from the posterior spread of each
+score contrast, and consensus is a positive finding, the event that
+every factor places a statement within one grid column of the others.
+A statement can be distinguishing, consensus, or neither.
+
+```{r}
+qdc <- compute_qdc(fit)
+table(qdc$verdict)
+```
+
+```{r}
+plot_contrasts(fit)
+```
+
+## What gets reported
+
+One rule decides. `claims()` keeps the most probable flags,
+distinguishing statements, consensus statements, and pairwise stars,
+and stops adding claims when the expected share of false ones passes
+the level you set.
+
+```{r}
+claims(fit, q = 0.05)
+```
+
+## The per-factor block
+
+`factor_characteristics()` is the summary a results section quotes.
+How many sorts define each factor, with an interval, how spread the
+factor's statement scores are, and how reliable its defining sorts
+are.
+
+```{r}
+factor_characteristics(fit)
+```
+
+## Checking the model
+
+```{r}
+check_fit(fit, draws = 30)
+```
+
+The person check separates sorts the model spans from shared
+viewpoints it does not.
+
+```{r}
+check_persons(fit, draws = 15, mixes = 30)
+```
+
+## How many viewpoints
+
+`fit_ladder()` fits a ladder of candidate K and `select_k()` applies
+two checks together. Adequacy asks whether K factors account for the
+shared structure in the panel. Support asks whether every factor earns
+its place, meaning at least two selected flags and one selected
+distinguishing statement. Expect one fit's runtime per rung.
 
 ```{r, eval = FALSE}
-run <- run_bayes(qdata, K_max = 4, seed = 1,
-                 chains = 2, iter = 1500, warmup = 800)
+ladder <- fit_ladder(qdata)
+select_k(ladder)
+plot_choice_k(select_k(ladder))
 ```
 
-```{r}
-run <- demo_run(K_max = 5, k_peak = 3, k_sivula = 1, case = "gap")
-run
-```
+`loo_ladder()` adds PSIS-LOO [@VehtariEtAl2017] as directional
+corroboration only. At typical Q panel sizes its standard errors
+cannot certify adjacent K.
 
-```{r elpd, fig.width = 7, fig.height = 4.2, fig.cap = "ΔELPD across K with the Sivula non-promotion band at |ΔELPD| < 4. Triangle marks the Sivula K, square marks the ELPD peak (the adopted K)."}
-make_elpd_diff(run)
-```
+## Coming from PQMethod or qmethod
 
-The ELPD peak is always the adopted K. The Sivula diagnostic is
-reported alongside as a parsimony check. The `run$case` field labels
-the relationship between the two: when Sivula lands on the same K as
-the peak, the case is `agree`; when Sivula points to a smaller K
-than the peak, the case is `gap`; when Sivula exceeds the peak, the
-case is `reversed` (rare in practice).
+The outputs you know have direct counterparts. Flagging, automatic or
+by hand, becomes `compute_flags()`, and `claims()` selects the flags
+at your false-discovery level. The loadings table is
+`compute_loadings()`, the factor arrays and z-scores are
+`compute_factor_array()` and `compute_zscores()`, and the
+distinguishing and consensus statements are the three-way verdicts of
+`compute_qdc()`. In place of eigenvalue rules and parallel analysis,
+the number of factors comes from `fit_ladder()` and `select_k()`.
+Explained variance alone has no counterpart in a generative model.
+Report the defining-sort counts from `factor_characteristics()` and
+the extra-factor check from `check_fit()` instead.
 
-## Distinguishing, consensus, and membership
+## Reproducibility
 
-`bayesqm` replaces the classical z-score test with the posterior of an
-explicit viewpoint-divergence measure. For each statement, D_j is the
-mean absolute pairwise difference of the K viewpoint scores; the
-package reports P(D_j > delta | Y) and P(D_j < delta | Y), the
-probabilities that the viewpoints diverge meaningfully or practically
-agree. By default the separation delta is the reliability-adjusted
-critical difference from classical Q analysis [@Brown1980], computed
-from the posterior dominant-factor counts (`critical_delta()`);
-`suggest_delta()` (one forced-distribution category on the standardised
-scale) is an alternative, and results are reported with sensitivity
-across the choice of delta. No fixed probability cutoff defines a
-statement.
-
-The full distinguishing/consensus table is stored on `fit$qdc` (per
-viewpoint: grid position and z-score with 95% CrI, then `D_j` with
-95% CrI, `pi_D`, `pi_C`). `critical_delta()` returns the separation
-the fit used:
-
-```{r}
-critical_delta(fit$Lambda_draws)
-head(fit$qdc)
-```
-
-```{r dist-cons, fig.cap = "Posterior viewpoint divergence D_j with 95% credible intervals; statements ordered by P(D_j > delta | Y)."}
-plot_dist_cons(fit)
-```
-
-Participant-level membership is also probabilistic.
-`classify_membership()` turns posterior dominance into a
-`Strong / Moderate / Weak` tier:
-
-```{r}
-head(classify_membership(fit$Lambda_draws))
-```
-
-```{r membership, fig.width = 6.5, fig.height = 5.5, fig.cap = "Blue tiles: posterior probability that each factor is dominant for a given participant (values printed in each cell). The right column shows the overall assignment verdict on an orange-red scale."}
-make_dominant_panel(fit)
-```
-
-## Posterior predictive check
-
-`plot_ppc()` shows the posterior distribution of the RMSE between
-`cor(Y_rep)` and `cor(Y_obs)`. A well-specified model puts most
-posterior mass at small RMSE.
-
-```{r ppc, fig.cap = "PPC on the by-person correlation matrix."}
-plot_ppc(fit)
-```
-
-## Hyperparameters
-
-```{r hyper, fig.cap = "Posterior densities of nu, sigma, and tau."}
-plot_hyper(fit)
-```
-
-## Reporting and exporting
-
-`save_bayesqm_plot()` writes any plot to PDF, SVG, PNG, TIFF, or
-JPEG at the chosen dimensions:
-
-```{r, eval = FALSE}
-save_bayesqm_plot("fig_loadings.pdf", plot_loading_posterior(fit))
-save_bayesqm_plot("fig_elpd.pdf",      plot_elpd(run),
-                  width = 3.5, height = 3)
-```
-
-`caption_bayesqm()` returns a figure caption with model
-configuration, sample sizes, interval probability, and convergence
-diagnostics:
-
-```{r}
-caption_bayesqm(fit)
-```
-
-Standard R accessors work on the fit (`coef`, `fitted`, `residuals`,
-`sigma`, `family`, `as.matrix`), and `as.matrix(fit)` returns a
-Stan-style draws matrix that `posterior` and `bayesplot` consume
-natively.
-
-## Theming
-
-Every plot reads its palette through `bayesqm_colors()`. Switch the
-scheme once and every subsequent base-R plot follows:
-
-```{r, eval = FALSE}
-bayesqm_set_colors("teal")   # "blue" (default), "red", "purple", "grey"
-plot(fit)
-bayesqm_set_colors("blue")
-```
+Fits are exactly reproducible given a seed, and `extend()` preserves
+that. It restores the sampler's saved random-number state, so
+continuing a chain after any amount of unrelated R work gives the same
+draws as one uninterrupted run.
 
 ## Where next
 
-- `?fit_bayesian`: every prior and sampler option
-- `?run_bayes`: peak-plus-Sivula thresholds
-- `?bayesqm-membership`: the full set of membership summaries
-- `?rename_factors`: relabel `f1..fK` with substantive factor names
-- `ggplot2::autoplot()`: ggplot2 / ggdist versions of every view
-  above, when `ggplot2` and `ggdist` are installed
+The remaining views are `plot_zscores()` for the whole statement
+panel, `plot_statement()` for one statement in depth,
+`plot_loading_posterior()`, `plot_flags()`, `plot_person_check()`,
+`plot_convergence()`, and `plot_ppc()`, with `ggplot2::autoplot()`
+methods for loadings, flags, contrasts, and the array. The reference
+index at <https://rdazadda.github.io/bayesqm/> groups every function
+by task.
 
 ## References

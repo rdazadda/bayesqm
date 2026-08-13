@@ -65,7 +65,7 @@ read_statements(file, column = 1, id_column = NULL)
 
 \item{sheet}{Excel sheet name or index (default \code{1}).}
 
-\item{statements_file}{For PQMethod, optional companion statements
+\item{statements_file}{For PQMethod, optional separate statements
 file.}
 
 \item{column, id_column}{For \code{read_statements()}: column index or name.}

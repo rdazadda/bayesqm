@@ -2,28 +2,23 @@
 % Please edit documentation in R/caption.R
 \name{caption_bayesqm}
 \alias{caption_bayesqm}
-\title{Dynamic figure caption for a bayesqm_fit}
+\title{Caption text for figures from a fit}
 \usage{
-caption_bayesqm(fit, include_ref = TRUE, include_diag = TRUE)
+caption_bayesqm(fit, include_gate = TRUE)
 }
 \arguments{
 \item{fit}{A \code{bayesqm_fit}.}
 
-\item{include_ref}{Logical; append a brief package-attribution line.}
-
-\item{include_diag}{Logical; append the convergence-diagnostic line.}
+\item{include_gate}{Append the gate report (default \code{TRUE}).}
 }
 \value{
-A length-1 character string.
+A length-one character string.
 }
 \description{
-Returns a human-readable caption string summarising the model
-configuration (\code{K}, \code{N}, \code{J}, family), the sampler (backend, chains,
-post-warmup draws), the interval probability, and convergence
-diagnostics (max Rhat, divergent transitions).
+A single string naming the model, the panel, the draws, and the gate
+verdict — the provenance a figure caption should carry.
 }
 \examples{
-fit <- demo_fit(N = 6, J = 10, K = 2, Td = 50, seed = 1)
-cat(caption_bayesqm(fit))
+caption_bayesqm(demo_fit())
 
 }

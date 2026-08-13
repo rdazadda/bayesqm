@@ -267,9 +267,8 @@ assess_classification <- function(flags, Lambda_true) {
   for (i in which(valid))
     conf[est[i], true_assign[i]] <- conf[est[i], true_assign[i]] + 1
 
-  if (requireNamespace("lpSolve", quietly = TRUE)) {
-    sol  <- lpSolve::lp.assign(max(conf + 1) - conf)
-    perm <- apply(sol$solution, 1, which.max)
+  if (requireNamespace("clue", quietly = TRUE)) {
+    perm <- as.integer(clue::solve_LSAP(conf, maximum = TRUE))
   } else {
     perm <- integer(K); used <- logical(K)
     for (k in seq_len(K)) {

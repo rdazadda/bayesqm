@@ -30,11 +30,3 @@ assert_bayesqm_fit <- function(x, var_name = deparse(substitute(x))) {
               var_name, class(x)[1L])
   invisible(x)
 }
-
-
-assert_bayesqm_run <- function(x, var_name = deparse(substitute(x))) {
-  if (!inherits(x, "bayesqm_run"))
-    .bq_abort("`%s` must be a bayesqm_run object, not %s.",
-              var_name, class(x)[1L])
-  invisible(x)
-}

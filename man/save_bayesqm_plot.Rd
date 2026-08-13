@@ -29,9 +29,8 @@ a \code{ggplot} object (for example, from \code{\link[ggplot2:autoplot]{ggplot2:
 \code{print()}ed onto the device.
 }
 \examples{
-fit <- demo_fit(N = 6, J = 10, K = 2, Td = 50, seed = 1)
-f <- file.path(tempdir(), "fig_loadings.pdf")
-save_bayesqm_plot(f, plot_loading_posterior(fit))
+f <- file.path(tempdir(), "fig.pdf")
+save_bayesqm_plot(f, plot(1:10))
 unlink(f)
 
 }

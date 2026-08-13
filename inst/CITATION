@@ -2,7 +2,7 @@ citHeader("To cite bayesqm in publications use:")
 
 bibentry(
   bibtype = "Manual",
-  title   = "{bayesqm}: Bayesian Q-Methodology Factor Analysis",
+  title   = "{bayesqm}: Bayesian {Q} Methodology with an Exact Rank-Order Likelihood for Forced {Q} Sorts",
   author  = c(
     person(given = "Raymond Dacosta", family = "Azadda"),
     person(family = "AK-ACE Team"),
@@ -17,7 +17,8 @@ bibentry(
   textVersion = paste0(
     "Azadda, R. D., AK-ACE Team, Hueffer, K., Peter, T., & Rasmus, S. (",
     format(Sys.Date(), "%Y"),
-    "). bayesqm: Bayesian Q-Methodology Factor Analysis. ",
+    "). bayesqm: Bayesian Q methodology with an exact rank-order ",
+    "likelihood for forced Q sorts. ",
     "R package version ", meta$Version, ". ",
     "https://github.com/rdazadda/bayesqm"
   )

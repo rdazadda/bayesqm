@@ -2,24 +2,18 @@
 % Please edit documentation in R/plots.R
 \name{plot_ppc}
 \alias{plot_ppc}
-\title{Posterior predictive check on the correlation-matrix RMSE}
+\title{Posterior-predictive check display}
 \usage{
-plot_ppc(fit, breaks = 30, ...)
+plot_ppc(x)
 }
 \arguments{
-\item{fit}{A \code{bayesqm_fit}.}
-
-\item{breaks}{Passed to \code{hist()}.}
-
-\item{...}{Additional arguments forwarded to \code{hist()}.}
+\item{x}{A \code{bayesqm_checks} from \code{\link[=check_fit]{check_fit()}}.}
 }
 \value{
-The input, invisibly.
+\code{x}, invisibly.
 }
 \description{
-Histogram of the replicated correlation-matrix RMSE stored on
-\code{fit$ppc$rmse.r}: per draw, the RMSE between \code{cor(Y_rep)} and
-\code{cor(Y_obs)}. Rendered in the bayesplot-idiom (filled bars, no
-border, suppressed y-axis) with the median and central credible
-interval marked.
+The replicated distributions behind \code{\link[=check_fit]{check_fit()}}: the agreement RMSE
+against its double-replicate reference, and the observed extra-factor
+eigenvalue in its replicated distribution.
 }

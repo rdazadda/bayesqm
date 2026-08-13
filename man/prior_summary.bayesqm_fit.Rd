@@ -2,26 +2,20 @@
 % Please edit documentation in R/accessors.R
 \name{prior_summary.bayesqm_fit}
 \alias{prior_summary.bayesqm_fit}
-\alias{print.bayesqm_prior}
 \title{Prior summary for a bayesqm_fit}
 \usage{
 \method{prior_summary}{bayesqm_fit}(object, ...)
-
-\method{print}{bayesqm_prior}(x, ...)
 }
 \arguments{
 \item{object}{A \code{bayesqm_fit}.}
 
 \item{...}{Unused.}
-
-\item{x}{A \code{bayesqm_prior} object.}
 }
 \value{
 A \code{bayesqm_prior} data frame with columns \code{parameter} and
 \code{prior}.
 }
 \description{
-Returns the priors actually used when the model was fit, as a
-printable \code{bayesqm_prior} object. Method for
-\code{\link[rstantools:prior_summary]{rstantools::prior_summary()}}.
+The partition model's priors, as a printable \code{bayesqm_prior} object.
+Method for \code{\link[=prior_summary]{prior_summary()}}.
 }

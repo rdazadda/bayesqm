@@ -36,7 +36,7 @@
 #' @param statements,distribution Optional overrides passed to
 #'   [qsort_data()].
 #' @param sheet Excel sheet name or index (default `1`).
-#' @param statements_file For PQMethod, optional companion statements
+#' @param statements_file For PQMethod, optional separate statements
 #'   file.
 #' @param column,id_column For `read_statements()`: column index or name.
 #' @param ... Passed to the underlying reader.

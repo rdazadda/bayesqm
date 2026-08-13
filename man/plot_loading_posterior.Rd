@@ -2,28 +2,25 @@
 % Please edit documentation in R/plots.R
 \name{plot_loading_posterior}
 \alias{plot_loading_posterior}
-\title{Loading forest with 50 and 95 percent credible intervals}
+\alias{plot.bayesqm_fit}
+\title{Bounded loadings with credible intervals}
 \usage{
-plot_loading_posterior(fit, factors = NULL, highlight_flagged = TRUE, ...)
+plot_loading_posterior(fit, q = 0.05)
+
+\method{plot}{bayesqm_fit}(x, ...)
 }
 \arguments{
 \item{fit}{A \code{bayesqm_fit}.}
 
-\item{factors}{Optional subset of factors to show (integer or name).}
+\item{q}{False-discovery level for the flag marks (default 0.05).}
 
-\item{highlight_flagged}{Logical; fill flagged participants.}
-
-\item{...}{Additional arguments forwarded to \code{plot()}.}
+\item{x, ...}{A \code{bayesqm_fit} and arguments passed on.}
 }
 \value{
-The input, invisibly.
+\code{fit}, invisibly.
 }
 \description{
-Horizontal dotchart of every participant's loading, one panel per
-factor, ranked by posterior mean. Each loading is drawn as a
-median point with nested 50 percent (thick) and 95 percent (thin)
-credible-interval whiskers. A faint grey vertical rule marks
-Brown's descriptive cut-off \verb{+/- 1.96 / sqrt(J)}. When
-\code{highlight_flagged = TRUE}, participants in \code{fit$flagged[, k]} are
-drawn as filled points in the accent colour.
+One row per participant, one interval per factor on the bounded
+loading scale, with selected flags marked. The dotted rules sit at
+the classical descriptive cut-off \code{1.96 / sqrt(J)} (reference).
 }

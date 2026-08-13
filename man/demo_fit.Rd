@@ -2,36 +2,28 @@
 % Please edit documentation in R/demo_fit.R
 \name{demo_fit}
 \alias{demo_fit}
-\title{A synthetic bayesqm_fit for examples and tutorials}
+\title{A small demonstration fit}
 \usage{
-demo_fit(N = 20, J = 22, K = 2, Td = 400, seed = 1L)
+demo_fit(N = 8, J = 13, K = 2, draws = 200, seed = 1)
 }
 \arguments{
-\item{N}{Number of participants.}
+\item{N, J, K}{Panel size, statement count, factors (defaults 8, 13, 2).}
 
-\item{J}{Number of statements.}
+\item{draws}{Kept posterior draws (default 200).}
 
-\item{K}{Number of factors.}
-
-\item{Td}{Number of posterior draws.}
-
-\item{seed}{Integer seed for reproducibility; \code{NULL} leaves the
-random number generator untouched.}
+\item{seed}{Random seed (default 1).}
 }
 \value{
 A \code{bayesqm_fit}.
 }
 \description{
-Returns a \code{bayesqm_fit} with realistic Q-methodology structure:
-every participant has a dominant factor, roughly 40 percent of the
-statements polarise the factor pair, 10 percent are consensus, and
-the remainder are weakly partial. Use it for documentation,
-teaching materials, and the package vignette; it is not a
-substitute for \code{\link[=fit_bayesian]{fit_bayesian()}} on real data.
+Runs the partition-model sampler on a small synthetic forced-sort
+dataset with a fixed seed and the convergence gate disabled. It exists
+so examples and tests have a complete \code{bayesqm_fit} in about a second;
+it is no substitute for \code{\link[=fit_bayesian]{fit_bayesian()}} at its defaults on real data.
 }
 \examples{
-fit <- demo_fit(N = 12, J = 15, K = 2)
-plot(fit)
-summary(fit)
+fit <- demo_fit()
+fit
 
 }

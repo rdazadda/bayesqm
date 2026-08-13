@@ -1,235 +1,227 @@
+
+<!-- README.md is generated from README.Rmd. Edit README.Rmd, then knit. -->
+
 # bayesqm <img src="man/figures/logo.png" align="right" height="139" alt="bayesqm logo" />
 
 <!-- badges: start -->
-[![CRAN status](https://www.r-pkg.org/badges/version/bayesqm)](https://CRAN.R-project.org/package=bayesqm)
+
 [![R-CMD-check](https://github.com/rdazadda/bayesqm/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rdazadda/bayesqm/actions/workflows/R-CMD-check.yaml)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: GPL
+v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- badges: end -->
 
-**Bayesian Q methodology: probabilistic factor analysis for the study
-of subjective opinions.**
+**bayesqm turns forced Q sorts into the full set of Q-methodology
+reports, each carrying its posterior uncertainty.** It reads the common
+study formats, PQMethod `.DAT`, Ken-Q, KADE, HTMLQ and FlashQ exports,
+CSV and Excel grids, and models the sort itself: each participant places
+every statement into a fixed grid, the quotas make that placement an
+ordered partition of the statement set, and the package computes the
+probability of the observed partition exactly. From one panel it derives
+what a Q study reports, bounded loadings, flags, factor arrays,
+statement scores, distinguishing and consensus statements, the number of
+factors, and the checks behind them. Every analysis returns an object
+that prints its own summary and draws its own plots.
 
-`bayesqm` is the first fully Bayesian framework for Q-methodology
-factor analysis. Since Stephenson (1935), Q analysis has relied on
-frequentist factor extraction with the standard error rule of Brown
-(1980), which returns participant-to-factor assignments as binary
-flagged / unflagged decisions and offers no measure of uncertainty
-about them. `bayesqm` replaces that with posterior credible intervals
-for every loading, probabilistic factor membership P(dominant_i = k | Y)
-that makes cross-loading visible and quantifiable, and a principled
-K-selection protocol built on element-wise PSIS-LOO. The model uses a
-Student-t likelihood for robustness to idiosyncratic Q-sorts and
-resolves rotational, sign, and label-permutation ambiguity through
-the MatchAlign post-processing of Poworoznek et al. (2025). Posterior
-sampling is via Stan (cmdstanr or rstan).
+Every decision states its rule. One posterior false-discovery rule
+selects everything the analysis reports, flags, distinguishing listings,
+consensus statements, and pairwise stars, and gives the expected number
+of false claims alongside. The number of factors is decided by two
+checks read together, whether K factors account for the panel and
+whether every factor earns its place. Quantities classical practice
+fixes by convention, above all the critical difference behind
+distinguishing statements, are estimated from the posterior instead, and
+the alignment of the posterior draws follows the MatchAlign procedure of
+Poworoznek et al. (2025).
 
-## What the package gives you
-
-For each Q-sort dataset, `bayesqm` returns four things classical Q
-analysis cannot:
-
-1. **Posterior credible intervals for every participant loading**,
-   replacing the binary flagged / unflagged classification of Brown
-   (1980) with a continuous measure of assignment certainty.
-2. **Probabilistic factor membership**, P(dominant_i = k | Y), making
-   cross-loading visible and quantifiable rather than forcing each
-   participant onto a single factor.
-3. **A peak-plus-Sivula protocol for choosing K**, pairing the ELPD
-   peak with the conservative parsimony diagnostic of Sivula et al.
-   (2025) and surfacing the gap between them as informative about how
-   strongly the data discriminate adjacent models.
-4. **Posterior distinguishing and consensus statements**, reporting
-   `P(D_j > delta | Y)` and `P(D_j < delta | Y)` from the posterior of
-   an explicit viewpoint-divergence measure rather than a classical
-   significance verdict.
+You can usually see the answer before you compute it. Plot the sorts and
+each completed grid becomes its own pyramid, every statement on its
+tile, the color giving the column it was placed in. Two like-minded
+sorters put the same statements under the same colors, and a panel that
+shares one viewpoint repeats itself pyramid after pyramid. The numbers
+that follow put a figure to what the picture shows.
 
 ## Installation
 
-```r
-# from CRAN
-install.packages("bayesqm")
-
-# development version from GitHub
+``` r
 # install.packages("remotes")
 remotes::install_github("rdazadda/bayesqm")
 ```
 
-### Stan backend
+CRAN still carries 0.1.0, an earlier model fitted through Stan. This
+version is a different model with its own sampler. Install from GitHub
+until 0.2.0 reaches CRAN.
 
-`bayesqm` fits models with Stan and needs a working backend:
-`cmdstanr` (recommended) or `rstan`.
+## A first analysis
 
-`cmdstanr` is not on CRAN and is installed from the Stan
-R-universe. CmdStan itself must then be installed separately:
+One real panel ships with the package, the childhood obesity study of
+Akhtar-Danesh (2023), so this runs without any data of your own.
+Thirty-three participants sorted forty-two statements about childhood
+obesity onto a nine-column grid.
 
-```r
-install.packages("cmdstanr", repos = c("https://stan-dev.r-universe.dev", getOption("repos")))
-cmdstanr::check_cmdstan_toolchain(fix = TRUE)
-cmdstanr::install_cmdstan()
-cmdstanr::cmdstan_version()   # verify
-```
-
-On Windows you also need Rtools; on macOS, the Xcode command-line
-tools (`xcode-select --install`). See the Getting Started vignette
-for the full setup walkthrough and the `rstan` alternative.
-
-## Minimal workflow
-
-```r
+``` r
 library(bayesqm)
-qdata <- read_qsort("mystudy.csv")
-fit   <- fit_bayesian(qdata, K = 3)
+
+obesity_sorts
+#> Q-sort data
+#>   statements  : 42   participants : 33 
+#>   distribution: 2 4 5 6 8 6 5 4 2   (sum = 42 )
+#>   value range : [-4, 4]
+#>   source      : excel:Childhood obesity dataset.xlsx
+plot(obesity_sorts, participants = 1:12)
+```
+
+<img src="man/figures/README-obesity-sorts-1.png" alt="" width="100%" />
+
+How many viewpoints does the panel hold? Fit two, three, and four
+factors and let two checks read each candidate. One asks whether K
+factors account for the shared structure. The other asks whether every
+factor earns its place, meaning at least two participants define it and
+at least one statement sets it apart from the rest.
+
+``` r
+sel <- select_k(fit_ladder(obesity_sorts, K_min = 2, K_max = 4,
+                           seed = 11, quiet = TRUE))
+plot_choice_k(sel)
+```
+
+<img src="man/figures/README-obesity-choicek-1.png" alt="" width="100%" />
+
+The classical analysis of this panel reports three factors. Here every K
+accounts for the panel and no factor at any K is set apart by a single
+statement, so the rule refuses to select, and the verdict names what the
+sorts show. One shared viewpoint. The one-factor fit is then the panel’s
+report, and its array is the shared sort itself.
+
+``` r
+fit1 <- fit_bayesian(obesity_sorts, K = 1, seed = 11)
+#> grid labels -4..4 recoded onto categories 1..9 (a monotone relabeling; the sorts are unchanged)
+plot_factor_array(fit1)
+```
+
+<img src="man/figures/README-obesity-array-1.png" alt="" width="100%" />
+
+Darker tiles are placements the posterior is more certain of. Each of
+these fits takes a minute or two.
+
+## When there are two viewpoints
+
+Simulated sorts with two planted viewpoints, so the right answer is
+known and the multi-factor reports have something to find.
+
+``` r
+sim <- generate_data(N = 14, J = 20, K = 2, noise_sd = 0.6,
+                     primary_range = c(0.65, 0.9), seed = 7)
+qdata <- qsort_data(sim$Y, distribution = sim$distribution)
+
+lad <- fit_ladder(qdata, K_min = 2, K_max = 4, seed = 7, quiet = TRUE)
+plot_choice_k(select_k(lad))
+```
+
+<img src="man/figures/README-choicek-1.png" alt="" width="100%" />
+
+Two factors pass both checks, boxed on their row. Fit that model. The
+sampler runs until a convergence check passes, and the printout reports
+it.
+
+``` r
+fit <- fit_bayesian(qdata, K = 2, seed = 7)
+#> grid labels -4..4 recoded onto categories 1..9 (a monotone relabeling; the sorts are unchanged)
 fit
+#> bayesqm fit: exact partition (rank-order) likelihood, PX-Gibbs
+#>   14 participants, 20 statements, 2 factors; grid 1-2-2-3-4-3-2-2-1
+#>   draws: 2000 kept (12000 iterations, burn 2000, thin 5)
+#>   gate: passed (max Rhat 1.003; min ESS 1255 bulk / 1606 tail)
+#>   alignment: pivot draw 332, mean congruence 0.89
+#>   tables: compute_loadings(), compute_flags(), compute_factor_array(),
+#>           compute_qdc(), claims()
 ```
 
-`read_qsort()` auto-detects CSV, Excel (including HTMLQ, FlashQ, and
-tablet-export variants), PQMethod `.DAT`, Ken-Q JSON or multi-sheet
-Excel, KADE ZIP, and Easy-HTMLQ Firebase JSON.
+What gets reported is decided by one rule. `claims()` keeps the most
+probable flags, distinguishing statements, consensus statements, and
+pairwise stars, and stops adding claims when the expected share of false
+ones passes five percent.
 
-`fit_bayesian()` returns an object of class `bayesqm_fit`. Standard R
-accessors work as expected: `coef()`, `fitted()`, `residuals()`,
-`sigma()`, `nobs()`, `family()`, `as.matrix()`, `summary()`,
-`plot()`, plus `posterior_interval()` and `prior_summary()` from the
-`rstantools` API.
-
-## Choosing K
-
-```r
-run <- run_bayes(qdata, K_max = 5)
-plot_elpd(run)
+``` r
+claims(fit)
+#> Selected claims at q = 0.05 (posterior expected FDR):
+#>   flags             9 participants selected (expected false 0.41)
+#>   distinguishing   11 listings selected (expected false 0.47)
+#>   consensus         0 statements selected (expected false 0.00)
+#>   stars             5 pairwise selected (expected false 0.17)
 ```
 
-`run_bayes()` fits the model for K = 1..K_max and reports two
-summaries:
+Behind the counts sit the full tables, and two of the views show the
+result at a glance. The reported sort for each factor, on its own grid:
 
-- The **ELPD peak**: argmax of the expected log pointwise predictive
-  density via element-wise PSIS-LOO (Vehtari, Gelman, & Gabry, 2017).
-- The **Sivula parsimony diagnostic** (Sivula et al., 2025): a
-  sequential rule that accepts a more complex K only when ΔELPD > 4
-  and |ΔELPD| / SE(Δ) > 2.
-
-The `$case` field labels their relationship as `agree`, `gap`, or
-`reversed`. The ELPD peak is always the adopted K; the case label
-indicates how confidently the data discriminate between adjacent
-models, and a gap between the two is itself diagnostic information.
-
-## Probabilistic factor membership
-
-Rather than dichotomizing each loading into flagged or unflagged,
-`bayesqm` reports the posterior probability that factor k is
-participant i's dominant factor, P(dominant_i = k | Y).
-`compute_dominant_sign()` adds the posterior probability that the
-dominant loading is positive, so negative exemplars (a viewpoint held
-by opposition) stay distinct. `classify_membership()` turns the
-probabilities into a descriptive Strong / Moderate / Weak tier:
-
-```r
-compute_dominant_prob(fit$Lambda_draws)
-compute_dominant_sign(fit$Lambda_draws)
-classify_membership(fit$Lambda_draws)
-plot_membership(fit)
+``` r
+plot_factor_array(fit)
 ```
 
-Distinguishing and consensus statements come from the posterior of an
-explicit viewpoint-divergence measure `D_j`, with the probabilities
-`P(D_j > delta | Y)` and `P(D_j < delta | Y)` it implies. By default
-`delta` is the reliability-adjusted critical difference from classical
-Q analysis (Brown, 1980; Zabala & Pascual, 2016), computed from the
-posterior dominant-factor counts (`critical_delta()`);
-`suggest_delta()` (one forced-distribution category) is an
-alternative:
+<img src="man/figures/README-array-1.png" alt="" width="100%" />
 
-```r
-d <- critical_delta(fit$Lambda_draws)   # default separation (computed)
-compute_divergence(fit$F_draws, delta = d)
-plot_dist_cons(fit)                 # uses the fit's stored divergence summary
+And statement by statement, where the two viewpoints separate and where
+they agree:
+
+``` r
+plot_contrasts(fit)
 ```
 
-## Plotting
+<img src="man/figures/README-contrasts-1.png" alt="" width="100%" />
 
-The package provides nine base-R plots and matching
-`ggplot2::autoplot()` methods (registered when `ggplot2` and `ggdist`
-are installed). All read their palette through `bayesqm_colors()` and
-restore `par()` on exit:
+## What the package covers
 
-```r
-plot(fit)                       # cross-panel z-score dotchart
-plot_loading_posterior(fit)     # loadings with 50% / 95% intervals
-plot_membership(fit)            # dominant-factor probability heatmap
-plot_dist_cons(fit)             # distinguishing/consensus divergence forest
-plot_ppc(fit)                   # posterior predictive check on by-person correlations
-plot_tucker(fit)                # MatchAlign alignment quality
-plot_hyper(fit)                 # hyperparameter posteriors
-plot_elpd(run)                  # ELPD across K with peak / Sivula annotations
-```
+**Import.** `read_qsort()` reads CSV, Excel (HTMLQ, FlashQ, and tablet
+exports), PQMethod `.DAT`, Ken-Q JSON and Excel, KADE ZIP, and
+Easy-HTMLQ Firebase JSON. Grids labeled `-4..+4`, from zero, or with any
+distinct printed values work as they are, and the sorts are never
+altered. `qsort_data()` builds the object from a plain matrix, and
+`plot()` on it draws the pyramids.
 
-For figure export, `save_bayesqm_plot()` opens the appropriate device
-from the file extension and `caption_bayesqm()` returns a figure
-caption that reports K, N, J, chains, coverage probability, and
-convergence diagnostics.
+**The tables.** `compute_loadings()` gives bounded loadings with
+credible intervals, `compute_flags()` flag probabilities with an
+explicit unclassified state, `compute_factor_array()` quota-exact
+arrays, `compute_zscores()` statement scores, and `compute_qdc()`
+distinguishing and consensus verdicts against a posterior critical
+difference and the one-grid-column region. `factor_characteristics()` is
+the per-factor block a results section quotes, and `claims()` selects
+what gets reported. `rename_factors()` relabels every table at once, and
+`rotate_factors()` and `flip_factor()` apply judgmental rotation to
+every draw.
 
-## Compatibility with `qmethod`
+**The number of factors.** `fit_ladder()` fits the candidate models,
+`select_k()` applies the two checks, and `plot_choice_k()` draws the
+whole decision. `loo_ladder()` adds PSIS-LOO as directional
+corroboration.
 
-`bayesqm_fit` deliberately mirrors the slot names from the `qmethod`
-package (Zabala, 2015): `$dataset`, `$loa`, `$zsc`, `$zsc_n`,
-`$f_char`, `$qdc`, `$flagged`. `$qdc` is the Bayesian divergence
-table: per-viewpoint grid position and z-score with 95% CrI, then
-`D_j` with 95% CrI, `pi_D`, and `pi_C`, not the classical
-significance-label vocabulary. Intentional
-Bayesian divergences are documented in `?bayesqm-package`:
+**Checks.** `check_fit()` runs the posterior-predictive checks, and
+`check_persons()` separates sorts the model spans from shared viewpoints
+it does not. Every fit passes a convergence check before it returns, and
+`extend()` continues a chain draw for draw.
 
-- `$flagged` is defined probabilistically as
-  P(argmax_k |λ_ik| = k) > 0.5, replacing Brown's (1980)
-  significance-based rule.
-- `$f_char$characteristics` omits the classical test-theory columns;
-  factor-score uncertainty is already in the posterior credible
-  intervals on `$ci_lower` and `$ci_upper`.
+**Plots and draws.** Eleven views in one style, from the raw sorts to
+the reported arrays, with `ggplot2::autoplot()` methods for loadings,
+flags, contrasts, and the array; `bayesqm_set_colors()` themes them and
+`save_bayesqm_plot()` writes the figures. `as.matrix()`, `as.array()`,
+and `as.data.frame()` return the draws under Stan-style names, and the
+`posterior::as_draws_*()` family is registered, so `bayesplot` and
+`tidybayes` read a fit directly.
 
-When you have substantive factor labels,
-`rename_factors(fit, c("a", "b", "c"))` relabels every
-factor-indexed slot in one call.
+## Documentation
 
-## Integration with `posterior` and `bayesplot`
+The package website is <https://rdazadda.github.io/bayesqm/>.
+`vignette("bayesqm-intro")` walks one analysis end to end, the reference
+index groups every function by task, and issues belong at
+<https://github.com/rdazadda/bayesqm/issues>.
 
-`as.matrix(fit)`, `as.array(fit)`, and `as.data.frame(fit)` return
-draws in Stan-style parameter naming (`Lambda[i,k]`, `F[j,k]`,
-`nu`, `sigma`, `tau`). `as_draws_df()`, `as_draws_matrix()`, and
-`as_draws_array()` are registered for `posterior::as_draws_*` when
-`posterior` is installed, so `bayesplot` and `tidybayes` consume
-`bayesqm_fit` objects natively.
+## Citation
 
-## Citing the package
-
-Run `citation("bayesqm")` for the canonical citation, or use:
-
-> Azadda, R. D., AK-ACE Team, Hueffer, K., Peter, T., & Rasmus, S.
-> (2026). bayesqm: Bayesian Q-Methodology Factor Analysis. R package
-> version 0.1.0. https://github.com/rdazadda/bayesqm
-
-BibTeX is available via `toBibtex(citation("bayesqm"))`.
-
-## Where to look next
-
-- `vignette("bayesqm-intro")` walks the full workflow end to end on
-  a synthetic Q-sort.
-- `?fit_bayesian` documents every prior and sampler option.
-- `?run_bayes` covers the peak-plus-Sivula thresholds and the three
-  case labels.
-- `?bayesqm-membership` covers the probabilistic membership and
-  distinguishing-statement summaries.
-- Issues and feature requests:
-  <https://github.com/rdazadda/bayesqm/issues>.
-
-## Funding
-
-This research was, in part, funded by the National Institutes of
-Health (NIH) Agreement OT2HL158287 (Stacy Rasmus, Contact PI,
-smrasmus@alaska.edu; Karsten Hueffer and Taa'aii Peter, MPIs). The
-views and conclusions contained in this document are those of the
-authors and should not be interpreted as representing the official
-policies, either expressed or implied, of the NIH.
+`citation("bayesqm")` gives the reference. Report the version with
+`packageVersion("bayesqm")`.
 
 ## License
 
-Released under the GNU General Public License version 3 (GPL-3); see
-<https://www.gnu.org/licenses/gpl-3.0.html> for the full text.
+GPL (\>= 3); see <https://www.gnu.org/licenses/gpl-3.0.html> for the
+full text.
+
+bayesqm is developed and maintained at the Center for Alaska Native
+Health Research, University of Alaska Fairbanks.

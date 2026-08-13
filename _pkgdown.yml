@@ -19,7 +19,7 @@ navbar:
   bg: primary
   type: dark
   structure:
-    left:  [intro, reference]
+    left:  [intro, reference, news]
     right: [search, github, lightswitch]
   components:
     intro:
@@ -46,92 +46,97 @@ home:
 reference:
   - title: "Model fitting"
     desc: >
-      The main entry points: fit a single Bayesian factor model, or fit
-      across a range of K under the peak-plus-Sivula protocol.
+      Fit the exact partition-likelihood model, continue a gated chain,
+      and realign draws.
     contents:
       - fit_bayesian
-      - run_bayes
+      - extend
       - matchalign
+      - delta_grid
 
-  - title: "Posterior summaries"
-    desc: "Tidy summaries of loadings, factor z-scores, and scalar hyperparameters."
+  - title: "The tables"
+    desc: >
+      The familiar Q outputs as posterior summaries, and the one
+      false-discovery rule behind every claim.
     contents:
       - compute_loadings
+      - compute_flags
       - compute_zscores
       - compute_factor_array
-      - compute_posterior_scalars
+      - compute_qdc
+      - factor_characteristics
+      - crib_sheet
+      - claims
 
-  - title: "Probabilistic factor membership"
-    desc: >
-      Posterior probabilities replacing the classical z-score tests and
-      Brown-threshold flags.
+  - title: "Model checking and choice of K"
     contents:
-      - compute_dominant_prob
-      - compute_threshold_prob
-      - compute_divergence
-      - critical_delta
-      - suggest_delta
-      - classify_membership
+      - check_fit
+      - check_persons
+      - fit_ladder
+      - select_k
+      - loo_ladder
+      - loglik_person
 
-  - title: "Plots (base R)"
+  - title: "Rotation and reporting"
+    contents:
+      - rotate_factors
+      - flip_factor
+      - rename_factors
+
+  - title: "Plots"
     desc: >
-      Every view reads a quantity the fit already carries; no new
-      dependencies required.
+      Base-graphics views of the fit; `ggplot2::autoplot()` serves the
+      flagship four (loadings, flags, contrasts, array).
     contents:
       - plot.bayesqm_fit
+      - plot_sorts
+      - plot_zscores
+      - plot_statement
       - plot_loading_posterior
-      - plot_zscore_posterior
-      - plot_membership
-      - plot_elpd
+      - plot_flags
+      - plot_factor_array
+      - plot_contrasts
+      - plot_choice_k
+      - plot_person_check
+      - plot_convergence
       - plot_ppc
-      - plot_tucker
-      - plot_dist_cons
-      - plot_hyper
-
-  - title: "ggplot2 figure renderers"
-    desc: >
-      Publication-grade ggplot2 figures for `bayesqm_run` and
-      `bayesqm_fit`: the ELPD curve, the dominant-factor panel, and
-      the PPC ridgeline. Also reachable through `ggplot2::autoplot()`.
-    contents:
-      - make_elpd_diff
-      - make_dominant_panel
-      - make_ppc_ridge
-      - autoplot.bayesqm_fit
-      - autoplot.bayesqm_run
 
   - title: "Theming and export"
-    desc: "Palette control, figure export, and ready-to-paste captions."
     contents:
       - bayesqm_colors
       - save_bayesqm_plot
       - caption_bayesqm
-      - rename_factors
 
   - title: "Standard accessors for a bayesqm_fit"
-    desc: "`coef()`, `fitted()`, `residuals()`, and the rstantools generics."
     contents:
-      - bayesqm-fit-accessors
-      - bayesqm-fit-methods
+      - coef.bayesqm_fit
+      - fitted.bayesqm_fit
+      - sigma.bayesqm_fit
+      - posterior_interval
       - posterior_interval.bayesqm_fit
+      - prior_summary
       - prior_summary.bayesqm_fit
 
   - title: "Data: import and construction"
-    desc: "Readers for CSV/Excel/PQMethod/Ken-Q/KADE/HTMLQ and the `qsort_data` object."
+    desc: "Readers for CSV/Excel/PQMethod/Ken-Q/KADE/HTMLQ, the `qsort_data` object, and the shipped example panel."
     contents:
       - read_qsort
       - import.pqmethod
       - qsort_data
       - qsort_data-methods
+      - validate_qsort
+      - obesity_sorts
 
   - title: "Simulation helpers"
-    desc: "Data-generating functions and assessment utilities."
     contents:
       - demo_fit
-      - demo_run
       - generate_data
       - assess_recovery
       - tucker_congruence
+
+  - title: "Defunct"
+    contents:
+      - bayesqm-defunct
 
 footer:
   structure:
