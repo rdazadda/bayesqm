@@ -41,6 +41,16 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="articles/bayesqm-intro.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/bayesqm-intro.html">Getting started with bayesqm</a></li>
+    <li><a class="dropdown-item" href="articles/decision-rules.html">The decision rules</a></li>
+    <li><a class="dropdown-item" href="articles/obesity.html">The obesity panel, start to finish</a></li>
+    <li><a class="dropdown-item" href="articles/output-codebook.html">Output codebook</a></li>
+    <li><a class="dropdown-item" href="articles/validation.html">Validation</a></li>
+  </ul>
+</li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -63,7 +73,7 @@
 <!-- badges: start -->
 
 <p><strong>bayesqm turns forced Q sorts into the full set of Q-methodology reports, each carrying its posterior uncertainty.</strong> It reads the common study formats, PQMethod <code>.DAT</code>, Ken-Q, KADE, HTMLQ and FlashQ exports, CSV and Excel grids, and models the sort itself: each participant places every statement into a fixed grid, the quotas make that placement an ordered partition of the statement set, and the package computes the probability of the observed partition exactly. From one panel it derives what a Q study reports, bounded loadings, flags, factor arrays, statement scores, distinguishing and consensus statements, the number of factors, and the checks behind them. Every analysis returns an object that prints its own summary and draws its own plots.</p>
-<p>Every decision states its rule. One posterior false-discovery rule selects everything the analysis reports, flags, distinguishing listings, consensus statements, and pairwise stars, and gives the expected number of false claims alongside. The number of factors is decided by two checks read together, whether K factors account for the panel and whether every factor earns its place. Quantities classical practice fixes by convention, above all the critical difference behind distinguishing statements, are estimated from the posterior instead, and the alignment of the posterior draws follows the MatchAlign procedure of Poworoznek et al. (2025).</p>
+<p>Every decision states its rule. One posterior false-discovery rule selects everything the analysis reports, flags, distinguishing listings, consensus statements, and pairwise stars, and gives the expected number of false claims alongside. The number of factors is decided by two checks read together, whether K factors account for the panel and whether every factor earns its place. Quantities classical practice fixes by convention, above all the critical difference behind distinguishing statements, are estimated from the posterior instead, and the alignment of the posterior draws follows the MatchAlign procedure of Poworoznek et al. (2025). The implementation is checked two ways, against planted truth in simulation and against the <code>qmethod</code> reference implementation wherever both compute the same object, and those checks run live in the validation article on the package website.</p>
 <p>You can usually see the answer before you compute it. Plot the sorts and each completed grid becomes its own pyramid, every statement on its tile, the color giving the column it was placed in. Two like-minded sorters put the same statements under the same colors, and a panel that shares one viewpoint repeats itself pyramid after pyramid. The numbers that follow put a figure to what the picture shows.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -155,7 +165,7 @@
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
-<p>The package website is <a href="https://rdazadda.github.io/bayesqm/" class="uri">https://rdazadda.github.io/bayesqm/</a>. <code><a href="articles/bayesqm-intro.html">vignette("bayesqm-intro")</a></code> walks one analysis end to end, the reference index groups every function by task, and issues belong at <a href="https://github.com/rdazadda/bayesqm/issues" class="external-link uri">https://github.com/rdazadda/bayesqm/issues</a>.</p>
+<p>The package website is <a href="https://rdazadda.github.io/bayesqm/" class="uri">https://rdazadda.github.io/bayesqm/</a>. <code><a href="articles/bayesqm-intro.html">vignette("bayesqm-intro")</a></code> walks one analysis end to end, and <code><a href="articles/output-codebook.html">vignette("output-codebook")</a></code> defines every column of every reported table. The articles go deeper: the validation checks, the decision rules with a worked example of each verdict, and a start-to-finish walkthrough of the obesity panel. The reference index groups every function by task, and issues belong at <a href="https://github.com/rdazadda/bayesqm/issues" class="external-link uri">https://github.com/rdazadda/bayesqm/issues</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>

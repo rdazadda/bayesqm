@@ -112,6 +112,10 @@ below.
   relabels every table at once.
 - Data import is unchanged, and grids with any distinct printed labels
   are accepted as they are.
+- A second vignette, the output codebook, defines every column of every
+  reported table, and the website gains three articles, the validation
+  checks, the decision rules, and a start-to-finish walkthrough of the
+  obesity panel.
 
 ### Dependencies
 
