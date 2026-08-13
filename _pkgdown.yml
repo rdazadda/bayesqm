@@ -19,7 +19,7 @@ navbar:
   bg: primary
   type: dark
   structure:
-    left:  [intro, reference, news]
+    left:  [intro, reference, articles, news]
     right: [search, github, lightswitch]
   components:
     intro:

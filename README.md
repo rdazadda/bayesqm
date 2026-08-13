@@ -31,7 +31,10 @@ whether every factor earns its place. Quantities classical practice
 fixes by convention, above all the critical difference behind
 distinguishing statements, are estimated from the posterior instead, and
 the alignment of the posterior draws follows the MatchAlign procedure of
-Poworoznek et al. (2025).
+Poworoznek et al. (2025). The implementation is checked two ways,
+against planted truth in simulation and against the `qmethod` reference
+implementation wherever both compute the same object, and those checks
+run live in the validation article on the package website.
 
 You can usually see the answer before you compute it. Plot the sorts and
 each completed grid becomes its own pyramid, every statement on its
@@ -209,9 +212,12 @@ and `as.data.frame()` return the draws under Stan-style names, and the
 ## Documentation
 
 The package website is <https://rdazadda.github.io/bayesqm/>.
-`vignette("bayesqm-intro")` walks one analysis end to end, the reference
-index groups every function by task, and issues belong at
-<https://github.com/rdazadda/bayesqm/issues>.
+`vignette("bayesqm-intro")` walks one analysis end to end, and
+`vignette("output-codebook")` defines every column of every reported
+table. The articles go deeper: the validation checks, the decision rules
+with a worked example of each verdict, and a start-to-finish walkthrough
+of the obesity panel. The reference index groups every function by task,
+and issues belong at <https://github.com/rdazadda/bayesqm/issues>.
 
 ## Citation
 

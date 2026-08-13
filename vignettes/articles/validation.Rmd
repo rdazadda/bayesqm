@@ -1,0 +1,135 @@
+---
+title: "Validation"
+bibliography: ../REFERENCES.bib
+csl: ../apa.csl
+link-citations: true
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7, fig.height = 5)
+library(bayesqm)
+```
+
+This article checks the implementation two ways. It fits a panel with
+planted viewpoints and measures how well the truth comes back, and it
+runs a real panel through both this package and `qmethod` to compare
+the outputs wherever the two compute the same object. Every number on
+this page is computed when the site builds.
+
+## Recovering planted truth
+
+`generate_data()` builds a panel with known viewpoints. 14 sorters, 20
+statements, two planted factors, the same panel the README analyzes.
+
+```{r truth-fit}
+sim <- generate_data(N = 14, J = 20, K = 2, noise_sd = 0.6,
+                     primary_range = c(0.65, 0.9), seed = 7)
+qdata <- qsort_data(sim$Y, distribution = sim$distribution)
+fit <- fit_bayesian(qdata, K = 2, seed = 7)
+```
+
+The model reports loadings on a bounded correlation scale, so the
+planted loadings go onto the same scale before the comparison, and
+the posterior draws supply the interval checks.
+`assess_recovery()` aligns the estimate to the truth and returns the
+error, the congruence per factor, a 0-to-1 agreement between loading
+patterns, and the coverage of the credible intervals.
+
+```{r truth-recovery}
+rho_true  <- sim$Lambda_true / sqrt(1 + rowSums(sim$Lambda_true^2))
+lo        <- compute_loadings(fit)
+rho_hat   <- as.matrix(lo[, paste0("f", 1:2, "_loading")])
+s2        <- fit$draws$s_i^2
+rho_draws <- fit$draws$Lambda /
+  sqrt(1 + array(s2, dim(fit$draws$Lambda)))
+
+rec <- assess_recovery(rho_hat, rho_true, rho_draws)
+round(rec$tucker, 3)
+round(unlist(rec[c("rmse", "coverage", "ci_width")]), 3)
+```
+
+Congruence at these levels says the planted viewpoints come back as
+themselves, and coverage near the 95 percent the intervals promise
+says the uncertainty is honest. The statement scores tell the same
+story.
+
+```{r truth-scores}
+zs <- compute_zscores(fit)
+F_hat <- as.matrix(zs[, paste0("f", 1:2, "_zsc")])
+R <- attr(procrustes_rotation(rho_hat, rho_true), "rotation")
+round(diag(cor(scale(sim$F_true), F_hat %*% R)), 3)
+```
+
+A single run shows the machinery working, it does not prove
+calibration. The generator scales to any panel shape, so the check can
+be repeated at your own study's size before you commit to an
+analysis.
+
+## Corresponding with classical analysis
+
+`qmethod` [@Zabala2014] is the field's reference implementation of the
+classical workflow, principal components, varimax rotation, and the
+standard flagging and scoring rules. Where both packages compute the
+same object the two should track each other, and the childhood
+obesity panel of @AkhtarDanesh2023 shows what that looks like on a
+real study.
+
+```{r obesity-fits}
+data(obesity_sorts)
+qm  <- qmethod::qmethod(as.data.frame(obesity_sorts$Y), nfactors = 3,
+                        silent = TRUE)
+fb  <- fit_bayesian(obesity_sorts, K = 3, seed = 11)
+lo3 <- compute_loadings(fb)
+rho <- as.matrix(lo3[, paste0("f", 1:3, "_loading")])
+```
+
+Find each classical factor's closest posterior counterpart by
+congruence, then compare the loadings and the statement scores.
+
+```{r obesity-compare}
+loa <- as.matrix(qm$loa)
+cong <- abs(t(apply(loa, 2, function(a)
+  apply(rho, 2, function(b) tucker_congruence(a, b)))))
+closest <- apply(cong, 1, which.max)
+zb <- as.matrix(compute_zscores(fb)[, paste0("f", 1:3, "_zsc")])
+zq <- as.matrix(qm$zsc)
+
+data.frame(
+  classical  = colnames(loa),
+  closest    = paste0("f", closest),
+  congruence = round(cong[cbind(1:3, closest)], 2),
+  score_cor  = round(diag(cor(zq, zb[, closest])), 2)
+)
+```
+
+The dominant factor corresponds tightly, in loadings and in scores.
+The two weaker classical factors correspond progressively less, and
+they are exactly the factors the decision layer declines to support.
+Notice also that two classical factors share the same closest
+posterior counterpart, which is what a split of one viewpoint looks
+like from the posterior's side.
+
+The arrays tell the same story. The share of statements both analyses
+place in the same grid column:
+
+```{r obesity-arrays}
+ab <- compute_factor_array(fb)
+gb <- as.matrix(ab[, paste0("f", 1:3, "_grid")])
+gq <- as.matrix(qm$zsc_n) + 5     # printed -4..4 onto categories 1..9
+round(colMeans(gq == gb[, closest]), 2)
+```
+
+Strong for the dominant pair, far weaker for the rest.
+
+The two differ where they are designed to differ. The classical
+analysis flags a participant or it does not, while `compute_flags()`
+returns the probability of that assignment, and `claims()` refuses to
+report a flag the posterior cannot stand behind. On this panel the
+classical account reports three factors, and the decision layer reads
+the same numbers as one shared viewpoint, a divergence the package
+front page shows in full. Point summaries correspond where both
+methods compute the same object. The Bayesian layer adds the
+uncertainty and the rules.
+
+## References

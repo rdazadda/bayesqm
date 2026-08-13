@@ -1,0 +1,122 @@
+---
+title: "The obesity panel, start to finish"
+bibliography: ../REFERENCES.bib
+csl: ../apa.csl
+link-citations: true
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7, fig.height = 5)
+library(bayesqm)
+```
+
+This walkthrough runs the childhood obesity panel of @AkhtarDanesh2023
+from raw sorts to write-up. The package front page shows this panel's
+headline, the ladder refusing a multi-factor solution and reading the
+panel as one shared viewpoint. Here the analysis goes all the way,
+with the checks and the tables a study would quote.
+
+## The sorts
+
+33 participants sorted 42 statements about childhood obesity onto a
+nine-column grid.
+
+```{r sorts, fig.height = 6}
+data(obesity_sorts)
+obesity_sorts
+plot(obesity_sorts, participants = 1:12)
+```
+
+## The ladder, row by row
+
+Fit two, three, and four factors and let the two checks read each
+candidate.
+
+```{r ladder, fig.height = 5.5}
+sel <- select_k(fit_ladder(obesity_sorts, K_min = 2, K_max = 4,
+                           seed = 11, quiet = TRUE))
+plot_choice_k(sel)
+```
+
+Read the rows. Every dot sits in the band, so every K accounts for
+the panel. On the right, one chip at every K carries a `d` alone,
+that factor attracts flags but not one statement distinguishes it
+from the others, and every other chip carries `fd`, neither flags nor
+a distinguishing statement. Flags piling onto one factor while
+nothing separates the factors is the signature of a single shared
+viewpoint, and the verdict says so. The marijuana panel, the
+package's second shipped dataset, refuses differently, no factor
+attracts flags at all and the verdict is no shared structure. The
+classical analysis of the obesity panel reports three factors, and
+the validation article shows how the two accounts relate, factor by
+factor.
+
+## The one-factor fit
+
+```{r fit}
+fit1 <- fit_bayesian(obesity_sorts, K = 1, seed = 11)
+fit1
+```
+
+Who carries the shared viewpoint, and how strongly:
+
+```{r loadings, fig.height = 7}
+plot_loading_posterior(fit1)
+```
+
+With one factor there are no pairs to distinguish, so the claims are
+the flags:
+
+```{r claims}
+claims(fit1)
+```
+
+```{r fchar}
+factor_characteristics(fit1)
+```
+
+## The shared sort
+
+The reported array is the viewpoint written as a completed sort, and
+with most of the panel behind it, the placements are firm.
+
+```{r array, fig.height = 6}
+plot_factor_array(fit1)
+```
+
+A write-up quotes the poles. `crib_sheet()` gives the probability of
+each statement landing in the extreme columns and of being the single
+most or least agreed statement:
+
+```{r crib}
+cs <- crib_sheet(fit1)
+head(cs[order(-cs$p_top), ], 3)
+head(cs[order(-cs$p_bottom), ], 3)
+```
+
+## The checks
+
+Does one factor account for the panel, and does it span the people?
+
+```{r checks, fig.height = 5.5}
+check_fit(fit1, draws = 40)
+pc <- check_persons(fit1)
+table(pc$verdict)
+plot_person_check(pc)
+```
+
+One factor sits comfortably inside every check, and the person check
+spans the whole panel. The single viewpoint is not a compromise the
+refusal forced, it is the model the data support.
+
+## What you report
+
+The study's findings are the shared array, the pole shortlists, and
+the loadings with their flags, each carrying its uncertainty. The
+write-up also owes the reader the ladder, because the single
+viewpoint is a decision the checks made, not an assumption. The
+classical account of this panel reports three factors, and the two
+readings are not in contradiction so much as at different standards
+of evidence. The correspondence between them, where it is tight and
+where it dissolves, is worked through in the validation article.

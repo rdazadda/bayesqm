@@ -1,0 +1,177 @@
+---
+title: "Output codebook"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{Output codebook}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(bayesqm)
+fit <- demo_fit(seed = 1)
+```
+
+Every column of every table the package reports, defined in one
+place. The examples run on the small demonstration fit, so the
+numbers here are illustrations, not findings.
+
+## compute_loadings()
+
+```{r}
+head(compute_loadings(fit), 3)
+```
+
+One row per participant. `f*_loading` is the posterior mean loading
+on the bounded correlation scale, between -1 and 1. `f*_lower` and
+`f*_upper` bound the credible interval at the fit's stored
+probability, 95 percent by default. `spread` is the posterior mean of
+the participant's person spread, the size of their systematic signal.
+Calling with `prob = 0.5` returns the same table with 50 percent
+intervals for nested plotting.
+
+## compute_flags()
+
+```{r}
+head(compute_flags(fit), 3)
+```
+
+One row per participant. `factor` is the participant's most probable
+factor, `sign` its pole, 1 for a defining sort and -1 for a mirrored
+one. `flag_prob` is the posterior probability that the participant
+defines that factor, both poles combined, and `unclassified_prob` the
+probability that no factor claims them. `selected` marks the flags
+the false-discovery rule reports at the chosen level. The table
+carries two attributes, `expected_false`, the expected number of
+false flags among the selected, and `phi`, the full probability
+matrix over every factor, pole, and the unclassified state.
+
+## compute_zscores()
+
+```{r}
+head(compute_zscores(fit), 3)
+```
+
+One row per statement. `f*_zsc` is the posterior mean statement score
+in z units under each factor, with `f*_lower` and `f*_upper` its
+interval. Scores are computed from the aligned draws, so they are
+comparable across factors.
+
+## compute_factor_array()
+
+```{r}
+head(compute_factor_array(fit), 3)
+```
+
+One row per statement. `f*_grid` is the reported grid column for the
+statement under each factor, quota-exact by construction, numbered as
+consecutive categories from 1 to the number of columns. Attribute `certainty` is the posterior
+probability of each placement, the shading in
+`plot_factor_array()`, and `footrule_disagreement` records how far
+the reported array sits from the unconstrained posterior ranking.
+
+## compute_qdc()
+
+```{r}
+qdc <- compute_qdc(fit)
+head(qdc, 3)
+```
+
+One row per statement. `f*_dist_prob` is the probability that the
+statement distinguishes that factor from every other, and
+`consensus_prob` the probability that all factors place it within one
+grid column of each other. `verdict` is the resulting three-way call,
+distinguishing with its factors named, consensus, or indeterminate.
+
+The `contrasts` attribute is the long table behind the verdicts:
+
+```{r}
+head(attr(qdc, "contrasts"), 3)
+```
+
+One row per statement and factor pair. `median`, `lower`, and `upper`
+summarize the posterior score contrast. `exceed_prob` is the
+probability that the contrast exceeds the critical difference,
+`diff_column_prob` the probability that the two factors place the
+statement in different grid columns, `selected` the false-discovery
+selection at the first level, and `stars` the two-level marking, one
+star for a selected contrast and two when the stricter level is also
+cleared. The attributes `delta_kl`, `delta_kl99`, and `delta_grid`
+carry the two critical differences and the one-column consensus
+region.
+
+## factor_characteristics()
+
+```{r}
+factor_characteristics(fit)
+```
+
+One row per factor. `flagged` counts the selected flags, and
+`defining_modal`, `defining_mean`, `defining_lower`, and
+`defining_upper` summarize the posterior number of defining sorts.
+`score_spread` is the average posterior spread of the factor's
+statement scores, and `reliability` the mean replicate reliability of
+the factor's flagged participants, `NA` when no participant is
+flagged. The `score_correlations` attribute holds the posterior mean
+correlations between factor score columns.
+
+## claims()
+
+```{r}
+claims(fit, q = 0.25)
+```
+
+Four tables and a rule. `flags`, `distinguishing`, `consensus`, and
+`stars` list every claim the false-discovery rule selects at level
+`q`, each row carrying its posterior probability, and
+`expected_false` gives the expected number of false claims inside
+each family.
+
+## check_fit() and check_persons()
+
+```{r}
+check_fit(fit, draws = 20)
+```
+
+`agreement` compares the observed person-to-model agreement with its
+replicated reference and reports a two-sided probability. `paired`
+does the same for paired comparisons. `extra_factor` reports where
+the next unused eigenvalue falls among the model's replications, the
+percentile the choice-of-K rule reads.
+
+```{r}
+pc <- check_persons(fit, draws = 10, mixes = 20)
+head(pc, 3)
+```
+
+One row per participant. `m` is agreement with the model's
+reconstruction, `w` agreement with their own mixed replicates, and
+`verdict` the resulting call, with `partner` naming the nearest
+other sorter when a shared viewpoint sits outside the model.
+
+## crib_sheet()
+
+```{r}
+head(crib_sheet(fit), 3)
+```
+
+One row per statement and factor. `p_top` and `p_bottom` are the
+probabilities of landing in the most extreme agree and disagree
+columns, `p_highest` and `p_lowest` of being that factor's single
+most and least agreed statement. These are the shortlists used when
+interpreting a factor.
+
+## select_k()
+
+Run on a ladder of fits, `select_k()` returns `K`, the verdict, and a
+table with one row per candidate. `extra_factor` is the
+posterior-predictive percentile, `adequate` whether it sits in the
+band with no unspanned cluster, `factors_supported` how many factors
+earn at least two selected flags and one selected distinguishing
+statement, and `all_supported` whether every factor does. The
+`detail` element carries the same support information factor by
+factor, and the plot method draws the whole decision.
