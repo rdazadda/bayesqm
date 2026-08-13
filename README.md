@@ -54,9 +54,9 @@ until 0.2.0 reaches CRAN.
 ## A first analysis
 
 One real panel ships with the package, the childhood obesity study of
-Akhtar-Danesh (2023), so this runs without any data of your own.
-Thirty-three participants sorted forty-two statements about childhood
-obesity onto a nine-column grid.
+Akhtar-Danesh (2023), so this runs without any data of your own. 33
+participants sorted 42 statements about childhood obesity onto a
+nine-column grid.
 
 ``` r
 library(bayesqm)
@@ -198,7 +198,7 @@ corroboration.
 it does not. Every fit passes a convergence check before it returns, and
 `extend()` continues a chain draw for draw.
 
-**Plots and draws.** Eleven views in one style, from the raw sorts to
+**Plots and draws.** The 11 views share one style, from the raw sorts to
 the reported arrays, with `ggplot2::autoplot()` methods for loadings,
 flags, contrasts, and the array; `bayesqm_set_colors()` themes them and
 `save_bayesqm_plot()` writes the figures. `as.matrix()`, `as.array()`,

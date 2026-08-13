@@ -23,3 +23,26 @@
 #' obesity_sorts
 #' plot(obesity_sorts, participants = 1:4)
 "obesity_sorts"
+
+
+#' Marijuana legalization Q sorts
+#'
+#' @description
+#' The marijuana legalization Q dataset from Akhtar-Danesh (2023): 40
+#' participants each force-sorted 19 statements about marijuana
+#' legalization onto a seven-column grid (quotas 1-2-4-5-4-2-1,
+#' printed values -3 to +3). A real, published panel with a small
+#' statement set, used in the package documentation.
+#'
+#' @format A [qsort_data] object: the 19 x 40 integer matrix of printed
+#'   grid values with statement and participant ids, and the forced
+#'   distribution.
+#'
+#' @source Akhtar-Danesh, N. (2023). Impact of factor rotation on
+#'   Q-methodology analysis. \emph{PLOS ONE}, 18(9), e0290728.
+#'   \doi{10.1371/journal.pone.0290728}
+#'
+#' @examples
+#' marijuana_sorts
+#' plot(marijuana_sorts, participants = 1:4)
+"marijuana_sorts"

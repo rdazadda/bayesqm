@@ -126,8 +126,12 @@ reference:
       - qsort_data-methods
       - validate_qsort
       - obesity_sorts
+      - marijuana_sorts
 
-  - title: "Simulation helpers"
+  - title: "Demonstration and synthetic panels"
+    desc: >
+      A fast demonstration fit, synthetic panels with known truth, and
+      recovery measures for method checks.
     contents:
       - demo_fit
       - generate_data
