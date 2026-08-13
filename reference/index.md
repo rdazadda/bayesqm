@@ -153,8 +153,13 @@ object, and the shipped example panel.
   : Print, summary, and matrix conversion for qsort_data
 - [`obesity_sorts`](https://rdazadda.github.io/bayesqm/reference/obesity_sorts.md)
   : Childhood obesity Q sorts
+- [`marijuana_sorts`](https://rdazadda.github.io/bayesqm/reference/marijuana_sorts.md)
+  : Marijuana legalization Q sorts
 
-## Simulation helpers
+## Demonstration and synthetic panels
+
+A fast demonstration fit, synthetic panels with known truth, and
+recovery measures for method checks.
 
 - [`demo_fit()`](https://rdazadda.github.io/bayesqm/reference/demo_fit.md)
   : A small demonstration fit

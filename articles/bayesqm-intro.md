@@ -41,8 +41,8 @@ Before any model runs, look at what the participants actually did.
 `plot(qdata)` draws every completed sort as its own pyramid, one tile
 per statement, the color giving the column it was placed in. Here on
 `obesity_sorts`, the childhood obesity panel of Akhtar-Danesh
-([2023](#ref-AkhtarDanesh2023)) that ships with the package.
-Thirty-three participants, forty-two statements, a nine-column grid.
+([2023](#ref-AkhtarDanesh2023)) that ships with the package. 33
+participants, 42 statements, a nine-column grid.
 
 ``` r
 

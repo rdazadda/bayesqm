@@ -9,7 +9,7 @@ sorting event exactly, and fits it with a Gibbs sampler written in R.
 Stan is no longer used. Scripts written against 0.1.0 need the changes
 below.
 
-### Breaking changes
+### Changes from 0.1.0
 
 - [`fit_bayesian()`](https://rdazadda.github.io/bayesqm/reference/fit_bayesian.md)
   fits the new model. The Stan-era arguments give migration errors that
@@ -79,9 +79,11 @@ below.
   gives the per-factor summary block.
 - Alignment ends in a stabilized orientation, so the delivered rotation
   does not inherit one draw’s sampling noise.
-- `obesity_sorts` ships with the package, the childhood obesity panel of
-  Akhtar-Danesh (2023). Thirty-three participants, forty-two statements,
-  a nine-column grid.
+- Two real panels ship with the package, both from Akhtar-Danesh (2023).
+  `obesity_sorts` is the childhood obesity panel, 33 participants
+  sorting 42 statements on a nine-column grid, and `marijuana_sorts` the
+  marijuana legalization panel, 40 participants sorting 19 statements on
+  a seven-column grid.
 - Plots rebuilt in one style, from
   [`plot_sorts()`](https://rdazadda.github.io/bayesqm/reference/plot_sorts.md),
   which previews every participant’s completed sort before any model
