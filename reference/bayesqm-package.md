@@ -4,9 +4,10 @@ A Bayesian analysis for Q methodology, alongside the classical one.
 Models the forced Q sort as an ordered partition of the statements
 through an exact rank-order likelihood (the design quotas fix the
 partition margins, so the likelihood of the observed sorting event is
-exact), fits it by a parameter-expanded Gibbs sampler in pure R with a
-convergence gate on rotation-invariant functionals, resolves rotational
-ambiguity via the MatchAlign post-processing of Poworoznek et al. (2025)
+exact), fits it by a parameter-expanded Gibbs sampler in R with no
+compiled code and a convergence gate on rotation-invariant functionals,
+resolves rotational ambiguity via the MatchAlign post-processing of
+Poworoznek et al. (2025)
 [doi:10.1214/25-BA1544](https://doi.org/10.1214/25-BA1544) , and returns
 the familiar Q tables as posterior summaries: credible intervals for
 bounded participant loadings, flag probabilities with an explicit
@@ -21,9 +22,9 @@ forced Q sort is modeled as an ordered partition of the statements
 through an exact rank-order likelihood: the design quotas fix the
 partition margins, so the probability of the observed sorting event is
 the full observed-data likelihood. The posterior is sampled by a
-parameter-expanded Gibbs sampler in pure R, gated on rotation-invariant
-convergence diagnostics, aligned by MatchAlign, and returned as the
-familiar Q tables with uncertainty attached.
+parameter-expanded Gibbs sampler in R with no compiled code, gated on
+rotation-invariant convergence diagnostics, aligned by MatchAlign, and
+returned as the familiar Q tables with uncertainty attached.
 
 ## Details
 
@@ -128,10 +129,17 @@ Useful links:
 ## Author
 
 **Maintainer**: Raymond Dacosta Azadda <rdazadda@alaska.edu>
+([ORCID](https://orcid.org/0009-0002-4384-4556))
 
 Authors:
 
 - Raymond Dacosta Azadda <rdazadda@alaska.edu>
+  ([ORCID](https://orcid.org/0009-0002-4384-4556))
+
+- Henry Ofoe Agbi-Kaiser
+  ([ORCID](https://orcid.org/0009-0008-6127-9136))
+
+- Hannah D. Robinson ([ORCID](https://orcid.org/0009-0000-5159-1363))
 
 - AK-ACE Team
 

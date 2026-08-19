@@ -3,7 +3,13 @@
 ## Authors
 
 - **[Raymond Dacosta Azadda](https://github.com/rdazadda)**. Author,
-  maintainer.
+  maintainer. [](https://orcid.org/0009-0002-4384-4556)
+
+- **Henry Ofoe Agbi-Kaiser**. Author.
+  [](https://orcid.org/0009-0008-6127-9136)
+
+- **Hannah D. Robinson**. Author.
+  [](https://orcid.org/0009-0000-5159-1363)
 
 - **AK-ACE Team**. Author.
 
