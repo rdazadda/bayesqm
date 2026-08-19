@@ -100,9 +100,10 @@ When no row passes both checks, the rule refuses to select and names
 what it sees instead. A panel whose flags pile onto one factor while no
 statement separates any pair reads as a single viewpoint, the verdict
 the childhood obesity panel receives in its walkthrough. A panel where
-no factor attracts even two flags reads as no shared structure, the
-verdict the marijuana panel, the package’s second shipped dataset,
-receives at the same standard. And when adequacy and support each hold
+no factor attracts even two flags reads as no shared structure. On the
+grizzly bear panel, the package’s second shipped dataset, the same
+standard resolves the other way, K = 2 passes both checks and the rule
+selects two viewpoints. And when adequacy and support each hold
 somewhere but never together, the verdict is tension, an instruction to
 look at the rows and make the choice openly.
 

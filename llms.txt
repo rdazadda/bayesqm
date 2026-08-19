@@ -420,8 +420,8 @@ object, and the shipped example panel.
   : Print, summary, and matrix conversion for qsort_data
 - [`obesity_sorts`](https://rdazadda.github.io/bayesqm/reference/obesity_sorts.md)
   : Childhood obesity Q sorts
-- [`marijuana_sorts`](https://rdazadda.github.io/bayesqm/reference/marijuana_sorts.md)
-  : Marijuana legalization Q sorts
+- [`grizzly_sorts`](https://rdazadda.github.io/bayesqm/reference/grizzly_sorts.md)
+  : Grizzly bear reintroduction Q sorts
 
 ## Demonstration and synthetic panels
 
