@@ -1,18 +1,21 @@
 ---
-title: 'bayesqm: Probabilistic factor analysis for Q methodology in R'
+title: 'bayesqm: Bayesian Q methodology from an exact rank-order likelihood'
 tags:
   - R
-  - Stan
   - Bayesian inference
-  - factor analysis
   - Q methodology
-  - subjective opinions
-  - posterior uncertainty
+  - factor analysis
+  - rank-order data
+  - forced distribution
 authors:
   - name: Raymond Dacosta Azadda
     orcid: 0009-0002-4384-4556
     affiliation: 1
     corresponding: true
+  - name: Henry Ofoe Agbi-Kaiser
+    affiliation: 1
+  - name: AK-ACE Team
+    affiliation: 1
   - name: Karsten Hueffer
     affiliation: 1
   - name: Taa'aii Peter
@@ -20,49 +23,37 @@ authors:
   - name: Stacy Rasmus
     affiliation: 1
 affiliations:
-  - name: Center for Alaska Native Health Research, University of Alaska Fairbanks, USA
+  - name: University of Alaska Fairbanks, USA
     index: 1
-date: 10 May 2026
+date: 18 August 2026
 bibliography: paper.bib
 ---
 
 # Summary
 
-`bayesqm` introduces fully Bayesian inference to Q methodology, an approach that identifies shared viewpoints from how participants rank-order a set of statements [@Stephenson1935; @Brown1980]. Each participant places statements onto a forced distribution (Figure \ref{fig:qsort}), so the analytic input is a $J \times N$ matrix of integer scores where every participant uses the same fixed count of statements at each rank position.
+`bayesqm` is an R package for Bayesian analysis of Q methodology studies. It fits a model whose likelihood, the probability assigned to the data, is the exact probability of each observed ranking under the design quotas, and each standard Q result carries a probability statement.
 
-![A common Q-sort grid: participants arrange 36 statements on a nine-category forced distribution from "most disagree" to "most agree." Each column placement is constrained to a fixed count, producing the structural constraint that distinguishes Q-sort data from conventional rating scales.\label{fig:qsort}](figures/qsort-grid.pdf){width=70%}
+In a Q study, participants rank a set of statements into a forced grid from most disagree to most agree, with column counts fixed by design [@Stephenson1935]. A completed sort records an ordered partition, which group outranks which with group sizes known in advance. Factor analysis gathers participants who ranked similarly, and each factor is read as a shared viewpoint [@Brown1980].
 
-The package fits a low-rank factor model to Q-sort data with a Student-$t$ likelihood and a hierarchical prior on loadings, samples the joint posterior with Stan [@CarpenterEtAl2017], resolves rotational ambiguity through MatchAlign post-processing [@PoworoznekEtAl2025], and returns posterior credible intervals for participant loadings, probabilistic factor-membership summaries (including a posterior sign that separates positive from negative exemplars), the posterior of an explicit viewpoint-divergence measure together with the distinguishing and consensus probabilities it implies, and PSIS-LOO-based factor enumeration [@VehtariEtAl2017; @SivulaEtAl2025]. It supports both `cmdstanr` and `rstan` as Stan backends, imports Q-sort datasets from PQMethod and KADE, and integrates with the broader R Bayesian ecosystem via `posterior`, `loo`, and `ggplot2` autoplot methods.
+![A forced Q sort grid, one statement per cell, column counts fixed by design.\label{fig:qsort}](figures/qsort-grid.pdf){width=70%}
+
+Fitting uses a parameter-expanded Gibbs sampler [@MurrayEtAl2013], a simulation method that draws many plausible solutions given the data, in pure R with no compiled code. MatchAlign [@PoworoznekEtAl2025] aligns the draws after sampling so factor order, signs, and orientation stay consistent. Loadings, each participant's strength of match to each factor on a correlation scale, carry credible intervals, ranges that contain the value with stated probability. The flags that assign participants to factors become probabilities. Factor arrays, the reconstructed sort for each viewpoint, shade every placement by how certain it is. Distinguishing statements, which separate one viewpoint from the rest, and consensus statements, which all viewpoints rank alike, are selected under an error rule that states the expected number of wrong claims in every table. The number of factors is itself a decision.
 
 # Statement of need
 
-The standard frequentist toolkit for Q methodology, represented in R by the `qmethod` package [@Zabala2014], reports participant-to-factor assignments as binary "flagged" or "unflagged" classifications, with thresholds derived from a fixed standard error of $1/\sqrt{J}$ where $J$ is the number of statements [@Brown1980]. This binary framing obscures cross-loadings, hides the dependence of assignment confidence on study design, and provides no single posterior describing uncertainty in both the factor structure and the participants' assignments. Resampling-based extensions [@ZabalaPascual2016] add variability estimates for individual loadings and statement scores, yet they remain frequentist procedures and do not produce a single posterior over the joint factor structure.
+Q studies are commonly analyzed with PQMethod or the qmethod package [@Zabala2014]. In classical practice a participant is flagged when a loading clears a threshold set from the number of statements, distinguishing and consensus statements are settled by significance against a conventional standard error, and the number of factors is chosen by rule and judgment [@Brown1980]. These conventions state no level of confidence for the claims they produce. Bootstrap extensions [@ZabalaPascual2016] measure the stability of the classical estimates without giving the uncertainty of the whole solution, general Bayesian factor-analysis software models measured variables, and no model of the sorting event existed to fit. `bayesqm` supplies that model and runs alongside classical practice. Varimax, the standard orientation of factors, stays the default, the classical flag rule is applied draw by draw, and defining sorts, the sorts of flagged participants, keep their role. Fixed numbers become estimated quantities with stated uncertainty.
 
-Existing Bayesian exploratory factor analysis software in R operates on the standard variable-by-variable covariance matrix of R-mode factor analysis. It does not accommodate the by-person correlation structure that defines Q-sort data, the forced-distribution constraints that shape Q-sort scores, or the rotation conventions used in Q-methodology interpretation. A researcher wishing to apply Bayesian inference to a Q study has had to author a Stan model from scratch, implement rotation post-processing, and rebuild Q-specific reporting tools, an effort rarely undertaken in practice.
+# Functionality
 
-`bayesqm` provides a complete alternative. It supplies a Q-aware Stan model with sensible default priors, propagates posterior uncertainty through every reported quantity, and presents results through R's standard model interface. The package serves Q-methodology researchers across disciplines including political science [@Brown1980], environmental management [@WeblerEtAl2009], and Indigenous health research [@SchmidtEtAl2021], where treating factor membership as binary in small Q-samples may overstate the confidence of those factor assignments, a risk that the Bayesian framework makes explicit. The package originated in Q studies conducted with Alaska Native communities at the Center for Alaska Native Health Research, where small participant samples and substantive interest in cross-loadings made the limitations of binary classical assignment particularly visible.
+`read_qsort()` loads a statements-by-sorts table and validates every sort against its grid, and importers load PQMethod, KenQ, KADE, and easyHTMLQ files without reformatting. `fit_bayesian()` fits the model at a single number of factors K, `fit_ladder()` fits a range of candidates, and `select_k()` decides from two checks, whether a candidate accounts for the sorts and whether every factor keeps at least two flagged participants and one distinguishing statement. The possible answers are a selected K, one shared viewpoint, no shared structure, or a tension between candidates. `claims()` returns the flag, distinguishing, and consensus tables with the expected number of false claims in each. `compute_factor_array()`, `compute_zscores()`, `factor_characteristics()`, and `crib_sheet()` cover the standard Q report. `check_fit()` and `check_persons()` test whether the fitted model reproduces the sorts and whether any participant sits outside it. Plot functions draw the sorts, arrays, contrasts, flags, and the choice of K. A fit takes one to three minutes on an ordinary desktop, and a complete analysis with checks runs in five to fifteen minutes.
 
-# Implementation
+Two studies ship as package data. `obesity_sorts` holds the childhood obesity study of @AkhtarDanesh2023, 42 statements and 33 participants, where the decision is one shared viewpoint, 32 of 33 participants flagged on a single factor, its array in Figure \ref{fig:array}. `grizzly_sorts` holds the grizzly bear reintroduction study of @EasterEtAl2025, 41 statements and 67 participants, where the rule selects two viewpoints, shown in Figure \ref{fig:choice}. The two decisions show the range of the rule, a selection when factors hold support and a single shared viewpoint when they do not. The analyses and figures in this paper regenerate from a seeded script using only the shipped datasets.
 
-The Stan model parameterizes the low-rank factorization
-$$\mathbf{Y} = \mathbf{F} \boldsymbol{\Lambda}^{\top} + \mathbf{E},$$
-with a per-draw column standardization of $\mathbf{F}$ to pin scale identifiability. Rotation, sign-flip, and factor-relabeling ambiguities are intentionally left unresolved during sampling and addressed in R after the fit. The function `fit_bayesian()` runs the sampler through whichever Stan backend is available, applies MatchAlign [@PoworoznekEtAl2025] to align the posterior draws, and returns a classed `bayesqm_fit` object carrying aligned draws, point and interval summaries, sampler diagnostics, and posterior predictive output.
+![The obesity study's shared factor array. Darker tiles mark more certain placements.\label{fig:array}](figures/obesity-array.pdf){width=85%}
 
-Results are available through standard model accessors: `coef()`, `fitted()`, `residuals()`, `posterior_interval()`, `prior_summary()`, and a `summary()` method with Q-specific reporting. The fit object integrates with `posterior` (via `as_draws_*` methods), with `loo` (via a `loo.bayesqm_fit` method), and with `ggplot2` (via `autoplot` methods covering loadings, dominant-factor probabilities, and posterior predictive checks). The probabilistic-membership output that distinguishes `bayesqm` from frequentist Q tools is illustrated in Figure \ref{fig:membership}: each cell shows $P(\mathrm{dominant}_i = k \mid \mathbf{Y})$, making cross-loadings visible rather than collapsing them to a binary flag.
+![Choice of K for the grizzly study. The rule selects K = 2, the smallest candidate with every factor supported.\label{fig:choice}](figures/grizzly-choice.pdf){width=85%}
 
-![Posterior dominant-factor probabilities estimated by `bayesqm` on two Q-sort datasets [@AkhtarDanesh2023]: a childhood-obesity study with $J = 42$ statements and $N = 33$ participants (panel A) and a marijuana-legalization study with $J = 19$ statements and $N = 40$ participants (panel B). Each cell shows $P(\mathrm{dominant}_i = k \mid \mathbf{Y})$. Cross-loadings and uncertain assignments are explicit, in contrast to the binary flagging used in classical Q analysis. With $J = 42$ statements, 30 of 33 participants reach moderate-or-strong assignment confidence; with $J = 19$, only 25 of 40 do, illustrating how assignment confidence depends on the size of the Q-sample.\label{fig:membership}](figures/dominant-membership.pdf){width=100%}
-
-Beyond membership, `bayesqm` summarizes how sharply the viewpoints separate on each statement. It reports the posterior of $D_j$, the mean absolute pairwise difference of the $K$ viewpoint scores (the mean, not the maximum, which is inflated when the posterior is diffuse), together with $P(D_j > \delta \mid \mathbf{Y})$ and $P(D_j < \delta \mid \mathbf{Y})$, the probabilities that the viewpoints diverge by a meaningful amount or practically agree. The separation $\delta$ is, by default, the reliability-adjusted critical difference long used to flag distinguishing statements in classical Q analysis [@Brown1980; @ZabalaPascual2016], here generalized by computing it from the posterior dominant-factor distribution rather than a point flagging (`critical_delta()`); `suggest_delta()` (the standardized width of one forced-distribution category) is an alternative, and divergence results are reported with sensitivity across the choice of $\delta$. No fixed probability cutoff defines a distinguishing or consensus statement; the posterior and the probabilities it implies are what the package returns.
-
-Classical Q analysis chooses the number of factors through interpretive judgment, eigenvalue thresholds, and other heuristics. `bayesqm` instead reports two principled signals across a fitted range of K, namely the expected log predictive density (ELPD) peak and the conservative parsimony rule of @SivulaEtAl2025. The package adopts the ELPD peak as the chosen K (Figure \ref{fig:elpd}). When the two signals agree, the choice is uncontroversial; when the Sivula rule recommends fewer factors than the peak, the gap is itself diagnostic.
-
-![Factor enumeration on two Q-sort datasets [@AkhtarDanesh2023]: $\Delta$ELPD relative to $K = 1$ across $K \in \{1, \ldots, 5\}$, with the Sivula parsimony rule (red triangle) and the ELPD peak (blue square) marked. The shaded band at $|\Delta\mathrm{ELPD}| < 4$ indicates where the Sivula rule rejects an increment as not parsimonious. In both datasets, the ELPD peak is $K = 3$ while the Sivula rule recommends fewer factors, illustrating the gap case the protocol is designed to handle.\label{fig:elpd}](figures/elpd-k-selection.pdf){width=100%}
-
-For users transitioning from existing Q-methodology workflows, `bayesqm` provides direct importers for the file formats produced by PQMethod and KADE, so legacy datasets can be analyzed without manual reformatting.
-
-# Acknowledgements
-
-`bayesqm` grew out of work at the Center for Alaska Native Health Research at the University of Alaska Fairbanks, and would not exist without the people there. I am grateful to the CANHR research team for their discussions and encouragement, and especially to the Numbers Team, particularly Andrew Grogan-Kaylor and KyungSook Lee, for their methodological discussions, feedback on early designs, and patience with the questions that shaped this package over many conversations.
+# Funding
 
 This research was, in part, funded by the National Institutes of Health (NIH) Agreement OT2HL158287 (Stacy Rasmus, Contact PI, smrasmus@alaska.edu; Karsten Hueffer and Taa'aii Peter, MPIs). The views and conclusions contained in this document are those of the authors and should not be interpreted as representing the official policies, either expressed or implied, of the NIH.
 

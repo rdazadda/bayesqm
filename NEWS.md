@@ -49,11 +49,11 @@ need the changes below.
   `factor_characteristics()` gives the per-factor summary block.
 * Alignment ends in a stabilized orientation, so the delivered
   rotation does not inherit one draw's sampling noise.
-* Two real panels ship with the package, both from Akhtar-Danesh
-  (2023). `obesity_sorts` is the childhood obesity panel, 33
-  participants sorting 42 statements on a nine-column grid, and
-  `marijuana_sorts` the marijuana legalization panel, 40 participants
-  sorting 19 statements on a seven-column grid.
+* Two real panels ship with the package. `obesity_sorts` is the
+  childhood obesity panel of Akhtar-Danesh (2023), 33 participants
+  sorting 42 statements on a nine-column grid, and `grizzly_sorts`
+  the grizzly bear reintroduction panel of Easter et al. (2025), 67
+  participants sorting 41 statements on an eleven-column grid.
 * Plots rebuilt in one style, from `plot_sorts()`, which previews
   every participant's completed sort before any model runs, to
   `plot_choice_k()`, which draws the whole choice-of-K decision with

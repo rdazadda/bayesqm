@@ -126,7 +126,7 @@ reference:
       - qsort_data-methods
       - validate_qsort
       - obesity_sorts
-      - marijuana_sorts
+      - grizzly_sorts
 
   - title: "Demonstration and synthetic panels"
     desc: >

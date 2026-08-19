@@ -25,24 +25,28 @@
 "obesity_sorts"
 
 
-#' Marijuana legalization Q sorts
+#' Grizzly bear reintroduction Q sorts
 #'
 #' @description
-#' The marijuana legalization Q dataset from Akhtar-Danesh (2023): 40
-#' participants each force-sorted 19 statements about marijuana
-#' legalization onto a seven-column grid (quotas 1-2-4-5-4-2-1,
-#' printed values -3 to +3). A real, published panel with a small
-#' statement set, used in the package documentation.
+#' The grizzly bear reintroduction Q dataset from Easter et al. (2025):
+#' 67 participants each force-sorted 41 statements about reintroducing
+#' grizzly bears to the North Cascades onto an eleven-column grid
+#' (quotas 1-2-3-5-6-7-6-5-3-2-1, printed values -5 to +5). A real,
+#' published panel where the two-signal rule selects a two-factor
+#' solution, used in the package documentation.
 #'
-#' @format A [qsort_data] object: the 19 x 40 integer matrix of printed
+#' @format A [qsort_data] object: the 41 x 67 integer matrix of printed
 #'   grid values with statement and participant ids, and the forced
 #'   distribution.
 #'
-#' @source Akhtar-Danesh, N. (2023). Impact of factor rotation on
-#'   Q-methodology analysis. \emph{PLOS ONE}, 18(9), e0290728.
-#'   \doi{10.1371/journal.pone.0290728}
+#' @source Easter, T. S., Santo, A. R., Sage, A. H., Carter, N. H.,
+#'   Chan, K. M. A., & Ransom, J. I. (2025). Divergent values and
+#'   perspectives drive three distinct viewpoints on grizzly bear
+#'   reintroduction in Washington, the United States. \emph{People and
+#'   Nature}, 7, 127--145. \doi{10.1002/pan3.10748}. Data from the
+#'   Dryad repository under CC0, \doi{10.5061/dryad.73n5tb369}.
 #'
 #' @examples
-#' marijuana_sorts
-#' plot(marijuana_sorts, participants = 1:4)
-"marijuana_sorts"
+#' grizzly_sorts
+#' plot(grizzly_sorts, participants = 1:4)
+"grizzly_sorts"
