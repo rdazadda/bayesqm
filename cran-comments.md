@@ -1,21 +1,31 @@
-This is a resubmission. Both points from the review of 28 May (Konstanze Lauseker) are addressed:
+This is a version update, 0.1.0 to 0.2.0.
 
-- \dontrun{} is gone. Four examples (bayesqm_set_colors, rename_factors, save_bayesqm_plot, caption_bayesqm) are now unwrapped and run in well under 5 seconds each, using the package's demo_fit() constructor, with save_bayesqm_plot() writing to tempdir(). The fit_bayesian() example, which needs a working Stan toolchain, is now in \donttest{} and guarded by a cmdstanr availability check so it is skipped where no backend is installed.
-- generate_data() no longer touches the global environment. The .Random.seed save/restore in R/helpers.R is removed; the function now follows the recommended pattern of an optional seed argument passed to set.seed(), the demo constructors take the same NULL opt-out, and the test asserting the old restore behavior was replaced by a reproducibility test.
+## What changed
+
+0.2.0 replaces the model and the sampler. The score-scale factor model
+fitted in Stan is gone, and the package now models the forced Q sort as
+an ordered partition through an exact rank-order likelihood, fitted by a
+parameter-expanded Gibbs sampler written in R with no compiled
+code. Stan, cmdstanr, and
+rstan are no longer used or suggested, so the Additional_repositories
+field and the backend guards from the 0.1.0 submission are gone with
+them. The user-facing changes are documented in NEWS.md.
+
+The two datasets that ship with the package are small published Q
+sorts, a few kilobytes each, redistributed under CC0 (Dryad) and CC-BY
+(PLOS ONE) with sources credited on their help pages.
 
 ## Test environments
 
 - Windows 11, R 4.6.0 (local)
-- GitHub Actions: ubuntu-latest, windows-latest, and macos-latest, on R release, R-devel, and R 4.5.x (oldrel-1)
+- GitHub Actions: ubuntu-latest, windows-latest, and macos-latest, on R
+  release, R-devel, and oldrel-1
 - win-builder, R-devel
-- R-hub v2
 
 ## R CMD check results
 
 Local `R CMD check --as-cran` (R 4.6.0): 0 errors | 0 warnings | 0 notes.
 
-The package is still a new submission, so CRAN will add the usual "New submission" note. The check will also flag `cmdstanr` as a suggested package that is not on a mainstream repository; that is expected. `cmdstanr` is distributed through the Stan project's r-universe, which the package declares in `Additional_repositories`, and the check confirms it is reachable there. Anything the spell check reports is a correctly spelled author surname from the DOI citations or a standard Q-methodology or Stan term, all kept in `inst/WORDLIST`.
+## Reverse dependencies
 
-## Stan and the test suite
-
-bayesqm uses Stan for posterior sampling. cmdstanr is the recommended backend, with rstan supported as a fallback. The integration tests that compile and sample the model live in tests/testthat/test-stan-sampling.R and are guarded by skip_on_cran(), so the CRAN check farm does not need a working Stan toolchain.
+There are none.

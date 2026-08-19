@@ -1,6 +1,5 @@
 Anceschi
 Azadda
-CmdStan
 CrI
 Dacosta
 Dunson
@@ -35,7 +34,6 @@ bayesplot
 bimodality
 brms
 centred
-cmdstanr
 colour
 colourbar
 colours
@@ -61,7 +59,6 @@ qsort
 relabelled
 reportable
 ridgeline
-rstan
 specialised
 standardised
 summarising

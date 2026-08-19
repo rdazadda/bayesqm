@@ -8,14 +8,14 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-A Bayesian analysis for Q methodology, alongside the classical one. Models the forced Q sort as an ordered partition of the statements through an exact rank-order likelihood (the design quotas fix the partition margins, so the likelihood of the observed sorting event is exact), fits it by a parameter-expanded Gibbs sampler in pure R with a convergence gate on rotation-invariant functionals, resolves rotational ambiguity via the MatchAlign post-processing of Poworoznek et al. (2025) \doi{10.1214/25-BA1544}, and returns the familiar Q tables as posterior summaries: credible intervals for bounded participant loadings, flag probabilities with an explicit unclassified state, quota-respecting factor arrays, distinguishing and consensus statements judged against a posterior critical difference and a grid-width equivalence region, one posterior false-discovery rule for all published claims, and a two-signal posterior-predictive workflow for the number of factors.
+A Bayesian analysis for Q methodology, alongside the classical one. Models the forced Q sort as an ordered partition of the statements through an exact rank-order likelihood (the design quotas fix the partition margins, so the likelihood of the observed sorting event is exact), fits it by a parameter-expanded Gibbs sampler in R with no compiled code and a convergence gate on rotation-invariant functionals, resolves rotational ambiguity via the MatchAlign post-processing of Poworoznek et al. (2025) \doi{10.1214/25-BA1544}, and returns the familiar Q tables as posterior summaries: credible intervals for bounded participant loadings, flag probabilities with an explicit unclassified state, quota-respecting factor arrays, distinguishing and consensus statements judged against a posterior critical difference and a grid-width equivalence region, one posterior false-discovery rule for all published claims, and a two-signal posterior-predictive workflow for the number of factors.
 
 A Bayesian analysis for Q methodology, alongside the classical one. The
 forced Q sort is modeled as an ordered partition of the statements
 through an exact rank-order likelihood: the design quotas fix the
 partition margins, so the probability of the observed sorting event is
 the full observed-data likelihood. The posterior is sampled by a
-parameter-expanded Gibbs sampler in pure R, gated on rotation-invariant
+parameter-expanded Gibbs sampler in R with no compiled code, gated on rotation-invariant
 convergence diagnostics, aligned by MatchAlign, and returned as the
 familiar Q tables with uncertainty attached.
 }
@@ -87,11 +87,13 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Raymond Dacosta Azadda \email{rdazadda@alaska.edu}
+\strong{Maintainer}: Raymond Dacosta Azadda \email{rdazadda@alaska.edu} (\href{https://orcid.org/0009-0002-4384-4556}{ORCID})
 
 Authors:
 \itemize{
-  \item Raymond Dacosta Azadda \email{rdazadda@alaska.edu}
+  \item Raymond Dacosta Azadda \email{rdazadda@alaska.edu} (\href{https://orcid.org/0009-0002-4384-4556}{ORCID})
+  \item Henry Ofoe Agbi-Kaiser (\href{https://orcid.org/0009-0008-6127-9136}{ORCID})
+  \item Hannah D. Robinson (\href{https://orcid.org/0009-0000-5159-1363}{ORCID})
   \item  AK-ACE Team
   \item Karsten Hueffer
   \item Taa'aii Peter

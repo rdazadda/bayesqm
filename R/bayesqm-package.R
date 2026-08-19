@@ -10,7 +10,7 @@
 #' through an exact rank-order likelihood: the design quotas fix the
 #' partition margins, so the probability of the observed sorting event is
 #' the full observed-data likelihood. The posterior is sampled by a
-#' parameter-expanded Gibbs sampler in pure R, gated on rotation-invariant
+#' parameter-expanded Gibbs sampler in R with no compiled code, gated on rotation-invariant
 #' convergence diagnostics, aligned by MatchAlign, and returned as the
 #' familiar Q tables with uncertainty attached.
 #'
