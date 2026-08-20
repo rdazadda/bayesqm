@@ -7,7 +7,7 @@
 
 [![R-CMD-check](https://github.com/rdazadda/bayesqm/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rdazadda/bayesqm/actions/workflows/R-CMD-check.yaml)
 [![License: GPL
-v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://cran.r-project.org/web/licenses/GPL-3)
 <!-- badges: end -->
 
 **bayesqm turns forced Q sorts into the full set of Q-methodology
@@ -226,7 +226,7 @@ and issues belong at <https://github.com/rdazadda/bayesqm/issues>.
 
 ## License
 
-GPL (\>= 3); see <https://www.gnu.org/licenses/gpl-3.0.html> for the
+GPL (\>= 3); see <https://cran.r-project.org/web/licenses/GPL-3> for the
 full text.
 
 bayesqm is developed and maintained at the Center for Alaska Native
