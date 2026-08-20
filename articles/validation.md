@@ -43,7 +43,7 @@ round(rec$tucker, 3)
 #> [1] 0.978 0.953
 round(unlist(rec[c("rmse", "coverage", "ci_width")]), 3)
 #>     rmse coverage ci_width 
-#>    0.128    0.964    0.586
+#>    0.129    0.964    0.588
 ```
 
 Congruence at these levels says the planted viewpoints come back as

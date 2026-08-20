@@ -259,7 +259,7 @@ reference index groups every function by task, and issues belong at
 
 ## License
 
-GPL (\>= 3); see <https://www.gnu.org/licenses/gpl-3.0.html> for the
+GPL (\>= 3); see <https://cran.r-project.org/web/licenses/GPL-3> for the
 full text.
 
 bayesqm is developed and maintained at the Center for Alaska Native
