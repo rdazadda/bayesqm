@@ -5,6 +5,10 @@
 
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/bayesqm)](https://CRAN.R-project.org/package=bayesqm)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/bayesqm)](https://CRAN.R-project.org/package=bayesqm)
 [![R-CMD-check](https://github.com/rdazadda/bayesqm/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rdazadda/bayesqm/actions/workflows/R-CMD-check.yaml)
 [![License: GPL
 v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://cran.r-project.org/web/licenses/GPL-3)
