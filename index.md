@@ -41,10 +41,6 @@ that follow put a figure to what the picture shows.
 remotes::install_github("rdazadda/bayesqm")
 ```
 
-CRAN still carries 0.1.0, an earlier model fitted through Stan. This
-version is a different model with its own sampler. Install from GitHub
-until 0.2.0 reaches CRAN.
-
 ## A first analysis
 
 One real panel ships with the package, the childhood obesity study of
