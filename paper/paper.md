@@ -16,19 +16,24 @@ authors:
     orcid: 0009-0008-6127-9136
     affiliation: 1
   - name: Hannah D. Robinson
-    affiliation: 1
     orcid: 0009-0000-5159-1363
+    affiliation: 1
+  - name: KyungSook Lee
+    orcid: 0000-0003-2351-7355
+    affiliation: 1
   - name: AK-ACE Team
     affiliation: 1
   - name: Karsten Hueffer
-    affiliation: 1
+    affiliation: 2
   - name: Taa'aii Peter
     affiliation: 1
   - name: Stacy Rasmus
     affiliation: 1
 affiliations:
-  - name: University of Alaska Fairbanks, USA
+  - name: Center for Alaska Native Health Research, University of Alaska Fairbanks, USA
     index: 1
+  - name: College of Natural Science and Mathematics, University of Alaska Fairbanks, USA
+    index: 2
 date: 18 August 2026
 bibliography: paper.bib
 ---
